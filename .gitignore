@@ -25,6 +25,6 @@ replay_pid*
 
 
 env/
-pycache/
+__pycache__/
 .env/
 venv/

@@ -1,2 +1,2 @@
-gunicorn
+waitress
 flask==3.0.3
