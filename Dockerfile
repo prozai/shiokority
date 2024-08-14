@@ -2,7 +2,7 @@
 FROM python:3.11.9-slim
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy the dependencies file to the working directory
 COPY requirements.txt .
@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 5000
 
 # Specify the command to run on container start
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "run:app"]
+CMD ["waitress-serve", "--host", "127.0.0.1", "run:app"]
