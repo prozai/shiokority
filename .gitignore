@@ -23,8 +23,8 @@
 hs_err_pid*
 replay_pid*
 
-
-env/
-__pycache__/
-.env/
 venv/
+.env/
+env
+__pycache__
+
