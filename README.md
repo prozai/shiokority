@@ -1,7 +1,7 @@
 # shiokority
 
-1. clone our repo
- --> git clone https://github.com/prozai/shiokority.git
+#clone our repo
+1. git clone https://github.com/prozai/shiokority.git
 
 #run this command before you start develop 
 2. --> python -m venv env
