@@ -17,4 +17,5 @@ Mac User
 5. you can start develop your features!
 
 #if you want to deactivate (windows)--> env\Scripts\deactivate.bat
+
 #if you want to deactivate (mac)--> deactivate
