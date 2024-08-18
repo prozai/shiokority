@@ -35,26 +35,10 @@ def dashboard():
     if 'merchantID' not in session:
         return redirect(url_for('loginPage'))  # Redirect to login if not logged in
     merchant = Merchant.query.get(session['merchantID'])  # Retrieve merchant from the database
-    template = """
-    <!doctype html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Profile</title>
-    </head>
-    <body>
-        <h1>Welcome to your dashboard!<h1>
-        <h2>Profile</h2>
-        <p>Username: {{ merchant.name }}</p>
-        <p>Email: {{ merchant.email }}</p>
-        <form method="POST" action="{{ url_for('merchantController.logout') }}">
-            <button type="submit">Log-Out</button>
-        </form>
-    </body>
-    </html>
-    """
-    return template
+
+    return render_template('dashboard.html', merchant=merchant)
+
+
 @merchantController.route('/logout', methods=['GET, POST'])
 def logout():
     if 'merchantID' in session:
