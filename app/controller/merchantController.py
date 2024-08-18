@@ -1,7 +1,66 @@
 # controllers/merchantController.py
+from flask import Flask, request, render_template, session, redirect, url_for, flash, Blueprint
+from app.models.merchant import Merchant
 from app.models.merchant import db, Merchant
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
+
+merchantController = Blueprint('merchantController', __name__)
+
+@merchantController.route('/login', methods=['GET', 'POST'])
+def loginPage():
+    error = None
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        merchant = authenticateMerchant(email, password)
+        if merchant:
+            session['merchantID'] = merchant.id  # Store the merchant ID in session
+            return redirect(url_for('dashboard'))  # Redirect to dashboard after login
+        else:
+            error = 'Invalid email or password. Please try again.'
+    return render_template("login.html",error=error)
+
+@merchantController.route('/register', methods=['GET', 'POST'])
+def accountCreationPage():
+    result = None
+    if request.method == 'POST':
+        form_data = request.form
+        result = createAccount(form_data)
+
+    return render_template('register.html', result=result)
+
+@merchantController.route('/merchantViews')
+def dashboard():
+    if 'merchantID' not in session:
+        return redirect(url_for('loginPage'))  # Redirect to login if not logged in
+    merchant = Merchant.query.get(session['merchantID'])  # Retrieve merchant from the database
+    template = """
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Profile</title>
+    </head>
+    <body>
+        <h1>Welcome to your dashboard!<h1>
+        <h2>Profile</h2>
+        <p>Username: {{ merchant.name }}</p>
+        <p>Email: {{ merchant.email }}</p>
+        <form method="POST" action="{{ url_for('merchantController.logout') }}">
+            <button type="submit">Log-Out</button>
+        </form>
+    </body>
+    </html>
+    """
+    return template
+@merchantController.route('/logout', methods=['GET, POST'])
+def logout():
+    if 'merchantID' in session:
+        session.pop('merchantID')  # Remove the merchant ID from the session
+        flash('You have been logged out successfully.')
+    return redirect(url_for('merchantController.loginPage'))  # Redirect to login page after logout
 
 def createAccount(form_data):
     email = form_data.get('email')
