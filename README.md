@@ -23,8 +23,10 @@ Mac User
 
 #setup for react
 1. --> need to install node js https://nodejs.org/en/download/package-manager
-2. --> npx create-react-app frontend
-3. --> before you start the server go to package.json insert this line --> "proxy":"http://localhost:5000/"
+2. --> cd .\your_app_directory
+3. --> npx create-react-app frontend
+4. --> before you start the server go to package.json insert this line --> "proxy":"http://localhost:5000/"
 ![image](https://github.com/user-attachments/assets/a7a146e8-7216-4333-b32c-0ef2786405c6)
-4. --> watch this tutorial before you start! https://www.youtube.com/watch?v=7LNl2JlZKHA
-5. --> npm start (you can start to develop your frontend!)
+5. --> watch this tutorial before you start! https://www.youtube.com/watch?v=7LNl2JlZKHA
+6. --> cd .\frontend
+7. --> npm start (you can start to develop your frontend!)
