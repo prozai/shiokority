@@ -4,10 +4,8 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'your-default-secret-key'
     SESSION_COOKIE_NAME = 'your_session_cookie'
     MYSQL_HOST = os.environ.get('MYSQL_HOST') or 'localhost'
-    MYSQL_USER = os.environ.get('MYSQL_USER') or 'your-username'
-    MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or 'your-password'
-    MYSQL_DB = os.environ.get('MYSQL_DB') or 'your-database'
-    MYSQL_PORT = int(os.environ.get('MYSQL_PORT') or 3306)
+    MYSQL_USER = os.environ.get('MYSQL_USER') or 'root'
+    MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or '1234'
     # Add other common configurations here
 
 class DevelopmentConfig(Config):
