@@ -27,4 +27,5 @@ venv/
 .env/
 env
 __pycache__
-instance
+instance/
+frontend/
