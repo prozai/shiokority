@@ -8,7 +8,6 @@ class Administrator():
         self.email = email
         self.password = password
     
-    
     # 227
     def validateLogin(self):
         connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='usermanagement',

@@ -28,4 +28,4 @@ venv/
 env
 __pycache__
 instance/
-frontend/
+config.py
