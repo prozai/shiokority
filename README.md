@@ -18,12 +18,16 @@ Mac User
 5. you can start develop your features!
 
 Deactivating the Virtual Environment
+
 Windows: --> env\Scripts\deactivate.bat
+
 macOS/Linux: --> deactivate
 
 
 Setting Up React
+
 Ensure you have Node.js installed.
+
 Install the required packages:
 
 1. --> npm install 
