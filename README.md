@@ -1,5 +1,6 @@
 # shiokority
 
+
 Window User
 #clone our repo
 1. git clone https://github.com/prozai/shiokority.git
@@ -11,16 +12,19 @@ Window User
 Mac User
 #clone our repo
 1. git clone https://github.com/prozai/shiokority.git
-2. --> python -m venv env
-3. --> source env\bin\activate
+2. --> python3 -m venv env
+3. --> source env/bin/activate
 4. --> pip install -r requirements.txt
 5. you can start develop your features!
 
-#if you want to deactivate (windows)--> env\Scripts\deactivate.bat
+Deactivating the Virtual Environment
+Windows: --> env\Scripts\deactivate.bat
+macOS/Linux: --> deactivate
 
-#if you want to deactivate (mac)--> deactivate
 
+Setting Up React
+Ensure you have Node.js installed.
+Install the required packages:
 
-#setup for react
-1. --> npm install (make sure you have already install node js!)
+1. --> npm install 
 2. --> npm start
