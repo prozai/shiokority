@@ -24,11 +24,24 @@ Windows: --> env\Scripts\deactivate.bat
 macOS/Linux: --> deactivate
 
 
-Setting Up React
+Frontend Setup (React)
 
 Ensure you have Node.js installed.
 
-Install the required packages:
+Navigate to the frontend directory:
+1. --> cd frontend
 
-1. --> npm install 
-2. --> npm start
+Install the required Node.js dependencies:
+
+2. --> npm install
+
+Update the React proxy (if necessary):
+
+If you changed the port in config.py, update the proxy setting in frontend/package.json:
+
+  "proxy": "http://localhost:5001"
+
+Start the React application:
+
+npm start
+
