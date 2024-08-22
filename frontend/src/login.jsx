@@ -1,68 +1,62 @@
 import React, { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 
-function Login() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [status, setStatus] = useState('');
-    const navigate = useNavigate();
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [status, setStatus] = useState('');
+  const navigate = useNavigate();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+  const loginMutation = useMutation({
+    mutationFn: (loginData) =>
+      axios.post('/login/admin', loginData),
+    onSuccess: (data) => {
+      console.log('Login successful:', data);
+      // Handle successful login (e.g., redirect, store token)
+      navigate('/dashboard');
+    },
+    onError: (error) => {
+      console.error('Login failed:', error);
+      // Handle error (e.g., display error message)
+      setStatus('Login failed')
+    },
+  });
 
-        try {
-            const response = await axios.post('/login/admin', {
-                username,
-                password,
-            });
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    loginMutation.mutate({ email, password });
+  };
 
-            if (response.data.success) {
-                console.log('Login successful:', response.data);
-                // Handle successful login, maybe redirect or show a success message
-                navigate('/dashboard');
-            }
-            else {
-                setStatus('Login failed: Incorrect username or password.');
-            }
-        } catch (error) {
-            if (error.response) {
-                console.log('Login failed:', error.response.data);
-                setStatus('Login failed')
-            } else {
-                console.error('Error:', error);
-                setStatus('An error occurred during login. Please try again.');
-            }
-        }
-    };
-
-    return (
+  return (  
+    <div>
+      <h2>Login</h2>
+      {status && <p>{status}</p>} 
+      <form onSubmit={handleSubmit}>
         <div>
-            <h2>Login</h2>
-            {status && <p>{status}</p>} 
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username </label>
-                    <input 
-                        type="text" 
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>Password </label>
-                    <input 
-                        type="password" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-                <button type="submit">Login</button>
-                
-            </form>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </div>
-    );
-}
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  );
+};
 
 export default Login;
