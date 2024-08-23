@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CreateMerchant from './CreateMerchant'
+import ViewMerchant from "./ViewMerchant";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ function Dashboard() {
     <button onClick={handleLogout}>Logout</button>
 
     <CreateMerchant />
+    <ViewMerchant />
 
   </div>
 );

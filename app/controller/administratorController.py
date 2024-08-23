@@ -48,8 +48,17 @@ def createMerchant():
         if createdMerchant:
             return jsonify(success=True), 200
         else:
-            print(1)
             return jsonify(success=False), 400
     
 
-
+@adminBlueprint.route('/admin/view-merchant', methods=['GET'])
+def fetchMerchantList():
+    
+    if request.method == 'GET':
+        
+        merchants = Administrator().getMerchantData()
+        
+        if merchants is not False:
+            return jsonify(merchants), 200
+        else:
+            return jsonify({"error": "Could not fetch merchant data"}), 500

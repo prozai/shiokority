@@ -55,4 +55,27 @@ class Administrator():
             
         finally:
             connect.close()  # Ensure the connection is closed
+    
+    def getMerchantData(self):
+        
+        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
+                                  cursorclass=pymysql.cursors.DictCursor)
+        
+        try:
+            with connect.cursor() as cursor:
+        
+                sqlQuery = "SELECT * FROM merchantmanagement.merchant"
+                cursor.execute(sqlQuery)
+                
+                merchant = cursor.fetchall()
+                
+                cursor.close()
+                
+                return merchant  # Merchant created successfully
+                
+        except pymysql.MySQLError as e:
+            print(f"Error Fetching merchant: {e}")
+            return False  # Return False in case of an error
             
+        finally:
+            connect.close()  # Ensure the connection is closed
