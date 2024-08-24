@@ -62,3 +62,33 @@ def fetchMerchantList():
             return jsonify(merchants), 200
         else:
             return jsonify({"error": "Could not fetch merchant data"}), 500
+        
+@adminBlueprint.route('/admin/merchants/<int:merch_id>', methods=['GET'])
+def getMerchant(merch_id):
+    
+    if request.method == 'GET':
+        
+        merchants = Administrator().getOneMerchant(merch_id)
+        
+        if merchants is not False:
+            return jsonify(merchants), 200
+        else:
+            return jsonify({"error": "Could not fetch merchant data"}), 500
+    
+    pass
+
+@adminBlueprint.route('/admin/merchants/<int:merch_id>', methods=['PUT'])
+def submitMerchantUpdate(merch_id):
+    
+    if request.method == 'PUT':
+        data = request.json
+        
+        updateStatus = Administrator().updateMerchantDetails(merch_id, data)
+        
+        if updateStatus:
+            return jsonify({'message': 'Merchant updated successfully'}), 200
+        else:
+            return jsonify({'message': 'Merchant updated fail'}), 400
+        
+    else:
+        return jsonify({'message': 'Bad Request!'}), 500

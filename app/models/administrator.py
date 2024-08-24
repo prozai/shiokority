@@ -79,3 +79,59 @@ class Administrator():
             
         finally:
             connect.close()  # Ensure the connection is closed
+            
+    def getOneMerchant(self, id):
+        
+        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
+                                  cursorclass=pymysql.cursors.DictCursor)
+        
+        try:
+            with connect.cursor() as cursor:
+        
+                sqlQuery = """SELECT * FROM merchantmanagement.merchant WHERE merch_id = %s"""
+                cursor.execute(sqlQuery, id)
+                
+                merchant = cursor.fetchone()
+                
+                cursor.close()
+                
+                if merchant is None:
+                    return False
+                
+                return merchant  # Merchant created successfully
+                
+        except pymysql.MySQLError as e:
+            print(f"Error Fetching merchant: {e}")
+            return False  # Return False in case of an error
+            
+        finally:
+            connect.close()  # Ensure the connection is closed
+        
+    
+    # 146
+    def updateMerchantDetails(self, merchID,merchData):
+        
+        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
+                                  cursorclass=pymysql.cursors.DictCursor)
+        try:
+            
+            query = """UPDATE merchantmanagement.merchant 
+                    SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW()
+                    WHERE merch_id = %s"""
+            
+            with connect.cursor() as cursor:
+                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_email'], merchData['merch_phone'], merchID))
+                connect.commit()
+            
+            #not found
+            if affected_rows == 0:
+                return False
+            
+            return True
+        
+        except pymysql.MySQLError as e:
+            connect.rollback()
+            return False
+
+        except Exception as e:
+            return False

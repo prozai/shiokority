@@ -1,8 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 
 const ViewMerchants = () => {
-  // Using React Query to fetch merchants
+
 
   const { data, isLoading, isError } 
   = useQuery({ 
@@ -13,6 +14,7 @@ const ViewMerchants = () => {
 
     } });
   
+    
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error: {isError.message}</p>;
@@ -40,6 +42,11 @@ const ViewMerchants = () => {
               <td>{merchant.merch_email}</td>
               <td>{merchant.date_created}</td>
               <td>{merchant.date_updated_on}</td>
+              <td>
+              <Link to={`/edit-merchant/${merchant.merch_id}`}>
+                  <button>Edit</button>
+              </Link>
+              </td>
             </tr>
           ))}
         </tbody>
