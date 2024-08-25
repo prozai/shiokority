@@ -9,10 +9,11 @@ def adminLogin():
     
     if request.method == 'POST':
         data = request.json
-        username = data.get('username')
+        email = data.get('email')
         password = data.get('password')
         
-        admin = Administrator.validateLogin(username, password)
+        print(email, password)
+        admin = Administrator.validateLogin(email, password)
         
         if admin is not False:
             session['id'] = admin['admin_id']
@@ -84,6 +85,22 @@ def submitMerchantUpdate(merch_id):
         data = request.json
         
         updateStatus = Administrator().updateMerchantDetails(merch_id, data)
+        
+        if updateStatus:
+            return jsonify({'message': 'Merchant updated successfully'}), 200
+        else:
+            return jsonify({'message': 'Merchant updated fail'}), 400
+        
+    else:
+        return jsonify({'message': 'Bad Request!'}), 500
+    
+    
+@adminBlueprint.route('/admin/suspend-merchants/<int:merch_id>', methods=['PUT'])
+def updateMerchantStatus(merch_id):
+    
+    if request.method == 'PUT':
+        
+        updateStatus = Administrator().updateMerchantStatus(merch_id)
         
         if updateStatus:
             return jsonify({'message': 'Merchant updated successfully'}), 200

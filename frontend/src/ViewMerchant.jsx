@@ -1,9 +1,11 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import UpdateMerchantStatus from './SuspendMerchant';
+
 
 const ViewMerchants = () => {
-
+  
 
   const { data, isLoading, isError } 
   = useQuery({ 
@@ -31,6 +33,7 @@ const ViewMerchants = () => {
             <th>Email</th>
             <th>Date Created</th>
             <th>Date Updated</th>
+            <th>Account Status</th>
           </tr>
         </thead>
         <tbody>
@@ -42,10 +45,12 @@ const ViewMerchants = () => {
               <td>{merchant.merch_email}</td>
               <td>{merchant.date_created}</td>
               <td>{merchant.date_updated_on}</td>
+              <td>{merchant.merch_status === 1 ? 'Active' : 'Suspend'}</td>
               <td>
               <Link to={`/edit-merchant/${merchant.merch_id}`}>
                   <button>Edit</button>
               </Link>
+              <button onClick={() => UpdateMerchantStatus(merchant.merch_id)}>Suspend</button>
               </td>
             </tr>
           ))}
