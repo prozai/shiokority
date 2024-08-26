@@ -29,3 +29,4 @@ env
 __pycache__
 instance/
 config.py
+testDatabase.py
