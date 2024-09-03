@@ -1,48 +1,136 @@
-# shiokority
+# ShiokorityAPI
+backend Setup (flask)
+<details>
+<summary><strong> Windows Users 🪟</strong></summary>
 
+### Clone Our Repository
+```bash  
+git clone https://github.com/prozai/shiokority.git
+```
+### ⚙️ Setting up local python environment
+#### creating 'env' environment folder  
+```bash 
+python -m venv env
+```
+## 🚩 If the environment doesn't activate, check the execution policy:
+```bash
+Get-ExecutionPolicy
+```
+## ⚠️ Giving terminal Administrative permission 
+Running the following commands with administrative privileges or elevated access can affect your system configuration. Use caution and ensure you understand the implications.
+```bash
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+```
+## Activating the environment
+```bash
+env\Scripts\activate.bat
+```
 
-Window User
-#clone our repo
-1. git clone https://github.com/prozai/shiokority.git
-2. --> python -m venv env
-3. --> env\Scripts\activate.bat
-4. --> pip install -r requirements.txt
-5. you can start develop your features!
+### Installing packages
+```bash
+pip install -r requirements.txt
+```
+### Deactivate environment
+```bash
+env\Scripts\deactivate.bat
+```
 
-Mac User
-#clone our repo
-1. git clone https://github.com/prozai/shiokority.git
-2. --> python3 -m venv env
-3. --> source env/bin/activate
-4. --> pip install -r requirements.txt
-5. you can start develop your features!
+## You can start developing your features!
+</details>
 
-Deactivating the Virtual Environment
+<details> 
+<summary><strong>macOS/Linux Users 🧑‍💻</strong></summary>
 
-Windows: --> env\Scripts\deactivate.bat
+### Clone Our Repository
 
-macOS/Linux: --> deactivate
+```bash  
+git clone https://github.com/prozai/shiokority.git
+```
+### ⚙️ Setting up local python environment
+## creating 'env' environment folder  
+```bash 
+python3 -m venv env
+```
 
+## Activating the environment
+```bash
+source env/bin/activate
+```
 
+### Installing packages
+```bash
+pip install -r requirements.txt
+```
+
+### Deactivate environment
+```bash
+deactivate
+```
+## You can start developing your features!
+
+</details>
+<br>
+
+# ShiokorityMerch
 Frontend Setup (React)
+# ⚠️ Prerequisites
+1. Node.js installed
 
-Ensure you have Node.js installed.
+<details>
+<summary><strong> Windows Users 🪟</strong></summary>
 
-Navigate to the frontend directory:
-1. --> cd frontend
+#### Navigate to the Frontend Directory
 
-Install the required Node.js dependencies:
+1. Change to the frontend directory:
+- **Windows Command Prompt**:
+     ```bash
+     cd frontend
+     ```
 
-2. --> npm install
+#### Install the Required Node.js Dependencies
+2. Install the necessary Node.js dependencies:
+   - **Windows Command Prompt**:
+     ```bash
+     npm install
+     ```
 
-Update the React proxy (if necessary):
+#### Update the React Proxy (If Necessary)
+3. Update the React proxy setting if you changed the port in `config.py`. Modify the `proxy` field in `frontend/package.json` to:
+   ```json
+   "proxy": "http://localhost:5001"
 
-If you changed the port in config.py, update the proxy setting in frontend/package.json:
-
-  "proxy": "http://localhost:5001"
-
-Start the React application:
-
+#### Starting the React application
+4. **Windows Command Prompt**:
+```bash
 npm start
+```
+</details>
 
+<details> 
+<summary><strong>macOS/Linux Users 🧑‍💻</strong></summary>
 
+1. Change to the frontend directory:
+- **macOS/Linux Bash**:
+     ```bash
+     cd frontend
+     ```
+
+#### Install the Required Node.js Dependencies
+2. Install the necessary Node.js dependencies:
+   - **macOS/Linux Bash**:
+     ```bash
+     npm install
+     ```
+
+#### Update the React Proxy (If Necessary)
+3. Update the React proxy setting if you changed the port in `config.py`. Modify the `proxy` field in `frontend/package.json` to:
+   ```json
+   "proxy": "http://localhost:5001"
+
+#### Starting the React application
+4. **macOS/Linux Bash**:
+```bash
+npm start
+```
+
+</details>
