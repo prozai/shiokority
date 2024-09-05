@@ -42,8 +42,8 @@ class Administrator():
                 
                 # Insert the new merchant
                 sqlQuery = """
-                    INSERT INTO merchant (merch_name,  merch_email, merch_phone, date_created, date_updated_on)
-                    VALUES (%s, %s, %s, NOW(), NOW())
+                    INSERT INTO merchant (merch_name,  merch_username, merch_phone, pass_hash, date_created, date_updated_on)
+                    VALUES (%s, %s, %s, 1, NOW(), NOW())
                     """ 
                 cursor.execute(sqlQuery, values)
                 connect.commit()  
