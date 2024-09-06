@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useQuery } from "@tanstack/react-query"
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CreateMerchant from './CreateMerchant'
 import ViewMerchant from "./ViewMerchant";
+
 
 function Dashboard() {
   const navigate = useNavigate();

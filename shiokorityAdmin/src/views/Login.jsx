@@ -1,34 +1,15 @@
-import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
+import React from 'react';
+import { useLoginController } from '../controller/administratorController';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [status, setStatus] = useState('');
-  const navigate = useNavigate();
-
-  const loginMutation = useMutation({
-    mutationFn: (loginData) =>
-      axios.post('/login/admin', loginData),
-    onSuccess: (data) => {
-      console.log('Login successful:', data);
-      // Handle successful login (e.g., redirect, store token)
-      navigate('/dashboard');
-    },
-    onError: (error) => {
-      console.error('Login failed:', error);
-      // Handle error (e.g., display error message)
-      setStatus('Login failed')
-    },
-  });
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    loginMutation.mutate({ email, password });
-  };
+  const {
+    email,
+    password,
+    status,
+    handleEmailChange,
+    handlePasswordChange,
+    handleSubmit
+  } = useLoginController();
 
   return (  
     <div>
@@ -40,7 +21,7 @@ const Login = () => {
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
             required
           />
         </div>
@@ -49,7 +30,7 @@ const Login = () => {
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
             required
           />
         </div>
