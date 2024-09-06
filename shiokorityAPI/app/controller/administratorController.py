@@ -83,12 +83,12 @@ def submitMerchantUpdate(merch_id):
     
     if request.method == 'PUT':
         data = request.json
-        
         updateStatus = Administrator().updateMerchantDetails(merch_id, data)
         
         if updateStatus:
             return jsonify({'message': 'Merchant updated successfully'}), 200
         else:
+            
             return jsonify({'message': 'Merchant updated fail'}), 400
         
     else:

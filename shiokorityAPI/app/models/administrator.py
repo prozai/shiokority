@@ -42,8 +42,8 @@ class Administrator():
                 
                 # Insert the new merchant
                 sqlQuery = """
-                    INSERT INTO merchant (merch_name,  merch_email, merch_phone, date_created, date_updated_on)
-                    VALUES (%s, %s, %s, NOW(), NOW())
+                    INSERT INTO merchant (merch_name,  merch_username, merch_phone, pass_hash, date_created, date_updated_on)
+                    VALUES (%s, %s, %s, 1, NOW(), NOW())
                     """ 
                 cursor.execute(sqlQuery, values)
                 connect.commit()  
@@ -116,11 +116,11 @@ class Administrator():
         try:
             
             query = """UPDATE merchantmanagement.merchant 
-                    SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW()
+                    SET merch_name = %s, merch_username = %s, merch_phone = %s, date_updated_on = NOW()
                     WHERE merch_id = %s"""
             
             with connect.cursor() as cursor:
-                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_email'], merchData['merch_phone'], merchID))
+                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_username'], merchData['merch_phone'], merchID))
                 connect.commit()
             
             #not found
@@ -135,7 +135,8 @@ class Administrator():
 
         except Exception as e:
             return False
-        
+    
+    
     def updateMerchantStatus(self, merch_id):
         connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
                                   cursorclass=pymysql.cursors.DictCursor)

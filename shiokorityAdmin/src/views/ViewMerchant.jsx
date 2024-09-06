@@ -47,10 +47,10 @@ const ViewMerchants = () => {
               <td>{merchant.date_updated_on}</td>
               <td>{merchant.merch_status === 1 ? 'Active' : 'Suspend'}</td>
               <td>
-              <Link to={`/edit-merchant/${merchant.merch_id}`}>
+                <Link to={`/edit-merchant/${merchant.merch_id}`}>
                   <button>Edit</button>
-              </Link>
-              <button onClick={() => UpdateMerchantStatus(merchant.merch_id)}>Suspend</button>
+                </Link>
+                <button onClick={() => UpdateMerchantStatus(merchant.merch_id)}>Suspend</button>
               </td>
             </tr>
           ))}

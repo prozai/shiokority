@@ -54,8 +54,8 @@ const MerchantEdit = () => {
                     <label>Email:</label>
                     <input 
                         type="email" 
-                        name="merch_email" 
-                        value={merchant.merch_email} 
+                        name="merch_username" 
+                        value={merchant.merch_username} 
                         onChange={handleChange} 
                     />
                 </div>
