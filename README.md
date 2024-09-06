@@ -23,7 +23,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 ```
 ## Activating the environment
 ```bash
-env\Scripts\activate.bat
+env\Scripts\activate
 ```
 
 ### Installing packages
