@@ -11,9 +11,20 @@ class Administrator {
     }
   }
 
+  static async logout() {
+    try {
+      await axios.post('/logout/admin'); // Assuming your API has a logout endpoint
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      localStorage.removeItem('token');
+    }
+  }
+
   static isLoggedIn() {
     return !!localStorage.getItem('token');
   }
+
   
 }
 

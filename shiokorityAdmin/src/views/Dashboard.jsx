@@ -3,26 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CreateMerchant from './CreateMerchant'
 import ViewMerchant from "./ViewMerchant";
+import { useDashboardController } from '../controller/administratorController';
+
 
 
 function Dashboard() {
   const navigate = useNavigate();
-  
-  const handleLogout = async () => {
-    try {
-        // Notify the backend about the logout
-        const response = await axios.post('/logout/admin');
-
-        if (response.status === 200) {
-          // Redirect to login page
-          navigate('/login');
-        }
-        
-    } catch (error) {
-        console.error('Error logging out:', error);
-        // Optionally handle errors here
-    }
-  };
+  const { handleLogout } = useDashboardController();
 
   return (
   <div>

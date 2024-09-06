@@ -32,3 +32,16 @@ export const useLoginController = () => {
     handleSubmit
   };
 };
+
+export const useDashboardController = () => {
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await Administrator.logout();
+        navigate('/login');
+    };
+
+    return {
+        handleLogout
+    };
+};
