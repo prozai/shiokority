@@ -34,8 +34,20 @@ pip install -r requirements.txt
 ```bash
 env\Scripts\deactivate.bat
 ```
+### Updating Flask libraries
+```bash
+pip freeze > requirements.txt
+```
 
 ## You can start developing your features!
+### To start and run shiokorityAPI
+```bash
+python shiokorityAPI.py
+```
+#### ⚠️ remember to change directory
+```bash
+cd shiokorityAPI
+```
 </details>
 
 <details> 
