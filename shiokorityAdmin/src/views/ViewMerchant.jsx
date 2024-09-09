@@ -2,22 +2,16 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import UpdateMerchantStatus from './SuspendMerchant';
+import AdministratorController from '../controller/administratorController';
 
 
 const ViewMerchants = () => {
   
-
-  const { data, isLoading, isError } 
-  = useQuery({ 
-    queryKey: ['merchant'], 
-    queryFn: async () => {
-        const response = await fetch('/admin/view-merchant')
-        return (await response.json())
-
-    } });
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['merchant'],
+    queryFn: AdministratorController.getMerchantData,
+  });
   
-    
-
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error: {isError.message}</p>;
 

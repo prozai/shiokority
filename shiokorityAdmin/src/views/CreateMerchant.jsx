@@ -1,87 +1,92 @@
 import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import AdministratorController from '../controller/administratorController';
 
-function CreateMerchant() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-
-  const createMerchantMutation = useMutation({
-    mutationFn: async (merchantData) => {
-      const response = await fetch('/create-merchant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(merchantData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Merchant creation failed!');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      setSuccess(true);
-      setError(null);
-      setName(''); // Clear the form fields on success
-      setEmail('');
-      setPhone('');
-    },
-    onError: (error) => {
-      setSuccess(false);
-      setError(error.message || 'An error occurred while creating the merchant.');
-    },
+const MerchantForm = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '' 
   });
+  const [status, setStatus] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const merchantData = {
-      name,
-      email,
-      phone,
-    };
-
-    createMerchantMutation.mutate(merchantData);
+    setStatus('Submitting...');
+    try {
+      await AdministratorController.createMerchant(formData);
+      setStatus('Merchant created successfully!');
+      setFormData({ name: '', email: '', phone: '', address: '' }); 
+    } catch (error) {
+      setStatus(`Error: ${error.message}`);
+    }
   };
 
   return (
-    <div>
-      <h3>Create Merchant</h3>
-      <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+
+      <br />
+      <div>
         <input
           type="text"
-          placeholder="Merchant Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          id="name"
+          name="name"
+          placeholder='Merchant Name'
+          value={formData.name}
+          onChange={handleChange}
+          required
         />
-        <br />
+      </div>
+      <div>
         <input
           type="email"
-          placeholder="Merchant Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          id="email"
+          name="email"
+          placeholder='Merchant Email'
+          value={formData.email}
+          onChange={handleChange}
+          required
         />
-        <br />
+      </div>
+      <div>
         <input
-          type="text"
-          placeholder="Merchant Phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder='Merchant Phone Number'
+          value={formData.phone}
+          onChange={handleChange}
+          required
         />
-        <br />
-        <button type="submit">Create Merchant</button>
-
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {success && <p style={{ color: 'green' }}>Merchant created successfully!</p>}
-      </form>
-    </div>
+      </div>
+      
+      <div>
+        <input 
+        type="text"
+        id="address"
+        name="address"
+        placeholder='merchant address'
+        value={formData.address}
+        onChange={handleChange}
+        required 
+        
+        />
+      </div>
+      
+      <button type="submit">Create Merchant</button>
+      {status && <p>{status}</p>}
+    </form>
   );
-}
+};
 
-export default CreateMerchant;
+export default MerchantForm;
+
+

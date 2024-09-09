@@ -1,31 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
 
 const Login = () => {
-  const [controller] = useState(() => new AdministratorController());
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [status, setStatus] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setStatus(controller.status);
-  }, [controller.status]);
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-    controller.setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-    controller.setPassword(e.target.value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await controller.handleLogin(e, navigate);
+    setStatus('Logging in...');
+    try {
+      await AdministratorController.login(formData);
+      setStatus('Login successful');
+      navigate('/dashboard');
+    } catch (error) {
+      setStatus('Login failed: ' + error.message);
+    }
   };
 
   return (  
@@ -34,20 +36,24 @@ const Login = () => {
       {status && <p>{status}</p>} 
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Email:</label>
+          <label htmlFor="email">Email:</label>
           <input
             type="email"
-            value={email}
-            onChange={handleEmailChange}
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
             required
           />
         </div>
         <div>
-          <label>Password:</label>
+          <label htmlFor="password">Password:</label>
           <input
             type="password"
-            value={password}
-            onChange={handlePasswordChange}
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             required
           />
         </div>

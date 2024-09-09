@@ -1,52 +1,33 @@
 import Administrator from '../model/administrator';
+import Merchant from '../model/merchant';  
 
 class AdministratorController {
-  constructor() {
-    this.email = '';
-    this.password = '';
-    this.status = '';
+  static async login(data) {
+    return Administrator.login(data);
   }
 
-  setEmail(email) {
-    this.email = email;
-  }
-
-  setPassword(password) {
-    this.password = password;
-  }
-
-  setStatus(status) {
-    this.status = status;
-  }
-
-  async handleLogin(event, navigate) {
-    event.preventDefault();
-    this.setStatus('Logging in...');
-    try {
-      
-      await Administrator.login(this.email, this.password);
-      
-      this.setStatus('Login successful');
-      navigate('/dashboard');
-    } catch (error) {
-      this.setStatus('Login failed: ' + error.message);
-    }
-  }
-
-  async handleLogout(navigate) {
-    try {
-      await Administrator.logout();
-      this.setStatus('Logged out successfully');
-      navigate('/login');
-    } catch (error) {
-      this.setStatus('Logout failed: ' + error.message);
-    }
+  static async logout() {
+    return Administrator.logout();
   }
 
   static isLoggedIn() {
     return Administrator.isLoggedIn();
   }
-  
+
+  static async createMerchant(data) {
+    try {
+      const result = await Merchant.createMerchant(data);
+      return result;
+    } catch (error) {
+      console.error('Error in createMerchant:', error);
+      throw error;
+    }
+  }
+
+  static async getMerchantData() {
+    return await Merchant.getMerchantData();
+  }
+
 }
 
 export default AdministratorController;
