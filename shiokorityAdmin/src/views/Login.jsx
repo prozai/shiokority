@@ -1,15 +1,32 @@
-import React from 'react';
-import { useLoginController } from '../controller/administratorController';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AdministratorController from '../controller/administratorController';
 
 const Login = () => {
-  const {
-    email,
-    password,
-    status,
-    handleEmailChange,
-    handlePasswordChange,
-    handleSubmit
-  } = useLoginController();
+  const [controller] = useState(() => new AdministratorController());
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [status, setStatus] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setStatus(controller.status);
+  }, [controller.status]);
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    controller.setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    controller.setPassword(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await controller.handleLogin(e, navigate);
+  };
 
   return (  
     <div>
