@@ -1,28 +1,42 @@
 from flask import Blueprint, render_template, request, session, jsonify
 from ..models.administrator import Administrator
-
+from werkzeug.exceptions import BadRequest
 
 adminBlueprint = Blueprint('adminBlueprint', __name__)
 
-@adminBlueprint.route("/login/admin",methods=['GET', 'POST'])
+@adminBlueprint.route("/login/admin", methods=['POST'])
 def adminLogin():
+    try:
+        if request.method == 'POST':
+
+            data = request.json
+
+            if not data:
+                raise BadRequest("No input data provided")
+            
+            email = data.get('email')
+            password = data.get('password')
+
+            if not email or not password:
+                raise BadRequest("Email and password are required")
+
+            admin = Administrator.validateLogin(email, password)
+            
+            if admin is not False:
+
+                session['loggedIn'] = True
+                return jsonify(success=True, message="Login successful"), 200
+            
+            else:
+                return jsonify(success=False, message="Invalid credentials"), 401
+
+    except BadRequest as e:
+        return jsonify(success=False, message=str(e)), 400
     
-    if request.method == 'POST':
-        data = request.json
-        email = data.get('email')
-        password = data.get('password')
-        
-        print(email, password)
-        admin = Administrator.validateLogin(email, password)
-        
-        if admin is not False:
-            session['id'] = admin['admin_id']
-            session['user_email'] = admin['admin_username']
-            session['loggedIn'] = True
-            print("success")
-            return jsonify(success=True), 200
-        else:
-            return jsonify(success=False), 400
+    except Exception as e:
+        # Log the error here
+        print(f"An error occurred: {str(e)}")
+        return jsonify(success=False, message="An unexpected error occurred"), 500
 
 @adminBlueprint.route("/logout/admin",methods=['POST'])
 def logout():

@@ -1,47 +1,52 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Administrator from '../model/administrator';
 
-export const useLoginController = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [status, setStatus] = useState('');
-  const navigate = useNavigate();
+class AdministratorController {
+  constructor() {
+    this.email = '';
+    this.password = '';
+    this.status = '';
+  }
 
-  const handleEmailChange = (e) => setEmail(e.target.value);
-  const handlePasswordChange = (e) => setPassword(e.target.value);
+  setEmail(email) {
+    this.email = email;
+  }
 
-  const handleSubmit = async (event) => {
+  setPassword(password) {
+    this.password = password;
+  }
+
+  setStatus(status) {
+    this.status = status;
+  }
+
+  async handleLogin(event, navigate) {
     event.preventDefault();
-    setStatus('Logging in...');
+    this.setStatus('Logging in...');
     try {
-      await Administrator.login(email, password);
-      setStatus('Login successful');
+      
+      await Administrator.login(this.email, this.password);
+      
+      this.setStatus('Login successful');
       navigate('/dashboard');
     } catch (error) {
-      setStatus('Login failed: ' + error.message);
+      this.setStatus('Login failed: ' + error.message);
     }
-  };
+  }
 
-  return {
-    email,
-    password,
-    status,
-    handleEmailChange,
-    handlePasswordChange,
-    handleSubmit
-  };
-};
+  async handleLogout(navigate) {
+    try {
+      await Administrator.logout();
+      this.setStatus('Logged out successfully');
+      navigate('/login');
+    } catch (error) {
+      this.setStatus('Logout failed: ' + error.message);
+    }
+  }
 
-export const useDashboardController = () => {
-    const navigate = useNavigate();
+  static isLoggedIn() {
+    return Administrator.isLoggedIn();
+  }
+  
+}
 
-    const handleLogout = async () => {
-        await Administrator.logout();
-        navigate('/login');
-    };
-
-    return {
-        handleLogout
-    };
-};
+export default AdministratorController;

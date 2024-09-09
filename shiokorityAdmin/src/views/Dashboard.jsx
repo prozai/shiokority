@@ -1,28 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import CreateMerchant from './CreateMerchant'
-import ViewMerchant from "./ViewMerchant";
-import { useDashboardController } from '../controller/administratorController';
-
-
+import AdministratorController from '../controller/administratorController';
+import CreateMerchant from './CreateMerchant';
+import ViewMerchant from './ViewMerchant';
 
 function Dashboard() {
+  const [controller] = useState(() => new AdministratorController());
+  const [status, setStatus] = useState('');
   const navigate = useNavigate();
-  const { handleLogout } = useDashboardController();
+
+  useEffect(() => {
+    setStatus(controller.status);
+  }, [controller.status]);
+
+  const handleLogout = async () => {
+    await controller.handleLogout(navigate);
+  };
 
   return (
-  <div>
-    <h2>Dashboard</h2>
-    <p>Welcome to the admin dashboard!</p>
-    
-    <button onClick={handleLogout}>Logout</button>
+    <div>
+      <h2>Dashboard</h2>
+      <p>Welcome to the admin dashboard!</p>
+      
+      {status && <p>{status}</p>}
+      
+      <button onClick={handleLogout}>Logout</button>
 
-    <CreateMerchant />
-    <ViewMerchant />
-
-  </div>
-);
+      <CreateMerchant />
+      <ViewMerchant />
+    </div>
+  );
 }
 
-export default Dashboard
+export default Dashboard;
