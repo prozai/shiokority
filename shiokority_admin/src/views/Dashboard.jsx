@@ -5,16 +5,17 @@ import CreateMerchant from './CreateMerchant';
 import ViewMerchant from './ViewMerchant';
 
 function Dashboard() {
-  const [controller] = useState(() => new AdministratorController());
   const [status, setStatus] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setStatus(controller.status);
-  }, [controller.status]);
-
   const handleLogout = async () => {
-    await controller.handleLogout(navigate);
+    try {
+      await AdministratorController.logout();
+      setStatus('Logged out successfully');
+      navigate('/login');
+    } catch (error) {
+      setStatus('Logout failed: ' + error.message);
+    }
   };
 
   return (

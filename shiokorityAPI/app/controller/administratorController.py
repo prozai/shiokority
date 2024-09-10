@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, session, jsonify
 from ..models.administrator import Administrator
+from ..models.merchant import Merchant 
 from werkzeug.exceptions import BadRequest
 
 adminBlueprint = Blueprint('adminBlueprint', __name__)
@@ -7,28 +8,25 @@ adminBlueprint = Blueprint('adminBlueprint', __name__)
 @adminBlueprint.route("/login/admin", methods=['POST'])
 def adminLogin():
     try:
-        if request.method == 'POST':
+        data = request.get_json()
 
-            data = request.json
+        if not data:
+            raise BadRequest("No input data provided")
+        
+        email = data.get('email', '')
+        password = data.get('password', '')
 
-            if not data:
-                raise BadRequest("No input data provided")
-            
-            email = data.get('email')
-            password = data.get('password')
+        if not email or not password:
+            raise BadRequest("Email and password are required")
 
-            if not email or not password:
-                raise BadRequest("Email and password are required")
-
-            admin = Administrator.validateLogin(email, password)
-            
-            if admin is not False:
-
-                session['loggedIn'] = True
-                return jsonify(success=True, message="Login successful"), 200
-            
-            else:
-                return jsonify(success=False, message="Invalid credentials"), 401
+        admin = Administrator.validateLogin(email, password)
+        
+        if admin:
+            session['loggedIn'] = True
+            return jsonify(success=True), 200
+        
+        else:
+            return jsonify(success=False), 401
 
     except BadRequest as e:
         return jsonify(success=False, message=str(e)), 400
@@ -43,9 +41,8 @@ def logout():
     session.clear()
     return jsonify({'message': 'Logout successful'}), 200
 
-@adminBlueprint.route("/create-merchant",methods=['POST'])
+@adminBlueprint.route("/create-merchant", methods=['POST'])
 def createMerchant():
-    
     if request.method == 'POST':
         data = request.get_json()  # Get the JSON data from the request
 
@@ -53,13 +50,10 @@ def createMerchant():
         name = data.get('name')
         email = data.get('email')
         phone = data.get('phone')
+        address = data.get('address')
 
-        # Validate the input
-        if not name or not email or not phone:
-            return jsonify({"error": "Name, address, and phone are required"}), 400
-        
-        createdMerchant = Administrator.createMerchant(name, email, phone)
-        
+        createdMerchant = Merchant.createMerchant(name, email, phone, address)
+
         if createdMerchant:
             return jsonify(success=True), 200
         else:
@@ -68,58 +62,61 @@ def createMerchant():
 
 @adminBlueprint.route('/admin/view-merchant', methods=['GET'])
 def fetchMerchantList():
-    
-    if request.method == 'GET':
-        
-        merchants = Administrator().getMerchantData()
-        
-        if merchants is not False:
-            return jsonify(merchants), 200
-        else:
-            return jsonify({"error": "Could not fetch merchant data"}), 500
+    try:
+        if request.method == 'GET':
+            merchants = Merchant().getMerchantData()
+            if merchants:
+                return jsonify(merchants), 200
+            else:
+                return jsonify(success=False), 500
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
         
 @adminBlueprint.route('/admin/merchants/<int:merch_id>', methods=['GET'])
 def getMerchant(merch_id):
     
     if request.method == 'GET':
         
-        merchants = Administrator().getOneMerchant(merch_id)
+        merchants = Merchant().getOneMerchant(merch_id)
         
         if merchants is not False:
             return jsonify(merchants), 200
         else:
             return jsonify({"error": "Could not fetch merchant data"}), 500
-    
-    pass
+
 
 @adminBlueprint.route('/admin/merchants/<int:merch_id>', methods=['PUT'])
 def submitMerchantUpdate(merch_id):
     
     if request.method == 'PUT':
         data = request.json
-        updateStatus = Administrator().updateMerchantDetails(merch_id, data)
+        updateStatus = Merchant().updateMerchantDetails(merch_id, data)
         
         if updateStatus:
-            return jsonify({'message': 'Merchant updated successfully'}), 200
+            return jsonify(success=True), 200
         else:
             
-            return jsonify({'message': 'Merchant updated fail'}), 400
+            return jsonify(success=False), 400
         
     else:
-        return jsonify({'message': 'Bad Request!'}), 500
+        return jsonify(success=False), 500
     
     
 @adminBlueprint.route('/admin/suspend-merchants/<int:merch_id>', methods=['PUT'])
 def updateMerchantStatus(merch_id):
     
     if request.method == 'PUT':
-        
-        updateStatus = Administrator().updateMerchantStatus(merch_id)
+
+        data = request.json
+        status = data.get('status')
+
+        updateStatus = Merchant().updateMerchantStatus(merch_id, status)
         
         if updateStatus:
-            return jsonify({'message': 'Merchant updated successfully'}), 200
+            return jsonify(success=True), 200
         else:
-            return jsonify({'message': 'Merchant updated fail'}), 400
+            return jsonify(success=False), 400
         
     else:
-        return jsonify({'message': 'Bad Request!'}), 500
+        return jsonify(success=False), 500

@@ -2,15 +2,13 @@ import axios from 'axios';
 
 class Administrator {
   
-  static async login(email, password) {
+  static async login(data) {
     try {
-
-      const response = await axios.post('/login/admin', { email, password });      
+      const response = await axios.post('/login/admin', data);      
       localStorage.setItem('token', response.data.token);
-      console.log(response.data);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Login failed');
+      throw new Error('Wrong email or password');
     }
   }
 
