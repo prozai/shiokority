@@ -56,23 +56,4 @@ class Administrator():
             raise
     
     
-    def updateMerchantStatus(self, merch_id):
-        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
-                                  cursorclass=pymysql.cursors.DictCursor)
-        
-        try:
-            with connect.cursor() as cursor:
-                # SQL query to delete the merchant by ID
-                sql = "UPDATE merchant SET merch_status = false, date_updated_on = NOW() WHERE merch_id = %s"
-                validate = cursor.execute(sql, (merch_id,))
-                
-                if validate == 0:
-                    return False
-            
-            connect.commit()
-
-            return True
-        
-        except Exception as e:
-            connect.rollback()
-            return False
+    

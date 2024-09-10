@@ -1,16 +1,28 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import UpdateMerchantStatus from './SuspendMerchant';
 import AdministratorController from '../controller/administratorController';
 
 
 const ViewMerchants = () => {
+
+  const queryClient = useQueryClient();
   
   const { data, isLoading, isError } = useQuery({
     queryKey: ['merchant'],
     queryFn: AdministratorController.getMerchantData,
   });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ merchantId, status }) => AdministratorController.updateMerchantStatus(merchantId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries('merchant');
+    },
+  });
+
+  const handleStatusChange = (merchantId, newStatus) => {
+    updateStatusMutation.mutate({ merchantId, status: newStatus });
+  };
   
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error: {isError.message}</p>;
@@ -44,7 +56,13 @@ const ViewMerchants = () => {
                 <Link to={`/edit-merchant/${merchant.merch_id}`}>
                   <button>Edit</button>
                 </Link>
-                <button onClick={() => UpdateMerchantStatus(merchant.merch_id)}>Suspend</button>
+                <select
+                  value={merchant.merch_status}
+                  onChange={(e) => handleStatusChange(merchant.merch_id, e.target.value)}
+                >
+                  <option value="1">Active</option>
+                  <option value="0">Suspended</option>
+                </select>
               </td>
             </tr>
           ))}

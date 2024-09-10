@@ -65,6 +65,16 @@ class Merchant {
     }
   }
 
+  static async updateMerchantStatus(merch_id, status) {
+    try {
+      const response = await axios.put(`/admin/suspend-merchants/${merch_id}`, { status });
+      return response.data;
+    } catch (error) {
+      console.error('Error suspending merchant:', error);
+      throw error;
+    }
+  }
+
 }
 
 export default Merchant;

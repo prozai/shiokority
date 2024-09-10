@@ -8,7 +8,8 @@ const MerchantEdit = () => {
     const [merchant, setMerchant] = useState({
         merch_name: '',
         merch_username: '',
-        merch_phone: ''
+        merch_phone: '',
+        merch_address: ''
     });
     const [statusMessage, setStatusMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -86,6 +87,16 @@ const MerchantEdit = () => {
                         onChange={handleChange} 
                     />
                 </div>
+                <div>
+                    <label>Address:</label>
+                    <input 
+                    type="text"
+                    name="merch_address"
+                    value={merchant.merch_address}
+                    onChange={handleChange}
+                    />
+                </div>            
+
                 <br />
                 <button type="submit" disabled={isLoading}>
                     {isLoading ? 'Updating...' : 'Update'}

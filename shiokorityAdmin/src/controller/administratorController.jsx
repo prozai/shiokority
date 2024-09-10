@@ -40,10 +40,18 @@ class AdministratorController {
     try {
       return await Merchant.updateMerchant(merchId, merchantData);
     } catch (error) {
-      console.error("Error in controller while updating merchant", error);
       throw error;
     }
   }
+
+  static async updateMerchantStatus(merch_id, status) {
+    try {
+      return await Merchant.updateMerchantStatus(merch_id, status);
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
 }
 
