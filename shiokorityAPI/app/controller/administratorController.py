@@ -68,7 +68,7 @@ def fetchMerchantList():
             if merchants:
                 return jsonify(merchants), 200
             else:
-                return jsonify({"error": "Could not fetch merchant data"}), 500
+                return jsonify(success=False), 500
             
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -78,7 +78,7 @@ def getMerchant(merch_id):
     
     if request.method == 'GET':
         
-        merchants = Administrator().getOneMerchant(merch_id)
+        merchants = Merchant().getOneMerchant(merch_id)
         
         if merchants is not False:
             return jsonify(merchants), 200
@@ -91,16 +91,16 @@ def submitMerchantUpdate(merch_id):
     
     if request.method == 'PUT':
         data = request.json
-        updateStatus = Administrator().updateMerchantDetails(merch_id, data)
+        updateStatus = Merchant().updateMerchantDetails(merch_id, data)
         
         if updateStatus:
-            return jsonify({'message': 'Merchant updated successfully'}), 200
+            return jsonify(success=True), 200
         else:
             
-            return jsonify({'message': 'Merchant updated fail'}), 400
+            return jsonify(success=False), 400
         
     else:
-        return jsonify({'message': 'Bad Request!'}), 500
+        return jsonify(success=False), 500
     
     
 @adminBlueprint.route('/admin/suspend-merchants/<int:merch_id>', methods=['PUT'])
@@ -111,9 +111,9 @@ def updateMerchantStatus(merch_id):
         updateStatus = Administrator().updateMerchantStatus(merch_id)
         
         if updateStatus:
-            return jsonify({'message': 'Merchant updated successfully'}), 200
+            return jsonify(success=True), 200
         else:
-            return jsonify({'message': 'Merchant updated fail'}), 400
+            return jsonify(succes=False), 400
         
     else:
-        return jsonify({'message': 'Bad Request!'}), 500
+        return jsonify(success=False), 500

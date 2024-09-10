@@ -28,6 +28,23 @@ class AdministratorController {
     return await Merchant.getMerchantData();
   }
 
+  static async fetchMerchantById(merchId) {
+    try {
+      return await Merchant.fetchMerchantById(merchId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateMerchant(merchId, merchantData) {
+    try {
+      return await Merchant.updateMerchant(merchId, merchantData);
+    } catch (error) {
+      console.error("Error in controller while updating merchant", error);
+      throw error;
+    }
+  }
+
 }
 
 export default AdministratorController;

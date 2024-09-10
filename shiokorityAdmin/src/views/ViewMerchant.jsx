@@ -36,7 +36,7 @@ const ViewMerchants = () => {
               <td>{merchant.merch_id}</td>
               <td>{merchant.merch_name}</td>
               <td>{merchant.merch_phone}</td>
-              <td>{merchant.merch_email}</td>
+              <td>{merchant.merch_username}</td>
               <td>{merchant.date_created}</td>
               <td>{merchant.date_updated_on}</td>
               <td>{merchant.merch_status === 1 ? 'Active' : 'Suspend'}</td>

@@ -1,24 +1,33 @@
+// src/views/MerchantEdit.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import AdministratorController from '../controller/administratorController';
 
 const MerchantEdit = () => {
     const { merchId } = useParams();
     const [merchant, setMerchant] = useState({
         merch_name: '',
-        merch_email: '',
+        merch_username: '',
         merch_phone: ''
     });
+    const [statusMessage, setStatusMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch merchant data
-        axios.get(`/admin/merchants/${merchId}`)
-            .then(response => {
-                setMerchant(response.data);
-            })
-            .catch(error => {
-                console.error("There was an error fetching the merchant data!", error);
-            });
+        const fetchMerchant = async () => {
+            setIsLoading(true);
+            try {
+                const merchantData = await AdministratorController.fetchMerchantById(merchId);
+                setMerchant(merchantData);
+                setStatusMessage('');
+            } catch (error) {
+                console.error("Error fetching merchant in view", error);
+                setStatusMessage('Error fetching merchant data');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchMerchant();
     }, [merchId]);
 
     const handleChange = (e) => {
@@ -26,16 +35,25 @@ const MerchantEdit = () => {
         setMerchant({ ...merchant, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        axios.put(`/admin/merchants/${merchId}`, merchant)
-            .then(response => {
-                alert('Merchant updated successfully');
-            })
-            .catch(error => {
-                console.error("There was an error updating the merchant!", error);
-            });
+        setIsLoading(true);
+        try {
+            const isSuccess = await AdministratorController.updateMerchant(merchId, merchant);
+            
+            if (isSuccess.success) {
+                setStatusMessage('Merchant updated successfully');
+            } else {
+                setStatusMessage('Failed to update merchant');
+            }
+        } catch (error) {
+            console.error("Error updating merchant in view", error);
+            setStatusMessage('An error occurred while updating merchant');
+        } finally {
+            setIsLoading(false);
+        }
     };
+
 
     return (
         <div>
@@ -44,7 +62,7 @@ const MerchantEdit = () => {
                 <div>
                     <label>Name:</label>
                     <input 
-                        type="text" 
+                        type="text"         
                         name="merch_name" 
                         value={merchant.merch_name} 
                         onChange={handleChange} 
@@ -68,8 +86,14 @@ const MerchantEdit = () => {
                         onChange={handleChange} 
                     />
                 </div>
-                <button type="submit">Update</button>
+                <br />
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Updating...' : 'Update'}
+                </button>
+                
             </form>
+            <br />
+            {statusMessage && <div className="status-message">{statusMessage}</div>}
         </div>
     );
 };
