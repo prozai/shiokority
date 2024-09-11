@@ -4,15 +4,15 @@ from flask import current_app
 class Merchant():
 
     # 143
-    def createMerchant(merch_name, merch_username, merch_phone, merch_address):
-        values = (merch_name, merch_username, merch_phone, merch_address)
+    def createMerchant(merch_name, merch_email, merch_phone, merch_address):
+        values = (merch_name, merch_email, merch_phone, merch_address)
         
         try:
-            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
+            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
                                   cursorclass=pymysql.cursors.DictCursor) as connect:
                 # Insert the new merchant
                 sqlQuery = """
-                    INSERT INTO merchant (merch_name, merch_username, merch_phone, merch_address, pass_hash, date_created, date_updated_on, merch_status)
+                    INSERT INTO merchant (merch_name, merch_email, merch_phone, merch_address, pass_hash, date_created, date_updated_on, status)
                     VALUES (%s, %s, %s, %s, 1, NOW(), NOW(), 1)
                     """ 
                 with connect.cursor() as cursor:
@@ -27,14 +27,14 @@ class Merchant():
     # 144
     def getMerchantData(self):
         try:
-            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
+            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
                                   cursorclass=pymysql.cursors.DictCursor) as connect:
                 
                 with connect.cursor() as cursor:
                     sqlQuery = "SELECT * FROM merchant"
                     cursor.execute(sqlQuery)
                     merchant = cursor.fetchall()
-                
+
                 if not merchant:
                     return False  # No merchant data found
                 
@@ -46,7 +46,7 @@ class Merchant():
 
     def getOneMerchant(self, id):
         try:
-            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
+            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
                                   cursorclass=pymysql.cursors.DictCursor) as connect:
                 with connect.cursor() as cursor:
                     sqlQuery = "SELECT * FROM merchant WHERE merch_id = %s"
@@ -66,16 +66,16 @@ class Merchant():
     # 146
     def updateMerchantDetails(self, merchID,merchData):
         
-        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
+        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
                                   cursorclass=pymysql.cursors.DictCursor)
         try:
             
-            query = """UPDATE merchantmanagement.merchant 
-                    SET merch_name = %s, merch_username = %s, merch_phone = %s, date_updated_on = NOW()
+            query = """UPDATE merchant_management.merchant 
+                    SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW()
                     WHERE merch_id = %s"""
             
             with connect.cursor() as cursor:
-                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_username'], merchData['merch_phone'], merchID))
+                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_email'], merchData['merch_phone'], merchID))
                 connect.commit()
             
             #not found
@@ -97,20 +97,22 @@ class Merchant():
             host=current_app.config['MYSQL_HOST'],
             user=current_app.config['MYSQL_USER'],
             password=current_app.config['MYSQL_PASSWORD'],
-            database='merchantmanagement',
+            database='merchant_management',
             cursorclass=pymysql.cursors.DictCursor
         )
-        
+       
         try:
             with connect.cursor() as cursor:
                 # Convert status to boolean
                 new_status = bool(int(status))
-                
+                               
                 # SQL query to update the merchant status
-                sql = "UPDATE merchant SET merch_status = %s, date_updated_on = NOW() WHERE merch_id = %s"
+                sql = "UPDATE merchant SET status = %s, date_updated_on = NOW() WHERE merch_id = %s"
+                  
                 validate = cursor.execute(sql, (new_status, merch_id))
                 
                 if validate == 0:
+                    
                     return False
             
             connect.commit()

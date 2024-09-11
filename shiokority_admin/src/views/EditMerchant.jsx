@@ -7,7 +7,7 @@ const MerchantEdit = () => {
     const { merchId } = useParams();
     const [merchant, setMerchant] = useState({
         merch_name: '',
-        merch_username: '',
+        merch_email: '',
         merch_phone: '',
         merch_address: ''
     });
@@ -73,8 +73,8 @@ const MerchantEdit = () => {
                     <label>Email:</label>
                     <input 
                         type="email" 
-                        name="merch_username" 
-                        value={merchant.merch_username} 
+                        name="merch_email" 
+                        value={merchant.merch_email} 
                         onChange={handleChange} 
                     />
                 </div>

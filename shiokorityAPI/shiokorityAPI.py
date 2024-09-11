@@ -4,7 +4,7 @@ from config import config
 import os
 
 #This is Root route for this application, so if needed just create a blueprint for your controller, do not create your own app route in your controller.
-app = Flask(__name__,template_folder=r"app\\templates")
+app = Flask(__name__)
 
 CORS(app)
 config_name = os.getenv('FLASK_ENV', 'testing')
