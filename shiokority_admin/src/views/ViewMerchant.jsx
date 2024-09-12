@@ -48,16 +48,16 @@ const ViewMerchants = () => {
               <td>{merchant.merch_id}</td>
               <td>{merchant.merch_name}</td>
               <td>{merchant.merch_phone}</td>
-              <td>{merchant.merch_username}</td>
+              <td>{merchant.merch_email}</td>
               <td>{merchant.date_created}</td>
               <td>{merchant.date_updated_on}</td>
-              <td>{merchant.merch_status === 1 ? 'Active' : 'Suspend'}</td>
+              <td>{merchant.status === 1 ? 'Active' : 'Suspend'}</td>
               <td>
                 <Link to={`/edit-merchant/${merchant.merch_id}`}>
                   <button>Edit</button>
                 </Link>
                 <select
-                  value={merchant.merch_status}
+                  value={merchant.status}
                   onChange={(e) => handleStatusChange(merchant.merch_id, e.target.value)}
                 >
                   <option value="1">Active</option>

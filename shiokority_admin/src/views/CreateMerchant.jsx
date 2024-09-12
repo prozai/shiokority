@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AdministratorController from '../controller/administratorController';
 
 const MerchantForm = () => {
-  const [formData, setFormData] = useState({
+  const [ formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',

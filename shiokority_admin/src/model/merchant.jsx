@@ -1,16 +1,16 @@
 import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
+
 
 class Merchant {
 
-  constructor(merch_id, merch_name, merch_phone, merch_username, date_created, date_updated_on, merch_status) {
+  constructor(merch_id, merch_name, merch_phone, merch_email, date_created, date_updated_on, status) {
     this.merch_id = merch_id;
     this.merch_name = merch_name;
     this.merch_phone = merch_phone;
-    this.merch_username = merch_username;
+    this.merch_email = merch_email;
     this.date_created = date_created;
     this.date_updated_on = date_updated_on;
-    this.merch_status = merch_status;
+    this.status = status;
   }
 
   static async createMerchant(merchantData) {
@@ -33,10 +33,10 @@ class Merchant {
             merchant.merch_id,
             merchant.merch_name,
             merchant.merch_phone,
-            merchant.merch_username,
+            merchant.merch_email,
             merchant.date_created,
             merchant.date_updated_on,
-            merchant.merch_status
+            merchant.status
           )
       );
     } catch (error) {

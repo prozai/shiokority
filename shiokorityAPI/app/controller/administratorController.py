@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, jsonify
+from flask import Blueprint, request, session, jsonify
 from ..models.administrator import Administrator
 from ..models.merchant import Merchant 
 from werkzeug.exceptions import BadRequest
@@ -45,7 +45,7 @@ def logout():
 def createMerchant():
     if request.method == 'POST':
         data = request.get_json()  # Get the JSON data from the request
-
+        print(data)
         # Extract the necessary fields
         name = data.get('name')
         email = data.get('email')
