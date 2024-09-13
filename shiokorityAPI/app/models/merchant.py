@@ -1,124 +1,157 @@
 import pymysql
-from flask import current_app
+from flask import current_app, g
+import bcrypt
 
-class Merchant():
+class Merchant:
+    @staticmethod
+    def get_db_connection():
+        if 'db' not in g:
+            g.db = pymysql.connect(
+                host=current_app.config['MYSQL_HOST'],
+                user=current_app.config['MYSQL_USER'],
+                password=current_app.config['MYSQL_PASSWORD'],
+                database='merchant_management',  # Make sure the database name matches your schema
+                cursorclass=pymysql.cursors.DictCursor
+            )
+        return g.db
 
-    # 143
-    def createMerchant(merch_name, merch_username, merch_phone, merch_address):
-        values = (merch_name, merch_username, merch_phone, merch_address)
-        
+    @staticmethod
+    def create_merchant(merch_email, pass_hash, merch_name=None, merch_phone=None, merch_address=None):
+        # Hash the password using bcrypt
+        pass_hash = bcrypt.hashpw(pass_hash.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        # Check if email already exists
+        existing_merchant = Merchant.get_merchant_by_email(merch_email)
+        if existing_merchant:
+            return False, "Email already in use"
+
         try:
-            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
-                                  cursorclass=pymysql.cursors.DictCursor) as connect:
+            connection = Merchant.get_db_connection()
+            with connection.cursor() as cursor:
                 # Insert the new merchant
-                sqlQuery = """
-                    INSERT INTO merchant (merch_name, merch_username, merch_phone, merch_address, pass_hash, date_created, date_updated_on, merch_status)
-                    VALUES (%s, %s, %s, %s, 1, NOW(), NOW(), 1)
-                    """ 
-                with connect.cursor() as cursor:
-                    cursor.execute(sqlQuery, values)
-                    connect.commit()  
-                return True  # Merchant created successfully
-                
+                sql_query = """
+                    INSERT INTO Merchant (merch_email, pass_hash, merch_name, merch_phone, merch_address, date_created, date_updated_on, status)
+                    VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 'active')
+                """
+                cursor.execute(sql_query, (merch_email, pass_hash, merch_name, merch_phone, merch_address))
+                connection.commit()
+                return True, "Merchant created successfully"
+
         except pymysql.MySQLError as e:
             print(f"Error creating merchant: {e}")
-            return False  # Return False in case of an error
-            
-    # 144
-    def getMerchantData(self):
-        try:
-            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
-                                  cursorclass=pymysql.cursors.DictCursor) as connect:
-                
-                with connect.cursor() as cursor:
-                    sqlQuery = "SELECT * FROM merchant"
-                    cursor.execute(sqlQuery)
-                    merchant = cursor.fetchall()
-                
-                if not merchant:
-                    return False  # No merchant data found
-                
-                return merchant  # Merchant data fetched successfully
-            
-        except pymysql.MySQLError as e:
-            print(f"Error fetching merchant data: {e}")
-            return False  # Return False in case of an error
+            return False, f"Error creating merchant: {e}"
 
-    def getOneMerchant(self, id):
+    @staticmethod
+    def get_all_merchants():
         try:
-            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
-                                  cursorclass=pymysql.cursors.DictCursor) as connect:
-                with connect.cursor() as cursor:
-                    sqlQuery = "SELECT * FROM merchant WHERE merch_id = %s"
-                    cursor.execute(sqlQuery, id)
-                    merchant = cursor.fetchone()
-                
-                if merchant is None:
-                    return False
-                
-                return merchant  # Merchant fetched successfully
-            
+            connection = Merchant.get_db_connection()
+            with connection.cursor() as cursor:
+                sql_query = "SELECT * FROM Merchant"
+                cursor.execute(sql_query)
+                merchants = cursor.fetchall()
+
+                if not merchants:
+                    return None  # No merchants found
+
+                return merchants  # Merchants data fetched successfully
+
+        except pymysql.MySQLError as e:
+            print(f"Error fetching merchants: {e}")
+            return None  # Return None in case of an error
+
+    @staticmethod
+    def get_merchant_by_id(merchant_id):
+        try:
+            connection = Merchant.get_db_connection()
+            with connection.cursor() as cursor:
+                sql_query = "SELECT * FROM Merchant WHERE merch_id = %s"
+                cursor.execute(sql_query, (merchant_id,))
+                merchant = cursor.fetchone()
+
+                if not merchant:
+                    return None  # No merchant found
+
+                return merchant  # Merchant data fetched successfully
+
         except pymysql.MySQLError as e:
             print(f"Error fetching merchant: {e}")
-            return False  # Return False in case of an error
-        
-    
-    # 146
-    def updateMerchantDetails(self, merchID,merchData):
-        
-        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchantmanagement',
-                                  cursorclass=pymysql.cursors.DictCursor)
+            return None  # Return None in case of an error
+
+    @staticmethod
+    def get_merchant_by_email(merch_email):
         try:
-            
-            query = """UPDATE merchantmanagement.merchant 
-                    SET merch_name = %s, merch_username = %s, merch_phone = %s, date_updated_on = NOW()
-                    WHERE merch_id = %s"""
-            
-            with connect.cursor() as cursor:
-                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_username'], merchData['merch_phone'], merchID))
-                connect.commit()
-            
-            #not found
-            if affected_rows == 0:
-                return False
-            
-            return True
-        
+            connection = Merchant.get_db_connection()
+            with connection.cursor() as cursor:
+                sql_query = "SELECT * FROM Merchant WHERE merch_email = %s"
+                cursor.execute(sql_query, (merch_email,))
+                merchant = cursor.fetchone()
+
+                return merchant  # Merchant data fetched successfully
+
         except pymysql.MySQLError as e:
-            connect.rollback()
-            return False
+            print(f"Error fetching merchant by email: {e}")
+            return None
 
-        except Exception as e:
-            return False
-    
-
-    def updateMerchantStatus(self, merch_id, status):
-        connect = pymysql.connect(
-            host=current_app.config['MYSQL_HOST'],
-            user=current_app.config['MYSQL_USER'],
-            password=current_app.config['MYSQL_PASSWORD'],
-            database='merchantmanagement',
-            cursorclass=pymysql.cursors.DictCursor
-        )
-        
+    @staticmethod
+    def update_merchant_details(merch_id, merch_data):
         try:
-            with connect.cursor() as cursor:
-                # Convert status to boolean
-                new_status = bool(int(status))
-                
-                # SQL query to update the merchant status
-                sql = "UPDATE merchant SET merch_status = %s, date_updated_on = NOW() WHERE merch_id = %s"
-                validate = cursor.execute(sql, (new_status, merch_id))
-                
-                if validate == 0:
-                    return False
-            
-            connect.commit()
-            return True
-        
-        except Exception as e:
-            print(f"Error updating merchant status: {str(e)}")
-            connect.rollback()
+            connection = Merchant.get_db_connection()
+            with connection.cursor() as cursor:
+                sql_query = """
+                    UPDATE Merchant 
+                    SET merch_name = %s, merch_phone = %s, merch_address = %s, date_updated_on = NOW()
+                    WHERE merch_id = %s
+                """
+                affected_rows = cursor.execute(sql_query, (
+                    merch_data.get('merch_name'),
+                    merch_data.get('merch_phone'),
+                    merch_data.get('merch_address'),
+                    merch_id
+                ))
+
+                if affected_rows == 0:
+                    return False  # No rows were affected, possibly invalid merchant ID
+
+                connection.commit()
+                return True
+
+        except pymysql.MySQLError as e:
+            print(f"Error updating merchant details: {e}")
+            connection.rollback()
             return False
-        finally:
-            connect.close()
+
+    @staticmethod
+    def update_merchant_status(merch_id, status):
+        try:
+            connection = Merchant.get_db_connection()
+            with connection.cursor() as cursor:
+                sql_query = "UPDATE Merchant SET status = %s, date_updated_on = NOW() WHERE merch_id = %s"
+                affected_rows = cursor.execute(sql_query, (status, merch_id))
+
+                if affected_rows == 0:
+                    return False  # No rows were affected, possibly invalid merchant ID
+
+                connection.commit()
+                return True
+
+        except pymysql.MySQLError as e:
+            print(f"Error updating merchant status: {e}")
+            connection.rollback()
+            return False
+
+    @staticmethod
+    def login(merch_email, pass_hash):
+        try:
+            merchant = Merchant.get_merchant_by_email(merch_email)
+            if not merchant:
+                return False, "Invalid email"
+
+            # Verify the password using native bcrypt
+            if not bcrypt.checkpw(pass_hash.encode('utf-8'), merchant['pass_hash'].encode('utf-8')):
+                return False, "Invalid password"
+
+            return True, merchant  # Login successful, return merchant data
+
+        except pymysql.MySQLError as e:
+            print(f"Error logging in: {e}")
+            return False, "Error logging in"

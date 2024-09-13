@@ -6,21 +6,25 @@ import os
 #This is Root route for this application, so if needed just create a blueprint for your controller, do not create your own app route in your controller.
 app = Flask(__name__,template_folder=r"app\\templates")
 
-CORS(app)
+# Enable CORS (Cross-Origin Resource Sharing)
+CORS(app, supports_credentials=True)
+
+#Load configuration
 config_name = os.getenv('FLASK_ENV', 'testing')
 app.config.from_object(config[config_name])
 
-#here is the blueprint 
+#Registering blueprints
 from app.controller.merchantController import merchantBlueprint
-app.register_blueprint(merchantBlueprint)
+app.register_blueprint(merchantBlueprint, url_prefix='/merchant')
 
 from app.controller.administratorController import adminBlueprint
 app.register_blueprint(adminBlueprint)
 
+# Root route for testing
 @app.route("/")
 def hello():
     return "this is main page without anything"
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, port=5001)
     
