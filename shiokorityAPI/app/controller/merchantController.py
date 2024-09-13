@@ -3,12 +3,14 @@ from flask import Blueprint, request, jsonify, session
 from ..models.merchant import Merchant
 import bcrypt
 
+merchant_instance = Merchant()
+
 # Create the Blueprint for merchant-related routes
 merchantBlueprint = Blueprint('merchant', __name__)
 
 # Route for creating a new merchant (registration)
-@merchantBlueprint.route('/create-merchant', methods=['POST'])
-def create_merchant():
+@merchantBlueprint.route('/register-merchant', methods=['POST'])
+def registerMerchant():
     data = request.get_json()
     
     # Extract data from request
@@ -19,7 +21,7 @@ def create_merchant():
     merch_address = data.get('merch_address')
     
     # Call the Merchant model to create the new merchant
-    success, message = Merchant.create_merchant(merch_email, password, merch_name, merch_phone, merch_address)
+    success, message = Merchant.registerMerchant(merch_email, password, merch_name, merch_phone, merch_address)
     
     if success:
         return jsonify({'success': True, 'message': message}), 201  # 201 = Created
@@ -35,7 +37,7 @@ def login_merchant():
     password = data['password'] # Plain-text password entered by the user
 
     # Fetch the merchant from the database
-    merchant = Merchant.get_merchant_by_email(email)
+    merchant = merchant_instance.getMerchantByEmail(email)
 
     # Verify the password using native bcrypt
     # The plain-text password (password) is compared with the hashed password (merchant['pass_hash'])
@@ -54,7 +56,7 @@ def profile():
         return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
 
     # Fetch the merchant profile
-    merchant = Merchant.get_merchant_by_id(session['merchant_id'])
+    merchant = merchant_instance.getMerchantByID(session['merchant_id'])
     if merchant:
         return jsonify({
             'success': True,
@@ -76,8 +78,10 @@ def update_merchant():
     if 'merchant_id' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
 
+    merchant = Merchant.updateMerchantDetails(session['merchant_id'], data)
+
     data = request.get_json()
-    result = Merchant.update_merchant_details(session['merchant_id'], data)
+    result = merchant_instance.updateMerchantDetails(session['merchant_id'], data)
 
     if result:
         return jsonify({'success': True, 'message': 'Merchant details updated successfully'}), 200
