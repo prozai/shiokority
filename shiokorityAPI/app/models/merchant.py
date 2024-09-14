@@ -5,6 +5,7 @@ import bcrypt
 class Merchant:
 
     # 143
+
     def createMerchant(self, merch_name, merch_email, merch_phone, merch_address):
         values = (merch_name, merch_email, merch_phone, merch_address)
 
@@ -12,6 +13,7 @@ class Merchant:
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
                                  password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
+              
                 sqlQuery = """
                     INSERT INTO merchant (merch_name, merch_email, merch_phone, merch_address, pass_hash, date_created, date_updated_on, status)
                     VALUES (%s, %s, %s, %s, 1, NOW(), NOW(), 1)
@@ -28,6 +30,7 @@ class Merchant:
     # 144
     def getMerchantData(self):
         try:
+
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
                                  password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
@@ -48,9 +51,11 @@ class Merchant:
 
     def getOneMerchant(self, id):
         try:
+
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
                                  password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
+
                 with connect.cursor() as cursor:
                     sqlQuery = "SELECT * FROM merchant WHERE merch_id = %s"
                     cursor.execute(sqlQuery, (id,))
@@ -66,19 +71,19 @@ class Merchant:
             return False  # Return False in case of an error
 
     # 146
-    def updateMerchantDetails(self, merch_id, merch_data):
-        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], 
-                                  password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
+    def updateMerchantDetails(self, merchID,merchData):
+        
+        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
                                   cursorclass=pymysql.cursors.DictCursor)
         try:
-            query = """
-                UPDATE merchant_management.merchant 
-                SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW()
-                WHERE merch_id = %s
-            """
+            
+            query = """UPDATE merchant_management.merchant 
+                    SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW()
+                    WHERE merch_id = %s"""
+            
             with connect.cursor() as cursor:
-                affected_rows = cursor.execute(query, 
-                    (merch_data['merch_name'], merch_data['merch_email'], merch_data['merch_phone'], merch_id))
+                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_email'], merchData['merch_phone'], merchID))
+
                 connect.commit()
 
             if affected_rows == 0:
@@ -92,6 +97,7 @@ class Merchant:
             return False
 
     def updateMerchantStatus(self, merch_id, status):
+
         connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
                                   password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
                                   cursorclass=pymysql.cursors.DictCursor)
@@ -99,10 +105,13 @@ class Merchant:
             with connect.cursor() as cursor:
                 new_status = bool(int(status))  # Convert status to boolean
                 sql = "UPDATE merchant SET status = %s, date_updated_on = NOW() WHERE merch_id = %s"
+
                 validate = cursor.execute(sql, (new_status, merch_id))
 
                 if validate == 0:
+
                     return False  # No rows affected
+
             
             connect.commit()
             return True

@@ -22,6 +22,7 @@ const Login = () => {
     e.preventDefault();
     setStatus('Logging in...');
     try {
+      console.log(formData);
       await AdministratorController.login(formData);
       setStatus('Login successful');
       navigate('/dashboard');
