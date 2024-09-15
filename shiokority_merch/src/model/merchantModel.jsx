@@ -1,6 +1,16 @@
 import axios from 'axios';
 
 class Merchant {
+  // Register a new merchant
+  // # 130
+  static async registerMerchant(merch_data) {
+    try {
+      const response = await axios.post('/register-merchant', merch_data);  // Updated path
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Registration failed');
+    }
+  }
   // Merchant login method
   // # 131
   static async login(data) {
@@ -9,7 +19,7 @@ class Merchant {
       localStorage.setItem('merchant_token', response.data.token); // Assuming the API returns a token
       return response.data;
     } catch (error) {
-      throw new Error('Wrong email or password');
+      throw new Error('Invalid email or password');
     }
   }
 
@@ -47,6 +57,30 @@ class Merchant {
       return response.data;
     } catch (error) {
       throw new Error('Unable to update profile');
+    }
+  }
+  // Send payment to merchant (API call)
+  static async processPayment(merch_email, amount) {
+    try {
+      const response = await axios.post('/bankpage', {merch_email,amount});
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to process payment');
+    }
+  }
+
+  // Fetch the merchant's transaction history
+  static async getTransactionHistory() {
+    try {
+      const merch_id = localStorage.getItem('merch_id'); // Fetch merch_id from localStorage
+      if (!merch_id) {
+        throw new Error('Merchant ID is missing.');
+      }
+      
+      const response = await axios.get(`/merchant/transactions?merch_id=${merch_id}`, { withCredentials: true });
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to fetch transaction history and balance');
     }
   }
 }
