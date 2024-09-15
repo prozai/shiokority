@@ -16,7 +16,7 @@ app.config.from_object(config[config_name])
 from app.controller.merchantController import merchantBlueprint
 app.register_blueprint(merchantBlueprint)
 
-from app.controller.administratorController import adminBlueprint
+from app.view.adminView import adminBlueprint
 app.register_blueprint(adminBlueprint)
 
 # Root route for testing
