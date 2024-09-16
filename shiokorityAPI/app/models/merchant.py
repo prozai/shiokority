@@ -134,7 +134,10 @@ class Merchant:
             )
         return g.db
 
-    def registerMerchant(self, merch_email, pass_hash, merch_name, merch_phone, merch_address):
+
+    # 130
+    def registerMerchant(self, merch_email, pass_hash, merch_name=None, merch_phone=None, merch_address=None):
+
         pass_hash = bcrypt.hashpw(pass_hash.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
         existing_merchant = self.getMerchantByEmail(merch_email)
@@ -157,6 +160,7 @@ class Merchant:
             print(f"Error creating merchant: {e}")
             return False, f"Error creating merchant: {e}"
 
+    # 131
     def login(self, merch_email, pass_hash):
         # Login function using bcrypt
         try:
@@ -187,13 +191,13 @@ class Merchant:
             print(f"Error fetching merchant by email: {e}")
             return None
 
-    def getMerchantByID(self, merchant_id):
-        """Fetch merchant by ID from the database"""
+    def getMerchantByID(self, merch_id):
+        # Fetch merchant by ID from the database
         try:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
                 sql_query = "SELECT * FROM Merchant WHERE merch_id = %s"
-                cursor.execute(sql_query, (merchant_id,))
+                cursor.execute(sql_query, (merch_id,))
                 merchant = cursor.fetchone()
 
                 if not merchant:
@@ -204,3 +208,55 @@ class Merchant:
         except pymysql.MySQLError as e:
             print(f"Error fetching merchant: {e}")
             return None
+    
+    # 133
+    def addPayment(self, merch_email, amount):
+        # Fetch the merchant by email
+        merchant = self.getMerchantByEmail(merch_email)
+        if not merchant:
+            return False, "Merchant not found"
+
+        merch_id = merchant['merch_id']
+        connection = self.getDBConnection()
+
+        try:
+            with connection.cursor() as cursor:
+                # Add the payment to the transaction record
+                query = """
+                    INSERT INTO transaction_management.Transaction (merch_id, amount, payment_date, status, date_created, date_updated_on)
+                    VALUES (%s, %s, NOW(), 'completed', NOW(), NOW())
+                """
+                cursor.execute(query, (merch_id, amount))
+                connection.commit()
+
+            return True, "Payment added successfully"
+        
+        except pymysql.MySQLError as e:
+            print(f"Error adding payment: {e}")
+            return False, "Error adding payment"
+
+    def getTransactionHistory(self, merch_id):
+        try:
+            connection = self.getDBConnection()
+            with connection.cursor() as cursor:
+                # Fetch all transactions for the merchant
+                query = """
+                    SELECT payment_id, amount, payment_date, status FROM transaction_management.Transaction
+                    WHERE merch_id = %s
+                """
+                cursor.execute(query, (merch_id,))
+                transactions = cursor.fetchall()
+
+                # Calculate the total balance
+                balance_query = """
+                    SELECT SUM(amount) as total_balance FROM transaction_management.Transaction
+                    WHERE merch_id = %s AND status = 'completed'
+                """
+                cursor.execute(balance_query, (merch_id,))
+                balance = cursor.fetchone()['total_balance'] or 0.0
+
+            return transactions, balance
+
+        except pymysql.MySQLError as e:
+            print(f"Error fetching transactions: {e}")
+            return None, 0.0  # Return None for transactions and 0.0 for balance in case of an error

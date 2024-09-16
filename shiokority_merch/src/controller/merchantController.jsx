@@ -1,47 +1,68 @@
-import axios from 'axios';
+import Merchant from '../model/merchantModel';
 
 class merchantController {
   // Register a new merchant
   // # 130
   static async registerMerchant(merch_data) {
     try {
-      const response = await axios.post('/register-merchant', merch_data);  // Updated path
-      return response.data;
+      return await Merchant.registerMerchant(merch_data);
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Registration failed');
+      throw new Error(error.message || 'Registration failed');
     }
   }
 
   // Merchant login
   // # 131
   static async login(data) {
-    try {
-      const response = await axios.post('/login', data, { withCredentials: true });
-      localStorage.setItem('merchant_token', response.data.token);
-      return response.data;
-    } catch (error) {
-      throw new Error('Invalid email or password');
-    }
+    return await Merchant.login(data);
   }
 
   // Logout the merchant
   // # 132
   static async logout() {
-    try {
-      await axios.post('/logout', {}, { withCredentials: true });
-      localStorage.removeItem('merchant_token');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+    return await Merchant.logout();
   }
 
   // Get the merchant's profile
   static async getProfile() {
     try {
-      const response = await axios.get('/profile', { withCredentials: true });
-      return response.data;
+      return await Merchant.getProfile();
     } catch (error) {
       throw new Error('Unable to fetch profile');
+    }
+  }
+
+  // Update the merchant's profile
+  static async updateProfile(data) {
+    try {
+      return await Merchant.updateProfile(data);
+    } catch (error) {
+      throw new Error('Unable to update profile');
+    }
+  }
+
+    // Check if merchant is logged in
+  static isLoggedIn() {
+      return Merchant.isLoggedIn();
+  }
+
+  // Handle sending payments
+  static async processPayment(merch_email, amount) {
+    try {
+      const response = await Merchant.processPayment(merch_email, amount);
+      return response;
+    } catch (error) {
+      throw new Error('Payment failed');
+    }
+  }
+
+  // Handle fetching merchant transactions and balance
+  static async getTransactionHistory() {
+    try {
+      const response = await Merchant.getTransactionHistory();
+      return response;
+    } catch (error) {
+      throw new Error('Failed to fetch transactions and balance');
     }
   }
 }
