@@ -11,7 +11,7 @@ class Administrator():
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database='user_management',
+                database=current_app.config['USER_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             ) as connection:
                 with connection.cursor() as cursor:

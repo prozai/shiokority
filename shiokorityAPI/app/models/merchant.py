@@ -11,7 +11,7 @@ class Merchant:
 
         try:
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
+                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'],
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
               
                 sqlQuery = """
@@ -32,7 +32,7 @@ class Merchant:
         try:
 
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
+                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'], 
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
 
                 with connect.cursor() as cursor:
@@ -53,7 +53,7 @@ class Merchant:
         try:
 
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
+                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'], 
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
 
                 with connect.cursor() as cursor:
@@ -73,7 +73,7 @@ class Merchant:
     # 146
     def updateMerchantDetails(self, merchID,merchData):
         
-        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
+        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'],
                                   cursorclass=pymysql.cursors.DictCursor)
         try:
             
@@ -99,7 +99,7 @@ class Merchant:
     def updateMerchantStatus(self, merch_id, status):
 
         connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                  password=current_app.config['MYSQL_PASSWORD'], database='merchant_management',
+                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'],    
                                   cursorclass=pymysql.cursors.DictCursor)
         try:
             with connect.cursor() as cursor:
@@ -129,7 +129,7 @@ class Merchant:
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database='merchant_management',
+                database=current_app.config['MERCHANT_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             )
         return g.db
