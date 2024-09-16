@@ -18,7 +18,7 @@ class Administrator():
                     # Query to retrieve the hashed password and status
                     sql_query = '''
                         SELECT admin_id, admin_email, pass_hash, status 
-                        FROM admin 
+                        FROM Admin 
                         WHERE admin_email = %s
                     '''
                     cursor.execute(sql_query, (email,))

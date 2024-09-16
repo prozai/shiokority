@@ -15,7 +15,7 @@ class Merchant:
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
               
                 sqlQuery = """
-                    INSERT INTO merchant (merch_name, merch_email, merch_phone, merch_address, pass_hash, date_created, date_updated_on, status)
+                    INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, pass_hash, date_created, date_updated_on, status)
                     VALUES (%s, %s, %s, %s, 1, NOW(), NOW(), 1)
                 """
                 with connect.cursor() as cursor:
@@ -36,7 +36,7 @@ class Merchant:
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
 
                 with connect.cursor() as cursor:
-                    sqlQuery = "SELECT * FROM merchant"
+                    sqlQuery = "SELECT * FROM Merchant"
                     cursor.execute(sqlQuery)
                     merchant = cursor.fetchall()
 
@@ -57,7 +57,7 @@ class Merchant:
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
 
                 with connect.cursor() as cursor:
-                    sqlQuery = "SELECT * FROM merchant WHERE merch_id = %s"
+                    sqlQuery = "SELECT * FROM Merchant WHERE merch_id = %s"
                     cursor.execute(sqlQuery, (id,))
                     merchant = cursor.fetchone()
 
@@ -77,7 +77,7 @@ class Merchant:
                                   cursorclass=pymysql.cursors.DictCursor)
         try:
             
-            query = """UPDATE merchant_management.merchant 
+            query = """UPDATE Merchant 
                     SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW()
                     WHERE merch_id = %s"""
             
@@ -104,7 +104,7 @@ class Merchant:
         try:
             with connect.cursor() as cursor:
                 new_status = bool(int(status))  # Convert status to boolean
-                sql = "UPDATE merchant SET status = %s, date_updated_on = NOW() WHERE merch_id = %s"
+                sql = "UPDATE Merchant SET status = %s, date_updated_on = NOW() WHERE merch_id = %s"
 
                 validate = cursor.execute(sql, (new_status, merch_id))
 
