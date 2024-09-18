@@ -196,7 +196,11 @@ class Merchant:
         try:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
-                sql_query = "SELECT * FROM Merchant WHERE merch_id = %s"
+                sql_query = """
+                    SELECT merch_id, merch_name, merch_email, merch_phone, merch_address, merch_amount 
+                    FROM merchant_management.Merchant 
+                    WHERE merch_id = %s
+                """
                 cursor.execute(sql_query, (merch_id,))
                 merchant = cursor.fetchone()
 
@@ -227,6 +231,15 @@ class Merchant:
                     VALUES (%s, %s, NOW(), 'completed', NOW(), NOW())
                 """
                 cursor.execute(query, (merch_id, amount))
+
+                # Update the merchant's total balance
+                update_query = """
+                    UPDATE merchant_management.Merchant 
+                    SET merch_amount = merch_amount + %s 
+                    WHERE merch_id = %s
+                """
+                cursor.execute(update_query, (amount, merch_id))
+
                 connection.commit()
 
             return True, "Payment added successfully"
