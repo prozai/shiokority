@@ -19,3 +19,21 @@ class AdminController:
 
     def update_merchant_status(self, merch_id, status):
         return Merchant().updateMerchantStatus(merch_id, status)
+
+
+    #My work
+    def addUser(self,email, password, first_name, last_name, status):
+        return Administrator().addUser(email, password, first_name, last_name, status)
+
+    # New method to fetch all users
+    def get_all_users(self):
+        try:
+            return Administrator.get_all_users(self)
+        except Exception as e:
+            print(f"Error fetching users in AdminController: {str(e)}")
+            raise
+
+    def submit_user_update(self, user_id, email=None, first_name=None, last_name=None, status=None):
+        return Administrator().update_user(user_id, email, first_name, last_name, status)
+
+    

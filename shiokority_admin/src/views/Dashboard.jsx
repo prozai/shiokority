@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
 import CreateMerchant from './CreateMerchant';
 import ViewMerchant from './ViewMerchant';
+import EditUser from './EditUser';
+import CreateUser from './CreateUser';
 
 function Dashboard() {
   const [status, setStatus] = useState('');
@@ -29,6 +31,8 @@ function Dashboard() {
 
       <CreateMerchant />
       <ViewMerchant />
+      <CreateUser />
+      <EditUser />
     </div>
   );
 }
