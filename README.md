@@ -32,7 +32,7 @@ pip install -r requirements.txt
 ```
 ### Deactivate environment
 ```bash
-env\Scripts\deactivate.bat
+deactivate
 ```
 ### Updating Flask libraries
 ```bash
