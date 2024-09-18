@@ -109,7 +109,7 @@ class Merchant:
                 validate = cursor.execute(sql, (new_status, merch_id))
 
                 if validate == 0:
-
+                    
                     return False  # No rows affected
 
             

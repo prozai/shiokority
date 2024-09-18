@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask
 from flask_cors import CORS
 from config import config
 import os
@@ -18,6 +18,9 @@ app.register_blueprint(merchantBlueprint)
 
 from app.view.adminView import adminBlueprint
 app.register_blueprint(adminBlueprint)
+
+from app.view.consumerView import consumerBlueprint
+app.register_blueprint(consumerBlueprint)
 
 # Root route for testing
 @app.route("/")
