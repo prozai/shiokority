@@ -14,6 +14,12 @@ const BankPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Basic validation to ensure amount is positive
+    if (formData.amount <= 0) {
+        setMessage("Please enter a valid payment amount.");
+        return;
+    }
     try {
       // Use merchantController to handle payment
       const response = await merchantController.processPayment(formData.merch_email, formData.amount);
