@@ -20,6 +20,8 @@ class AdminController:
     def update_merchant_status(self, merch_id, status):
         return Merchant().updateMerchantStatus(merch_id, status)
 
+
+    #My work
     def addUser(self,email, password, first_name, last_name, status):
         return Administrator().addUser(email, password, first_name, last_name, status)
 
