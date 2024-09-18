@@ -124,7 +124,6 @@ class Merchant:
             connect.close()
 
     def getDBConnection(self):
-
         if 'db' not in g:
             g.db = pymysql.connect(
                 host=current_app.config['MYSQL_HOST'],
@@ -135,11 +134,14 @@ class Merchant:
             )
         return g.db
 
+
     # 130
     def registerMerchant(self, merch_email, pass_hash, merch_name=None, merch_phone=None, merch_address=None):
-        pass_hash = bcrypt.hashpw(pass_hash.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
+        pass_hash = bcrypt.hashpw(pass_hash.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
         existing_merchant = self.getMerchantByEmail(merch_email)
+
         if existing_merchant:
             return False, "Email already in use"
 
@@ -148,7 +150,7 @@ class Merchant:
             with connection.cursor() as cursor:
                 sql_query = """
                     INSERT INTO Merchant (merch_email, pass_hash, merch_name, merch_phone, merch_address, date_created, date_updated_on, status)
-                    VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 'active')
+                    VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 1)
                 """
                 cursor.execute(sql_query, (merch_email, pass_hash, merch_name, merch_phone, merch_address))
                 connection.commit()
@@ -182,7 +184,7 @@ class Merchant:
             with connection.cursor() as cursor:
                 sql_query = "SELECT * FROM Merchant WHERE merch_email = %s"
                 cursor.execute(sql_query, (merch_email,))
-                merchant = cursor.fetchone()
+                merchant = cursor.fetchone()  
                 return merchant  # Merchant data fetched successfully
 
         except pymysql.MySQLError as e:
