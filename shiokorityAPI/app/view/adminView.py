@@ -140,3 +140,62 @@ def updateMerchantStatus(merch_id):
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         return jsonify(success=False, message="An unexpected error occurred"), 500
+
+
+# My work of art
+@adminBlueprint.route("/admin/add-user", methods=['POST'])
+def addUser():
+    if request.method == 'POST':
+            data = request.get_json()  # Get the JSON data from the request
+
+            # Extract the necessary fields
+            email = data.get('email', '')
+            password = data.get('password', '')
+            first_name = data.get('first_name', '')
+            last_name = data.get('last_name', '')
+            status = data.get('status', True)  # default to True if not provided
+
+            createdUser = admin_controller.addUser(email, password, first_name, last_name, status)
+
+            if createdUser:
+                return jsonify(success=True), 200
+            else:
+                return jsonify(success=False), 400
+
+
+@adminBlueprint.route('/admin/get-users', methods=['GET'])
+def getAllUser():
+    try:
+        users = admin_controller.get_all_users()
+        if users:
+            return jsonify(users), 200
+        else:
+            return jsonify({"error": "No users found"}), 404
+
+    except Exception as e:
+        print(f"An error occurred: {e}")  # Log the error
+        return jsonify({"error": "An unexpected error occurred"}), 500
+
+
+@adminBlueprint.route('/admin/users/<int:user_id>/update', methods=['PUT'])
+def submitUserUpdate(user_id):
+    try:
+        data = request.get_json()
+
+        # Extract the necessary fields (similar to addUser)
+        email = data.get('email', None)
+        first_name = data.get('first_name', None)
+        last_name = data.get('last_name', None)
+        status = data.get('status', None)
+
+        # Update the user with the new details
+        updateStatus = admin_controller.submit_user_update(user_id, email, first_name, last_name, status)
+
+        if updateStatus:
+            return jsonify(success=True), 200
+        else:
+            return jsonify(success=False), 400
+
+    except Exception as e:
+        print(f"Error updating user details: {e}")
+        return jsonify({"error": "Failed to update user details"}), 500

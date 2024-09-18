@@ -26,6 +26,35 @@ class Administrator {
     return !!localStorage.getItem('token');
   }
 
+  //My work of art
+  static async addUser(data) {
+    const response = await axios.post('/admin/add-user', data); 
+    if (response.status !== 200){
+      throw new Error(response.data.message || "Adding of user failed!");
+    }
+    return response.data;
+  }
+
+  // Fetch all users from the backend
+  static async getAllUsers() {
+    try {
+      const response = await axios.get('/admin/get-users'); // Updated endpoint
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching users (2): ', error); // Updated error message
+      throw error;
+    }
+  }
+
+  static async updateUser(userId, userData) {
+    try {
+      const response = await axios.put(`/admin/users/${userId}/update`, userData);  // Updated endpoint for editing user
+      return response.data;
+    } catch (error) {
+      throw new Error('Error updating user details');
+    }
+  }
+
   
 }
 
