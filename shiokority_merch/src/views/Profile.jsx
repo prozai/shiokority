@@ -17,7 +17,7 @@ const Profile = () => {
         // Fetch transactions and balance after profile data is available
         if (data.merchant?.merch_id) {
           fetchTransactionHistory(data.merchant.merch_id);
-         } // Fetch transactions for this merchant
+        }
       } catch (error) {
         setMessage(error.message);
       }
@@ -34,16 +34,16 @@ const Profile = () => {
 
     fetchProfile();
 
-        // Poll for new transactions every 10 seconds
+    // Poll for new transactions every 10 seconds
     const interval = setInterval(() => {
       if (profileData?.merch_id) {
         fetchTransactionHistory(profileData.merch_id);
       }
     }, 10000); // Poll every 10 seconds
     
-        // Clean up the interval when the component unmounts
-        return () => clearInterval(interval);
-      }, [profileData]);
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(interval);
+  }, []); // Remove profileData from the dependency array
 
   const handleLogout = async () => {
     await merchantController.logout();
