@@ -126,7 +126,7 @@ def updateMerchantStatus(merch_id):
         status = data.get('status')
         if status is None:
             raise BadRequest("Status is required")
-
+        
         updateStatus = admin_controller.update_merchant_status(merch_id, status)
         
         if updateStatus:
