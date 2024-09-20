@@ -3,6 +3,7 @@ from werkzeug.exceptions import BadRequest
 from ..controller.administratorController import AdminController
 
 adminBlueprint = Blueprint('adminBlueprint', __name__)
+
 admin_controller = AdminController()
 
 @adminBlueprint.route("/login/admin", methods=['POST'])
@@ -15,7 +16,7 @@ def adminLogin():
         
         email = data.get('email', '')
         password = data.get('password', '')
-
+        
         if not email or not password:
             raise BadRequest("Email and password are required")
 
