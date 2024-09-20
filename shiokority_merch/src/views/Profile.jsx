@@ -19,7 +19,7 @@ const Profile = () => {
           fetchTransactionHistory(data.merchant.merch_id);
         }
       } catch (error) {
-        setMessage(error.message);
+        setMessage('Failed to load data. Please try again later.');
       }
     };
 
@@ -35,7 +35,7 @@ const Profile = () => {
     fetchProfile();
 
     // Poll for new transactions every 10 seconds
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       if (profileData?.merch_id) {
         fetchTransactionHistory(profileData.merch_id);
       }
@@ -43,13 +43,17 @@ const Profile = () => {
     
     // Clean up the interval when the component unmounts
     return () => clearInterval(interval);
-  }, []); // Remove profileData from the dependency array
+  }, [profileData?.merch_id]); // Remove profileData from the dependency array
 
   const handleLogout = async () => {
     await merchantController.logout();
     navigate('/login'); // Redirect to login after logout
   };
 
+  const handleViewTransactionHistory = () => {
+    navigate('/transactions'); // Navigate to transaction history page
+  };
+  
   return (
     <div>
       <h2>Merchant Profile</h2>
@@ -59,23 +63,9 @@ const Profile = () => {
           <p>Email: {profileData.email}</p>
           <p>Phone: {profileData.phone}</p>
           <p>Address: {profileData.address}</p>
-          <p>Current Balance: ${profileData?.merch_amount ? profileData.merch_amount : 0.0}</p>
-
-          <h3>Recent Transactions</h3>
-          {transactions.length > 0 ? (
-            <ul>
-              {transactions.map((transaction) => (
-                <li key={transaction.payment_id}>
-                  Transaction ID: {transaction.payment_id},
-                  Amount: ${transaction.amount},
-                  Date: {new Date(transaction.payment_date).toLocaleString()}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No transactions found.</p>
-          )}
+          <p>Current Balance: ${profileData.merch_amount}</p>
           <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleViewTransactionHistory}>View Transaction History</button>
         </div>
       ) : (
         <p>{message || 'Loading profile...'}</p>

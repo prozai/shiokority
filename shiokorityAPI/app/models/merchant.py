@@ -254,7 +254,8 @@ class Merchant:
             with connection.cursor() as cursor:
                 # Fetch all transactions for the merchant
                 query = """
-                    SELECT payment_id, amount, payment_date, status FROM transaction_management.Transaction
+                    SELECT payment_id, amount, payment_date, status
+                    FROM transaction_management.Transaction
                     WHERE merch_id = %s
                 """
                 cursor.execute(query, (merch_id,))
@@ -262,7 +263,8 @@ class Merchant:
 
                 # Calculate the total balance
                 balance_query = """
-                    SELECT SUM(amount) as total_balance FROM transaction_management.Transaction
+                    SELECT SUM(amount) as total_balance
+                    FROM transaction_management.Transaction
                     WHERE merch_id = %s AND status = 'completed'
                 """
                 cursor.execute(balance_query, (merch_id,))
