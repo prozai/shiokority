@@ -61,7 +61,7 @@ const Profile = () => {
           <p>Email: {profileData.email}</p>
           <p>Phone: {profileData.phone}</p>
           <p>Address: {profileData.address}</p>
-          <p>Current Balance: ${balance.toFixed(2)}</p>
+          <p>Current Balance: ${profileData.balance}</p>
 
           <h3>Recent Transactions</h3>
           {transactions.length > 0 ? (

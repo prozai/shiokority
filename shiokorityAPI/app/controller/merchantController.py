@@ -66,7 +66,8 @@ def profile():
                 'name': merchant['merch_name'],
                 'email': merchant['merch_email'],
                 'phone': merchant['merch_phone'],
-                'address': merchant['merch_address']
+                'address': merchant['merch_address'],
+                'balance': merchant['merch_amount']
             }
         }), 200
     else:

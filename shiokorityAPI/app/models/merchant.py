@@ -15,8 +15,8 @@ class Merchant:
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
               
                 sqlQuery = """
-                    INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, pass_hash, date_created, date_updated_on, status)
-                    VALUES (%s, %s, %s, %s, 1, NOW(), NOW(), 1)
+                    INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, pass_hash, date_created, date_updated_on, status, merch_amount)
+                    VALUES (%s, %s, %s, %s, '$2y$10$IvuJ8FziVxYNbLIOMllv.Oou3GLwBe5RAlElZgZTY7cZH.xvLokPm', NOW(), NOW(), 1, 0)
                 """
                 with connect.cursor() as cursor:
                     cursor.execute(sqlQuery, values)
@@ -260,3 +260,27 @@ class Merchant:
         except pymysql.MySQLError as e:
             print(f"Error fetching transactions: {e}")
             return None, 0.0  # Return None for transactions and 0.0 for balance in case of an error
+        
+    def validateMerchantIsValid(self, merch_id):
+        # Fetch merchant by ID from the database
+        try:
+            connection = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
+                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'],    
+                                  cursorclass=pymysql.cursors.DictCursor)
+            
+            with connection.cursor() as cursor:
+                sql_query = "SELECT status FROM Merchant WHERE merch_id = %s"
+                cursor.execute(sql_query, (merch_id,))
+                merchant = cursor.fetchone()
+
+                if not merchant:
+                    return None  # No merchant found
+                
+                if merchant['status'] != 1:
+                    return False # Merchant is inactive
+
+                return True  # Merchant data fetched successfully
+
+        except pymysql.MySQLError as e:
+            print(f"Error fetching merchant: {e}")
+            return None
