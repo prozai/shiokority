@@ -57,9 +57,9 @@ class merchantController {
   }
 
   // Handle fetching merchant transactions and balance
-  static async getTransactionHistory() {
+  static async getTransactionHistory(merch_id) {
     try {
-      const response = await Merchant.getTransactionHistory();
+      const response = await Merchant.getTransactionHistory(merch_id);
       return response;
     } catch (error) {
       throw new Error('Failed to fetch transactions and balance');
