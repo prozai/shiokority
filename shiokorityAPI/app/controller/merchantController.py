@@ -46,7 +46,7 @@ def login_merchant():
     if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['pass_hash'].encode('utf-8')):
         # Store the merchant ID in the session upon successful login
         session['merch_id'] = merchant['merch_id']
-        return jsonify({'success': True, 'message': 'Login successful'}), 200
+        return jsonify({'success': True, 'message': 'Login successful', 'merchant': {'merch_id': merchant['merch_id']}}), 200
     else:
         return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
 
@@ -59,6 +59,7 @@ def profile():
 
     # Fetch the merchant profile
     merchant = merchant_instance.getMerchantByID(session['merch_id'])
+
     if merchant:
         return jsonify({
             'success': True,
@@ -67,7 +68,8 @@ def profile():
                 'email': merchant['merch_email'],
                 'phone': merchant['merch_phone'],
                 'address': merchant['merch_address'],
-                'balance': merchant['merch_amount']
+                'merch_amount': merchant['merch_amount']
+
 
             }
         }), 200
@@ -121,6 +123,7 @@ def processPayment():
 @merchantBlueprint.route('/merchant/transactions', methods=['GET'])
 def merchant_transactions():
     merch_id = request.args.get('merch_id')  # Assuming merchant ID is passed as a query parameter
+
 
     merchant = merchant_instance.getMerchantByID(merch_id)
 
