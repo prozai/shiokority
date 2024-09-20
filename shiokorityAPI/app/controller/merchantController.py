@@ -67,7 +67,11 @@ def profile():
                 'email': merchant['merch_email'],
                 'phone': merchant['merch_phone'],
                 'address': merchant['merch_address'],
+<<<<<<< HEAD
                 'balance': merchant['merch_amount']
+=======
+                'merch_amount': merchant.get('merch_amount', 0)
+>>>>>>> 4c19fa0bfe157a02f7b46e36d6a526867b9a8d99
             }
         }), 200
     else:
@@ -120,13 +124,19 @@ def processPayment():
 @merchantBlueprint.route('/merchant/transactions', methods=['GET'])
 def merchant_transactions():
     merch_id = request.args.get('merch_id')  # Assuming merchant ID is passed as a query parameter
-    transactions, balance = merchant_instance.getTransactionHistory(merch_id)
+
+    merchant = merchant_instance.getMerchantByID(merch_id)
+
+    if merchant is None:
+        return jsonify({'success': False, 'message': 'Merchant not found'}), 404
+    
+    transactions = merchant_instance.getTransactionHistory(merch_id)
 
     if transactions is not None:
         return jsonify({
             'success': True,
             'transactions': transactions,
-            'balance': balance
+            'balance': merchant['merch_amount'] # Get balance directly from Merchant table
         }), 200
     else:
         return jsonify({'success': False, 'message': 'Merchant not found'}), 404

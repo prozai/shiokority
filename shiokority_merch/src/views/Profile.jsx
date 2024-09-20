@@ -6,7 +6,6 @@ const Profile = () => {
   const [profileData, setProfileData] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [message, setMessage] = useState('');
-  const [balance, setBalance] = useState(0);
 
   const navigate = useNavigate();
 
@@ -28,7 +27,6 @@ const Profile = () => {
       try {
         const data = await merchantController.getTransactionHistory(merch_id);
         setTransactions(data.transactions);
-        setBalance(data.balance);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
@@ -61,7 +59,11 @@ const Profile = () => {
           <p>Email: {profileData.email}</p>
           <p>Phone: {profileData.phone}</p>
           <p>Address: {profileData.address}</p>
+<<<<<<< HEAD
           <p>Current Balance: ${profileData.balance}</p>
+=======
+          <p>Current Balance: ${profileData?.merch_amount ? profileData.merch_amount : 0.0}</p>
+>>>>>>> 4c19fa0bfe157a02f7b46e36d6a526867b9a8d99
 
           <h3>Recent Transactions</h3>
           {transactions.length > 0 ? (
