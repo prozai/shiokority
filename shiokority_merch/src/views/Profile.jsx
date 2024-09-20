@@ -63,12 +63,8 @@ const Profile = () => {
           <p>Email: {profileData.email}</p>
           <p>Phone: {profileData.phone}</p>
           <p>Address: {profileData.address}</p>
-<<<<<<< HEAD
-          <p>Current Balance: ${profileData.balance}</p>
-=======
           <p>Current Balance: ${profileData.merch_amount}</p>
 
->>>>>>> af55db3d9a975dfacc92e3b6eb4201fdc77c28c8
 
 
           <h3>Recent Transactions</h3>
