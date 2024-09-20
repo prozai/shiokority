@@ -3,32 +3,30 @@ import merchantController from '../controller/merchantController';
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
-  const [balance, setBalance] = useState(0.0);
   const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    const fetchTransactionHistory = async () => {
-      try {
+  
+  const fetchTransactionHistory = async () => {
+    try {
         const merch_id = localStorage.getItem('merch_id');
-        if (merch_id) {
-            const data = await merchantController.getTransactionHistory();
-            setTransactions(data.transactions);
-            setBalance(data.balance);
-        } else {
-            setMessage('Merchant ID not found');
-        }
-      } catch (error) {
-        setMessage('Unable to fetch transaction history');
-      }
-    };
 
-    fetchTransactionHistory();
-  }, []);
+        if (merch_id) {
+            const data = await merchantController.getTransactionHistory(merch_id);
+            setTransactions(data.transactions);
+        } else {
+            setMessage('Merchant ID not found.')
+        }
+    } catch (error) {
+        setMessage('Unable to fetch transaction history');
+    }
+};
+
+useEffect(() => {
+        fetchTransactionHistory();
+    }, []);
 
   return (
     <div>
       <h2>Transaction History</h2>
-        <p><strong>Current Balance:</strong> ${balance.toFixed(2)}</p>
         {transactions.length > 0 ? (
             <ul>
                 {transactions.map((transaction) => (
