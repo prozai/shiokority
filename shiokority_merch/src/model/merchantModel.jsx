@@ -73,12 +73,7 @@ class Merchant {
   // Fetch the merchant's transaction history
   static async getTransactionHistory() {
     try {
-      const merch_id = localStorage.getItem('merch_id'); // Fetch merch_id from localStorage
-      if (!merch_id) {
-        throw new Error('Merchant ID is missing.');
-      }
-      
-      const response = await axios.get(`/merchant/transactions?merch_id=${merch_id}`, { withCredentials: true });
+      const response = await axios.get("/merchant/transactions");
       return response.data;
     } catch (error) {
       throw new Error('Failed to fetch transaction history and balance');
