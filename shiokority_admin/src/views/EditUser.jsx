@@ -74,7 +74,7 @@ const EditUser = () => {
 
   return (
     <div>
-      <h2>Edit Users</h2>
+      <h2>View Users</h2>
       {statusMessage && <p>{statusMessage}</p>}
       {error && <p>{error}</p>}
       {!error && (

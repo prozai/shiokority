@@ -69,6 +69,7 @@ def profile():
                 'phone': merchant['merch_phone'],
                 'address': merchant['merch_address'],
                 'merch_amount': merchant['merch_amount']
+
             }
         }), 200
     else:
@@ -122,16 +123,19 @@ def processPayment():
 def merchant_transactions():
     merch_id = request.args.get('merch_id')  # Assuming merchant ID is passed as a query parameter
 
-    if not merch_id:
-        return jsonify({'success': False, 'message': 'Merchant ID not provided'}), 404
+
+    merchant = merchant_instance.getMerchantByID(merch_id)
+
+    if merchant is None:
+        return jsonify({'success': False, 'message': 'Merchant not found'}), 404
     
-    transactions, balance = merchant_instance.getTransactionHistory(merch_id)
+    transactions = merchant_instance.getTransactionHistory(merch_id)
 
     if transactions is not None:
         return jsonify({
             'success': True,
             'transactions': transactions,
-            'balance': balance
+            'balance': merchant['merch_amount'] # Get balance directly from Merchant table
         }), 200
     else:
         return jsonify({'success': False, 'message': 'Merchant not found'}), 404

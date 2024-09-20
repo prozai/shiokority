@@ -64,6 +64,23 @@ const Profile = () => {
           <p>Phone: {profileData.phone}</p>
           <p>Address: {profileData.address}</p>
           <p>Current Balance: ${profileData.merch_amount}</p>
+
+
+
+          <h3>Recent Transactions</h3>
+          {transactions.length > 0 ? (
+            <ul>
+              {transactions.map((transaction) => (
+                <li key={transaction.payment_id}>
+                  Transaction ID: {transaction.payment_id},
+                  Amount: ${transaction.amount},
+                  Date: {new Date(transaction.payment_date).toLocaleString()}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No transactions found.</p>
+          )}
           <button onClick={handleLogout}>Logout</button>
           <button onClick={handleViewTransactionHistory}>View Transaction History</button>
         </div>
