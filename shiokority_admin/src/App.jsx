@@ -4,6 +4,7 @@ import Login from './views/Login'
 import EditMerchant from './views/EditMerchant'
 import AdministratorController from './controller/administratorController';
 
+
 const ProtectedRoute = () => {
   if (!AdministratorController.isLoggedIn()) {
     return <Navigate to="/login" replace />;
