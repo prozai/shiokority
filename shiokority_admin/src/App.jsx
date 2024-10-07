@@ -3,6 +3,8 @@ import Dashboard from './views/Dashboard'
 import Login from './views/Login'
 import EditMerchant from './views/EditMerchant'
 import AdministratorController from './controller/administratorController';
+//import './index.css';
+
 
 const ProtectedRoute = () => {
   if (!AdministratorController.isLoggedIn()) {

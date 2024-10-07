@@ -5,6 +5,8 @@ import Register from './views/Register';
 import Profile from './views/Profile';
 import BankPage from './views/BankPage';
 import TransactionHistory from './views/TransactionHistory';
+import './index.css';
+
 
 function App() {
   return (
