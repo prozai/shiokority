@@ -19,10 +19,11 @@ def registerMerchant():
     merch_name = data.get('merch_name')
     merch_phone = data.get('merch_phone')
     merch_address = data.get('merch_address')
+    uen = data.get('uen')
     
     # Call the Merchant model to create the new merchant
 
-    success, message = merchant_instance.registerMerchant(merch_email, password, merch_name, merch_phone, merch_address)
+    success, message = merchant_instance.registerMerchant(merch_email, password, merch_name, merch_phone, merch_address, uen)
 
     
     if success:
@@ -43,10 +44,10 @@ def login_merchant():
 
     # Verify the password using native bcrypt
     # The plain-text password (password) is compared with the hashed password (merchant['pass_hash'])
-    if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['pass_hash'].encode('utf-8')):
+    if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['hashed_password'].encode('utf-8')):
         # Store the merchant ID in the session upon successful login
-        session['merch_id'] = merchant['merch_id']
-        return jsonify({'success': True, 'message': 'Login successful', 'merchant': {'merch_id': merchant['merch_id']}}), 200
+        session['merch_id'] = merchant['merchant_id']
+        return jsonify({'success': True, 'message': 'Login successful', 'merchant': {'merch_id': merchant['merchant_id']}}), 200
     else:
         return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
 
@@ -64,11 +65,11 @@ def profile():
         return jsonify({
             'success': True,
             'merchant': {
-                'name': merchant['merch_name'],
+                'name': merchant['merchant_name'],
                 'email': merchant['merch_email'],
-                'phone': merchant['merch_phone'],
-                'address': merchant['merch_address'],
-                'merch_amount': merchant['merch_amount']
+                'phone': merchant['phone_number'],
+                'address': merchant['address'],
+                'merch_amount': 1234.56
             }
         }), 200
     else:

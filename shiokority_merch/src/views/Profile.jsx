@@ -63,7 +63,7 @@ const Profile = () => {
           <p>Email: {profileData.email}</p>
           <p>Phone: {profileData.phone}</p>
           <p>Address: {profileData.address}</p>
-          <p>Current Balance: ${profileData.merch_amount}</p>
+          <p>Current Balance: ${profileData.merch_amount}</p>   
 
 
 
