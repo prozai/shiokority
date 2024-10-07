@@ -5,8 +5,8 @@ class AdminController:
     def validate_admin_login(self, email, password):
         return Administrator.validateLogin(email, password)
 
-    def create_merchant(self, name, email, phone, address):
-        return Merchant().createMerchant(name, email, phone, address)
+    def create_merchant(self, merchant):
+        return Merchant().createMerchant(merchant)
 
     def get_merchant_data(self):
         return Merchant().getMerchantData()

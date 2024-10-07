@@ -3,14 +3,15 @@ import axios from 'axios';
 
 class Merchant {
 
-  constructor(merch_id, merch_name, merch_phone, merch_email, date_created, date_updated_on, status) {
+  constructor(merch_id, merch_name, merch_phone, merch_email, date_created, date_updated_on, merch_status, merch_uen) {
     this.merch_id = merch_id;
     this.merch_name = merch_name;
     this.merch_phone = merch_phone;
     this.merch_email = merch_email;
     this.date_created = date_created;
     this.date_updated_on = date_updated_on;
-    this.status = status;
+    this.merch_status = merch_status;
+    this.merch_uen = merch_uen;
   }
 
   static async createMerchant(merchantData) {
@@ -36,7 +37,8 @@ class Merchant {
             merchant.merch_email,
             merchant.date_created,
             merchant.date_updated_on,
-            merchant.status
+            merchant.merch_status,
+            merchant.merch_uen
           )
       );
     } catch (error) {

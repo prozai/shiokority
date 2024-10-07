@@ -47,15 +47,7 @@ def createMerchant():
         if not data:
             raise BadRequest("No input data provided")
 
-        name = data.get('name')
-        email = data.get('email')
-        phone = data.get('phone')
-        address = data.get('address')
-
-        if not all([name, email, phone, address]):
-            raise BadRequest("Name, email, phone, and address are required")
-
-        createdMerchant = admin_controller.create_merchant(name, email, phone, address)
+        createdMerchant = admin_controller.create_merchant(data)
 
         if createdMerchant:
             return jsonify(success=True), 200
@@ -82,7 +74,7 @@ def fetchMerchantList():
         print(f"An error occurred: {str(e)}")
         return jsonify(success=False, message="An unexpected error occurred"), 500
         
-@adminBlueprint.route('/admin/merchants/<int:merch_id>', methods=['GET'])
+@adminBlueprint.route('/admin/merchants/<merch_id>', methods=['GET'])
 def getMerchant(merch_id):
     try:
         merchant = admin_controller.get_one_merchant(merch_id)
@@ -96,10 +88,11 @@ def getMerchant(merch_id):
         print(f"An error occurred: {str(e)}")
         return jsonify(success=False, message="An unexpected error occurred"), 500
 
-@adminBlueprint.route('/admin/merchants/<int:merch_id>', methods=['PUT'])
+@adminBlueprint.route('/admin/merchants/<merch_id>', methods=['PUT'])
 def submitMerchantUpdate(merch_id):
     try:
         data = request.json
+
         if not data:
             raise BadRequest("No input data provided")
 
@@ -117,7 +110,7 @@ def submitMerchantUpdate(merch_id):
         print(f"An error occurred: {str(e)}")
         return jsonify(success=False, message="An unexpected error occurred"), 500
     
-@adminBlueprint.route('/admin/suspend-merchants/<int:merch_id>', methods=['PUT'])
+@adminBlueprint.route('/admin/suspend-merchants/<merch_id>', methods=['PUT'])
 def updateMerchantStatus(merch_id):
     try:
         data = request.json
@@ -125,8 +118,6 @@ def updateMerchantStatus(merch_id):
             raise BadRequest("No input data provided")
 
         status = data.get('status')
-        if status is None:
-            raise BadRequest("Status is required")
         
         updateStatus = admin_controller.update_merchant_status(merch_id, status)
         
