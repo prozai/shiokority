@@ -5,17 +5,18 @@ import bcrypt
 class Merchant:
 
     # 143
-    def createMerchant(self, merch_name, merch_email, merch_phone, merch_address):
-        values = (merch_name, merch_email, merch_phone, merch_address)
+    def createMerchant(self, merchant):
+        print(merchant)
+        values = (merchant['name'], merchant['email'], merchant['phone'], merchant['address'], merchant['uen'])   
 
         try:
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'],
+                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'],
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
               
                 sqlQuery = """
-                    INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, pass_hash, date_created, date_updated_on, status, merch_amount)
-                    VALUES (%s, %s, %s, %s, '$2y$10$IvuJ8FziVxYNbLIOMllv.Oou3GLwBe5RAlElZgZTY7cZH.xvLokPm', NOW(), NOW(), 1, 0)
+                    INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
+                    VALUES (%s, %s, %s, %s, '$2y$10$IvuJ8FziVxYNbLIOMllv.Oou3GLwBe5RAlElZgZTY7cZH.xvLokPm', NOW(), NOW(), 1, %s)
                 """
                 with connect.cursor() as cursor:
                     cursor.execute(sqlQuery, values)
@@ -31,7 +32,7 @@ class Merchant:
         try:
 
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'], 
+                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'], 
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
 
                 with connect.cursor() as cursor:
@@ -52,7 +53,7 @@ class Merchant:
         try:
 
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'], 
+                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'], 
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
 
                 with connect.cursor() as cursor:
@@ -72,16 +73,17 @@ class Merchant:
     # 146
     def updateMerchantDetails(self, merchID,merchData):
         
-        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'],
+        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], 
+                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'],
                                   cursorclass=pymysql.cursors.DictCursor)
         try:
             
             query = """UPDATE Merchant 
-                    SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW()
+                    SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW(), merch_uen = %s
                     WHERE merch_id = %s"""
             
             with connect.cursor() as cursor:
-                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_email'], merchData['merch_phone'], merchID))
+                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_email'], merchData['merch_phone'],merchData['merch_uen'], merchID))
 
                 connect.commit()
 
@@ -98,19 +100,18 @@ class Merchant:
     def updateMerchantStatus(self, merch_id, status):
 
         connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'],    
+                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'],    
                                   cursorclass=pymysql.cursors.DictCursor)
         try:
             with connect.cursor() as cursor:
                 new_status = bool(int(status))  # Convert status to boolean
-                sql = "UPDATE Merchant SET status = %s, date_updated_on = NOW() WHERE merch_id = %s"
+                print(new_status)
+                sql = "UPDATE Merchant SET merch_status = %s, date_updated_on = NOW() WHERE merch_id = %s"
 
                 validate = cursor.execute(sql, (new_status, merch_id))
 
                 if validate == 0:
-                    
                     return False  # No rows affected
-
             
             connect.commit()
             return True

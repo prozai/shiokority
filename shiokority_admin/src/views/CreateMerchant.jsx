@@ -6,7 +6,8 @@ const MerchantForm = () => {
     name: '',
     email: '',
     phone: '',
-    address: '' 
+    address: '',
+    uen: ''
   });
   const [status, setStatus] = useState('');
 
@@ -24,7 +25,7 @@ const MerchantForm = () => {
     try {
       await AdministratorController.createMerchant(formData);
       setStatus('Merchant created successfully!');
-      setFormData({ name: '', email: '', phone: '', address: '' }); 
+      setFormData({ name: '', email: '', phone: '', address: '', uen: '' }); 
     } catch (error) {
       setStatus(`Error: ${error.message}`);
     }
@@ -75,6 +76,19 @@ const MerchantForm = () => {
         name="address"
         placeholder='merchant address'
         value={formData.address}
+        onChange={handleChange}
+        required 
+        
+        />
+      </div>
+
+      <div>
+        <input 
+        type="text"
+        id="uen"
+        name="uen"
+        placeholder='UEN'
+        value={formData.uen}
         onChange={handleChange}
         required 
         
