@@ -5,7 +5,6 @@ import bcrypt
 class Merchant:
 
     # 143
-
     def createMerchant(self, merch_name, merch_email, merch_phone, merch_address):
         values = (merch_name, merch_email, merch_phone, merch_address)
 
@@ -136,7 +135,7 @@ class Merchant:
 
 
     # 130
-    def registerMerchant(self, merch_email, pass_hash, merch_name=None, merch_phone=None, merch_address=None):
+    def registerMerchant(self, merch_email, pass_hash, merch_name, merch_phone, merch_address, uen):
 
         pass_hash = bcrypt.hashpw(pass_hash.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
@@ -149,10 +148,10 @@ class Merchant:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
                 sql_query = """
-                    INSERT INTO Merchant (merch_email, pass_hash, merch_name, merch_phone, merch_address, date_created, date_updated_on, status)
-                    VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 1)
+                    INSERT INTO Merchant (merch_email, hashed_password, merchant_name, phone_number, address, date_created, date_updated_on, status, uen)
+                    VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 1, %s)
                 """
-                cursor.execute(sql_query, (merch_email, pass_hash, merch_name, merch_phone, merch_address))
+                cursor.execute(sql_query, (merch_email, pass_hash, merch_name, merch_phone, merch_address, uen))
                 connection.commit()
                 return True, "Merchant created successfully"
 
@@ -168,7 +167,7 @@ class Merchant:
             if not merchant:
                 return False, "Invalid email"
 
-            if not bcrypt.checkpw(pass_hash.encode('utf-8'), merchant['pass_hash'].encode('utf-8')):
+            if not bcrypt.checkpw(pass_hash.encode('utf-8'), merchant['hashed_password'].encode('utf-8')):
                 return False, "Invalid password"
 
             return True, merchant  # Login successful, return merchant data
@@ -197,9 +196,9 @@ class Merchant:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
                 sql_query = """
-                    SELECT merch_id, merch_name, merch_email, merch_phone, merch_address, merch_amount 
-                    FROM merchant_management.Merchant 
-                    WHERE merch_id = %s
+                    SELECT merchant_id, merchant_name, merch_email, phone_number, address, uen 
+                    FROM Merchant 
+                    WHERE merchant_id = %s
                 """
                 cursor.execute(sql_query, (merch_id,))
                 merchant = cursor.fetchone()
