@@ -8,7 +8,8 @@ const Register = () => {
     password: '',
     merch_name: '',
     merch_phone: '',
-    merch_address: ''
+    merch_address: '',
+    uen: ''
   });
   const [message, setMessage] = useState('');
   
@@ -70,6 +71,13 @@ const Register = () => {
           name="merch_address"
           placeholder="Address"
           value={formData.merch_address}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="uen"
+          placeholder="UEN"
+          value={formData.uen}
           onChange={handleChange}
         />
         <button type="submit">Register</button>
