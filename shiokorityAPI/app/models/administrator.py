@@ -57,28 +57,29 @@ class Administrator():
     
     # My work of art
     #136
-    def addUser(self, email, password, first_name, last_name, status):
+    def addUser(self, user):
         connection = None
+        
         try:
             # Establish a connection to the database
             connection = pymysql.connect(
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['USER_SCHEMA'],
+                database=current_app.config['PAY_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             )
 
             # Hash the password before storing
-            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            hashed_password = bcrypt.hashpw(user['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
             with connection.cursor() as cursor:
                 # Insert the new user into the Admin table
                 sql_query = '''
-                    INSERT INTO User_Profile (user_email, pass_hash, first_name, last_name, status, date_created, date_updated_on)
-                    VALUES (%s, %s, %s, %s, %s, NOW(),NOW())
+                    INSERT INTO Customer (cust_email, cust_pass, cust_fname, cust_lname, cust_status, cust_address, cust_phone, date_created, date_updated_on)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(),NOW())
                 '''
-                cursor.execute(sql_query, (email, hashed_password, first_name, last_name, status))
+                cursor.execute(sql_query, (user['email'], hashed_password, user['first_name'], user['last_name'], user['status'], user['address'], user['phone']))
                 connection.commit()
                 
                 # Return the new user ID
@@ -103,11 +104,11 @@ class Administrator():
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['USER_SCHEMA'],
+                database=current_app.config['PAY_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             ) as connect:
                 with connect.cursor() as cursor:
-                    sqlQuery = "SELECT * FROM User_Profile"
+                    sqlQuery = "SELECT * FROM Customer"
                     cursor.execute(sqlQuery)
                     users = cursor.fetchall()
                 
