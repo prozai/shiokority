@@ -9,7 +9,8 @@ const MerchantEdit = () => {
         merch_name: '',
         merch_email: '',
         merch_phone: '',
-        merch_address: ''
+        merch_address: '',
+        merch_uen: ''
     });
     const [statusMessage, setStatusMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -93,6 +94,15 @@ const MerchantEdit = () => {
                     type="text"
                     name="merch_address"
                     value={merchant.merch_address}
+                    onChange={handleChange}
+                    />
+                </div>
+                <div>
+                    <label>UEN:</label>
+                    <input 
+                    type="text"
+                    name="merch_uen"
+                    value={merchant.merch_uen}
                     onChange={handleChange}
                     />
                 </div>            

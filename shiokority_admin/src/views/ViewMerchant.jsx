@@ -40,6 +40,7 @@ const ViewMerchants = () => {
             <th>Date Created</th>
             <th>Date Updated</th>
             <th>Account Status</th>
+            <th>UEN</th>
           </tr>
         </thead>
         <tbody>
@@ -51,7 +52,8 @@ const ViewMerchants = () => {
               <td>{merchant.merch_email}</td>
               <td>{merchant.date_created}</td>
               <td>{merchant.date_updated_on}</td>
-              <td>{merchant.status === 1 ? 'Active' : 'Suspend'}</td>
+              <td>{merchant.merch_status === 1 ? 'Active' : 'Suspend'}</td>
+              <td>{merchant.merch_uen}</td>
               <td>
                 <Link to={`/edit-merchant/${merchant.merch_id}`}>
                   <button>Edit</button>
