@@ -7,6 +7,8 @@ const AdminAddUser = () => {
     password: '',
     first_name: '',
     last_name: '',
+    address: '',
+    phone: '',
     status: true // Default to 'true' for active status
   });
   const [statusMessage, setStatusMessage] = useState('');
@@ -76,6 +78,26 @@ const AdminAddUser = () => {
             id="last_name"
             name="last_name"
             value={formData.last_name}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label htmlFor="address">Address:</label>
+          <input
+            type="text"
+            id="address"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label htmlFor="phone">Phone:</label>
+          <input
+            type="text"
+            id="phone"
+            name="phone"
+            value={formData.phone}
             onChange={handleChange}
           />
         </div>

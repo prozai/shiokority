@@ -140,14 +140,10 @@ def addUser():
     if request.method == 'POST':
             data = request.get_json()  # Get the JSON data from the request
 
-            # Extract the necessary fields
-            email = data.get('email', '')
-            password = data.get('password', '')
-            first_name = data.get('first_name', '')
-            last_name = data.get('last_name', '')
-            status = data.get('status', True)  # default to True if not provided
+            if not data:
+                raise BadRequest("No input data provided")
 
-            createdUser = admin_controller.addUser(email, password, first_name, last_name, status)
+            createdUser = admin_controller.addUser(data)
 
             if createdUser:
                 return jsonify(success=True), 200

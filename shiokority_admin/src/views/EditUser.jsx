@@ -87,6 +87,8 @@ const EditUser = () => {
                   <th>Email</th>
                   <th>First Name</th>
                   <th>Last Name</th>
+                  <th>Address</th>
+                  <th>Phone</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -94,10 +96,12 @@ const EditUser = () => {
               <tbody>
                 {users.map((user) => (
                   <tr key={user.user_id}>
-                    <td>{user.user_id}</td>
-                    <td>{user.user_email}</td>
-                    <td>{user.first_name}</td>
-                    <td>{user.last_name}</td>
+                    <td>{user.cust_id}</td>
+                    <td>{user.cust_email}</td>
+                    <td>{user.cust_fname}</td>
+                    <td>{user.cust_lname}</td>
+                    <td>{user.cust_address}</td>
+                    <td>{user.cust_phone}</td>
                     <td>{user.status ? 'Active' : 'Deactivated'}</td>
                     <td>
                       <button onClick={() => handleEdit(user)}>Edit</button>
