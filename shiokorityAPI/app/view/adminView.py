@@ -6,7 +6,7 @@ adminBlueprint = Blueprint('adminBlueprint', __name__)
 
 admin_controller = AdminController()
 
-@adminBlueprint.route("/login/admin", methods=['POST'])
+@adminBlueprint.route("/auth/login", methods=['POST'])
 def adminLogin():
     try:
         data = request.get_json()
@@ -35,7 +35,7 @@ def adminLogin():
         print(f"An error occurred: {str(e)}")
         return jsonify(success=False, message="An unexpected error occurred"), 500
 
-@adminBlueprint.route("/logout/admin", methods=['POST'])
+@adminBlueprint.route("/auth/logout", methods=['POST'])
 def logout():
     session.clear()
     return jsonify({'message': 'Logout successful'}), 200
@@ -61,7 +61,7 @@ def createMerchant():
         print(f"An error occurred: {str(e)}")
         return jsonify(success=False, message="An unexpected error occurred"), 500
 
-@adminBlueprint.route('/admin/view-merchant', methods=['GET'])
+@adminBlueprint.route('/view-merchant', methods=['GET'])
 def fetchMerchantList():
     try:
         merchants = admin_controller.get_merchant_data()
@@ -74,7 +74,7 @@ def fetchMerchantList():
         print(f"An error occurred: {str(e)}")
         return jsonify(success=False, message="An unexpected error occurred"), 500
         
-@adminBlueprint.route('/admin/merchants/<merch_id>', methods=['GET'])
+@adminBlueprint.route('/merchants/<merch_id>', methods=['GET'])
 def getMerchant(merch_id):
     try:
         merchant = admin_controller.get_one_merchant(merch_id)
@@ -88,7 +88,7 @@ def getMerchant(merch_id):
         print(f"An error occurred: {str(e)}")
         return jsonify(success=False, message="An unexpected error occurred"), 500
 
-@adminBlueprint.route('/admin/merchants/<merch_id>', methods=['PUT'])
+@adminBlueprint.route('/merchants/<merch_id>', methods=['PUT'])
 def submitMerchantUpdate(merch_id):
     try:
         data = request.json
@@ -110,7 +110,7 @@ def submitMerchantUpdate(merch_id):
         print(f"An error occurred: {str(e)}")
         return jsonify(success=False, message="An unexpected error occurred"), 500
     
-@adminBlueprint.route('/admin/suspend-merchants/<merch_id>', methods=['PUT'])
+@adminBlueprint.route('/suspend-merchants/<merch_id>', methods=['PUT'])
 def updateMerchantStatus(merch_id):
     try:
         data = request.json
@@ -135,7 +135,7 @@ def updateMerchantStatus(merch_id):
 
 
 # My work of art
-@adminBlueprint.route("/admin/add-user", methods=['POST'])
+@adminBlueprint.route("/add-user", methods=['POST'])
 def addUser():
     if request.method == 'POST':
             data = request.get_json()  # Get the JSON data from the request
@@ -151,7 +151,7 @@ def addUser():
                 return jsonify(success=False), 400
 
 
-@adminBlueprint.route('/admin/get-users', methods=['GET'])
+@adminBlueprint.route('/get-users', methods=['GET'])
 def getAllUser():
     try:
         users = admin_controller.get_all_users()
@@ -165,7 +165,7 @@ def getAllUser():
         return jsonify({"error": "An unexpected error occurred"}), 500
 
 
-@adminBlueprint.route('/admin/users/<int:user_id>/update', methods=['PUT'])
+@adminBlueprint.route('/users/<int:user_id>/update', methods=['PUT'])
 def submitUserUpdate(user_id):
     try:
         data = request.get_json()
