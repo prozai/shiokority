@@ -6,7 +6,7 @@ import Dashboard from './views/Dashboard'
 import Profile from './views/Profile';
 import BankPage from './views/BankPage';
 import TransactionHistory from './views/TransactionHistory';
-import './index.css';
+//import './index.css';
 
 
 function App() {
