@@ -2,7 +2,7 @@
   "name": "shiokority_admin",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "proxy": "http://localhost:5001",
   "dependencies": {
     "@tanstack/react-query": "^5.51.24",
     "@testing-library/jest-dom": "^5.17.0",
