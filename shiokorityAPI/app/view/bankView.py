@@ -1,53 +1,63 @@
 from flask import Blueprint, request, jsonify
 from ..controller.bankController import BankController
+from werkzeug.exceptions import BadRequest
 
-bankBlueprint = Blueprint('bank', __name__)
+bankBlueprint = Blueprint('bankBlueprint', __name__)
 bank_controller = BankController()
 
+# Process a transaction between consumer and merchant
 @bankBlueprint.route('/process-transaction', methods=['POST'])
 def process_transaction():
-    data = request.get_json()
-    consumer_email = data.get('consumer_email')
-    merch_email = data.get('merch_email')
-    amount = data.get('amount')
+    try:
+        data = request.get_json()
+        if not data:
+            raise BadRequest("No input data provided")
 
-    if not consumer_email or not merch_email or not amount:
-        return jsonify({'success': False, 'message': 'Consumer email, merchant email, and amount are required'}), 400
+        consumer_id = data.get('consumer_id')
+        merchant_id = data.get('merchant_id')
+        amount = data.get('amount')
 
-    success, message = bank_controller.process_transaction(consumer_email, merch_email, amount)
-    if success:
-        return jsonify({'success': True, 'message': message}), 200
-    else:
-        return jsonify({'success': False, 'message': message}), 400
+        if not consumer_id or not merchant_id or not amount:
+            raise BadRequest("Consumer ID, Merchant ID, and amount are required")
 
-@bankBlueprint.route('/refund-transaction', methods=['POST'])
+        success, message = bank_controller.process_transaction(consumer_id, merchant_id, amount)
+
+        if success:
+            return jsonify(success=True, message=message), 200
+        else:
+            return jsonify(success=False, message=message), 400
+
+    except BadRequest as e:
+        return jsonify(success=False, message=str(e)), 400
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return jsonify(success=False, message="An unexpected error occurred"), 500
+
+# Process a refund for a specific transaction
+@bankBlueprint.route('/refund', methods=['POST'])
 def refund_transaction():
-    data = request.get_json()
-    payment_id = data.get('payment_id')
-    amount = data.get('amount')
-    merch_id = data.get('merch_id')
+    try:
+        data = request.get_json()
+        if not data:
+            raise BadRequest("No input data provided")
 
-    if not payment_id or not amount or not merch_id:
-        return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        transaction_id = data.get('transaction_id')
+        amount = data.get('amount')
 
-    success, message = bank_controller.refund_transaction(payment_id, amount, merch_id)
-    if success:
-        return jsonify({'success': True, 'message': message}), 200
-    else:
-        return jsonify({'success': False, 'message': message}), 400
+        if not transaction_id or not amount:
+            raise BadRequest("Transaction ID and amount are required")
 
-@bankBlueprint.route('/merchant-balance', methods=['GET'])
-def get_merchant_balance():
-    merch_id = request.args.get('merch_id')
+        success, message = bank_controller.refund_transaction(transaction_id, amount)
 
-    if not merch_id:
-        return jsonify({'success': False, 'message': 'Merchant ID is required'}), 400
+        if success:
+            return jsonify(success=True, message=message), 200
+        else:
+            return jsonify(success=False, message=message), 400
 
-    balance = bank_controller.get_merchant_balance(merch_id)
-
-    if balance is not None:
-        return jsonify({'success': True, 'balance': balance}), 200
-    else:
-        return jsonify({'success': False, 'message': 'Merchant not found'}), 404
+    except BadRequest as e:
+        return jsonify(success=False, message=str(e)), 400
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return jsonify(success=False, message="An unexpected error occurred"), 500
 
 

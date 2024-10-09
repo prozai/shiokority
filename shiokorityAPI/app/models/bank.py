@@ -1,5 +1,5 @@
 import pymysql
-from flask import current_app
+from flask import current_app, g
 
 class Bank:
 
@@ -8,15 +8,15 @@ class Bank:
 
     def getDBConnection(self):
         # Check if the database connection already exists
-        if not self.connection:
-            self.connection = pymysql.connect(
+        if 'db' not in g:
+            g.db = pymysql.connect(
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['PAY_SCHEMA'],
+                database=current_app.config['BANK_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             )
-        return self.connection
+        return g.db
 
     def processTransaction(self, consumer_id, merch_id, amount):
         """Process a payment transaction between consumer and merchant."""

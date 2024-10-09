@@ -25,6 +25,9 @@ app.register_blueprint(consumerBlueprint, url_prefix='/consumer')
 from app.view.developerView import developerBlueprint
 app.register_blueprint(developerBlueprint, url_prefix='/developers')
 
+from app.view.transactionView import transactionBlueprint
+app.register_blueprint(transactionBlueprint, url_prefix='/transactions')
+
 # Root route for testing
 @app.route("/")
 def hello():

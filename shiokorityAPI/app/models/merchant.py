@@ -4,6 +4,17 @@ import bcrypt
 
 class Merchant:
 
+    def getDBConnection(self):
+        if 'db' not in g:
+            g.db = pymysql.connect(
+                host=current_app.config['MYSQL_HOST'],
+                user=current_app.config['MYSQL_USER'],
+                password=current_app.config['MYSQL_PASSWORD'],
+                database=current_app.config['PAY_SCHEMA'],
+                cursorclass=pymysql.cursors.DictCursor
+            )
+        return g.db
+
     # 143
     def createMerchant(self, merchant):
         print(merchant)
