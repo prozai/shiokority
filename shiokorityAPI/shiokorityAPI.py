@@ -17,10 +17,10 @@ from app.view.merchantView import merchantBlueprint
 app.register_blueprint(merchantBlueprint,  url_prefix='/merchant')
 
 from app.view.adminView import adminBlueprint
-app.register_blueprint(adminBlueprint)
+app.register_blueprint(adminBlueprint, url_prefix='/admin')
 
 from app.view.consumerView import consumerBlueprint
-app.register_blueprint(consumerBlueprint)
+app.register_blueprint(consumerBlueprint, url_prefix='/consumer')
 
 from app.view.developerView import developerBlueprint
 app.register_blueprint(developerBlueprint, url_prefix='/developers')

@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdministratorController from '../controller/administratorController';
-import CreateMerchant from './CreateMerchant';
-import ViewMerchant from './ViewMerchant';
-import EditUser from './EditUser';
-import CreateUser from './CreateUser';import { FiHome, FiSettings, FiBell, FiUser } from 'react-icons/fi';
-import ShiokorityAdminLogo from '../asset/image/ShiokorityAdmin.png';
+import { FiHome, FiSettings, FiBell, FiUser, FiPieChart, FiFileText, FiMaximize2 } from 'react-icons/fi';
+import ShiokorityMerchLogo from '../asset/image/ShiokorityMerch.png';
+import merchantController from '../controller/merchantController';
 
-function Dashboard() {
+function MerchantDashboard() {
   const [status, setStatus] = useState('');
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await AdministratorController.logout();
+      // Assume logout logic is implemented in the controller
+      await merchantController.logout();
       setStatus('Logged out successfully');
       navigate('/login');
     } catch (error) {
@@ -25,15 +23,20 @@ function Dashboard() {
     <div className="flex h-screen bg-gray-200">
       {/* Sidebar */}
       <aside className="w-64 bg-[#153247] p-4 text-white flex flex-col items-center">
-      <img src={ShiokorityAdminLogo} alt="Shiokority Admin"  className="h-24 mb-6" />
-        <h2 className="text-xl font-bold mb-4">Administrator</h2>
+      <img src={ShiokorityMerchLogo} alt="Shiokority Merch" className="h-24 mb-6" />
+        <h2 className="text-xl font-bold mb-4">Merchant</h2>
         
         <nav className="flex flex-col w-full space-y-4">
-          <SidebarLink text="User Management" />
-          <SidebarLink text="Feature Management" />
-          <SidebarLink text="Customer Support" />
-          <SidebarLink text="System Management" />
-          <SidebarLink text="Predictive Analytics Tools" />
+          <SidebarLink icon={<FiUser size={20} />} text="Profile" />
+          <SidebarLink icon={<FiPieChart size={20} />} text="Analytics" />
+          <SidebarLink icon={<FiFileText size={20} />} text="Transaction History" />
+          {/* Pay Button with Circular Style */}
+          <div className="flex flex-col items-center mt-4">
+            <button className="flex flex-col items-center justify-center bg-[#153247] text-white w-16 h-16 rounded-full shadow-md hover:shadow-lg">
+              <FiMaximize2 size={20} />
+              <span className="text-xs">Pay</span>
+            </button>
+          </div>
         </nav>
         
         <button onClick={handleLogout} className="mt-auto bg-[#0f1e28] hover:bg-[#0c1821] text-white font-bold py-2 px-4 rounded-full w-full">
@@ -54,7 +57,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Alert Section */}
+        {/* Alert and Notification Sections */}
         <section className="space-y-4 mb-8">
           <Alert color="bg-pink-500" />
           <Alert color="bg-gray-500" />
@@ -64,10 +67,8 @@ function Dashboard() {
           <Alert color="bg-black" />
         </section>
 
-        {/* Notifications */}
         <section className="bg-white p-4 rounded-lg shadow-lg">
           <h2 className="text-lg font-semibold mb-4">Notifications</h2>
-          <p className="text-gray-600 mb-4">Notifications on this page. Read more details here.</p>
           <div className="flex space-x-4">
             <NotificationButton text="SUCCESS" color="bg-green-500" />
             <NotificationButton text="INFO" color="bg-blue-500" />
@@ -76,20 +77,16 @@ function Dashboard() {
           </div>
         </section>
         
-        {/* Existing Components */}
         {status && <p className="mt-4 text-center text-red-500">{status}</p>}
-        <CreateMerchant />
-        <ViewMerchant />
-        <CreateUser />
-        <EditUser />
       </main>
     </div>
   );
 }
 
-const SidebarLink = ({ text }) => (
-  <div className="p-2 rounded-lg hover:bg-[#0c1821] w-full text-center">
-    {text}
+const SidebarLink = ({ icon, text }) => (
+  <div className="flex items-center p-2 rounded-lg hover:bg-[#0c1821] w-full cursor-pointer">
+    <span className="mr-3">{icon}</span>
+    <span>{text}</span>
   </div>
 );
 
@@ -106,4 +103,4 @@ const NotificationButton = ({ text, color }) => (
   </button>
 );
 
-export default Dashboard;
+export default MerchantDashboard;
