@@ -14,7 +14,7 @@ app.config.from_object(config[config_name])
 
 #Registering blueprints
 from app.controller.merchantController import merchantBlueprint
-app.register_blueprint(merchantBlueprint)
+app.register_blueprint(merchantBlueprint,  url_prefix='/merchant')
 
 from app.view.adminView import adminBlueprint
 app.register_blueprint(adminBlueprint)

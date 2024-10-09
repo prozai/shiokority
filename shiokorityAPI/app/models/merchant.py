@@ -299,3 +299,37 @@ class Merchant:
         except pymysql.MySQLError as e:
             print(f"Error fetching merchant: {e}")
             return None
+        
+    def updateMerchantBalance(self, merch_id, amount):
+        try:
+            connection = self.getDBConnection()
+            with connection.cursor() as cursor:
+                # Update the merchant's balance
+                update_query = """
+                    UPDATE Merchant 
+                    SET merch_amount = merch_amount + %s 
+                    WHERE merch_id = %s
+                """
+                cursor.execute(update_query, (amount, merch_id))
+                connection.commit()
+                return True, "Merchant balance updated successfully"
+        except pymysql.MySQLError as e:
+            print(f"Error updating merchant balance: {e}")
+            return False, "Error updating merchant balance"
+
+    def getMerchantBalance(self, merch_id):
+        try:
+            connection = self.getDBConnection()
+            with connection.cursor() as cursor:
+                # Retrieve the merchant's balance
+                sql_query = "SELECT merch_amount FROM Merchant WHERE merch_id = %s"
+                cursor.execute(sql_query, (merch_id,))
+                result = cursor.fetchone()
+
+                if result is None:
+                    return None
+
+                return result['merch_amount']
+        except pymysql.MySQLError as e:
+            print(f"Error fetching merchant balance: {e}")
+            return None
