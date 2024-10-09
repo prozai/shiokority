@@ -6,7 +6,7 @@ class Administrator {
   
   static async login(data) {
     try {
-      const response = await axios.post(`${ADMIN_PREFIX}/login`, data);      
+      const response = await axios.post(`${ADMIN_PREFIX}/auth/login`, data);      
       localStorage.setItem('token', response.data.token);
       return response.data;
     } catch (error) {
@@ -16,7 +16,7 @@ class Administrator {
 
   static async logout() {
     try {
-      await axios.post(`${ADMIN_PREFIX}/logout`); // Assuming your API has a logout endpoint
+      await axios.post(`${ADMIN_PREFIX}/auth/logout`); // Assuming your API has a logout endpoint
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
