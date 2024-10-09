@@ -13,7 +13,7 @@ config_name = os.getenv('FLASK_ENV', 'testing')
 app.config.from_object(config[config_name])
 
 #Registering blueprints
-from app.controller.merchantController import merchantBlueprint
+from app.view.merchantView import merchantBlueprint
 app.register_blueprint(merchantBlueprint,  url_prefix='/merchant')
 
 from app.view.adminView import adminBlueprint
@@ -24,6 +24,9 @@ app.register_blueprint(consumerBlueprint)
 
 from app.view.developerView import developerBlueprint
 app.register_blueprint(developerBlueprint, url_prefix='/developers')
+
+from app.view.transactionView import transactionBlueprint
+app.register_blueprint(transactionBlueprint, url_prefix='/transactions')
 
 # Root route for testing
 @app.route("/")

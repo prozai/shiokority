@@ -1,6 +1,7 @@
 # app/controller/merchantController.py
 from flask import Blueprint, request, jsonify, session
 from ..models.merchant import Merchant
+from ..controller.merchantController import MerchantController
 import bcrypt
 
 merchant_instance = Merchant()
@@ -12,7 +13,6 @@ merchantBlueprint = Blueprint('merchant', __name__)
 @merchantBlueprint.route('/register-merchant', methods=['POST'])
 def registerMerchant():
     data = request.get_json()
-    
     # Extract data from request
     merch_email = data.get('merch_email')
     password = data.get('password') # Plain-text password entered by the user
@@ -129,7 +129,7 @@ def merchant_transactions():
     print(f"Fetching transactions for merchant ID: {merch_id}")
 
     merchant = merchant_instance.getMerchantByID(merch_id)
-    transactions = merchant_instance.getTransactionHistory(merch_id)
+    transactions = MerchantController.getTransactionHistory(session['merch_id'])
 
     if transactions is not None:
         return jsonify({
