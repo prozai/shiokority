@@ -13,7 +13,7 @@ config_name = os.getenv('FLASK_ENV', 'testing')
 app.config.from_object(config[config_name])
 
 #Registering blueprints
-from app.controller.merchantController import merchantBlueprint
+from app.view.merchantView import merchantBlueprint
 app.register_blueprint(merchantBlueprint,  url_prefix='/merchant')
 
 from app.view.adminView import adminBlueprint
