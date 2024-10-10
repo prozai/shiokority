@@ -183,3 +183,58 @@ class Administrator():
         finally:
             if connection:
                 connection.close()
+
+    def getAdminTokenByEmail(self, email):
+        try:
+            with pymysql.connect(
+                host=current_app.config['MYSQL_HOST'],
+                user=current_app.config['MYSQL_USER'],
+                password=current_app.config['MYSQL_PASSWORD'],
+                database=current_app.config['ADMIN_SCHEMA'],
+                cursorclass=pymysql.cursors.DictCursor
+            ) as connection:
+                with connection.cursor() as cursor:
+                    # Query to retrieve the hashed password and status
+                    sql_query = '''
+                        SELECT admin_secret_key
+                        FROM Admin 
+                        WHERE admin_email = %s
+                    '''
+                    cursor.execute(sql_query, (email,))
+                    user = cursor.fetchone()
+                    
+                    return user
+
+        except MySQLError as e:
+            print(f"Database error during login validation: {str(e)}")
+            return False
+
+        except Exception as e:
+            print(f"Unexpected error during login validation: {str(e)}")
+            return False
+        
+    def update2FAbyEmail(self, email):
+        try:
+            with pymysql.connect(
+                host=current_app.config['MYSQL_HOST'],
+                user=current_app.config['MYSQL_USER'],
+                password=current_app.config['MYSQL_PASSWORD'],
+                database=current_app.config['ADMIN_SCHEMA'],
+                cursorclass=pymysql.cursors.DictCursor
+            ) as connection:
+                with connection.cursor() as cursor:
+                    sql_query = '''
+                        UPDATE Admin
+                        SET admin_mfa_enabled = 1
+                        WHERE admin_email = %s
+                    '''
+                    cursor.execute(sql_query, (email))
+                    connection.commit()
+                    return True
+        except MySQLError as e:
+            print(f"Database error during login validation: {str(e)}")
+            return False
+
+        except Exception as e:
+            print(f"Unexpected error during login validation: {str(e)}")
+            return False

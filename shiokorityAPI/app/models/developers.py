@@ -53,7 +53,7 @@ class Developers():
                 with connection.cursor() as cursor:
                     # Query to retrieve the hashed password and status
                     sql_query = '''
-                        SELECT developer_id, dev_email, hashed_password, status, twoFactorEnabled FROM Developer WHERE dev_email = %s
+                        SELECT dev_id, dev_email, dev_pass, dev_status, dev_mfa_enabled FROM Developer WHERE dev_email = %s
                     '''
                     cursor.execute(sql_query, (developer['email'],))
                     user = cursor.fetchone()
@@ -62,16 +62,16 @@ class Developers():
                         print(f"Login attempt failed: User not found for email {developer['email']}")
                         return False
                     
-                    if user['status'] != 1:
+                    if user['dev_status'] != 1:
                         print(f"Login attempt failed: Inactive account for email {developer['email']}")
                         return False
                     
                     # Retrieve the hashed password from the database
-                    hashed_password = user['hashed_password'].encode('utf-8')
+                    hashed_password = user['dev_pass'].encode('utf-8')
                     
                     # Check if the provided password matches the hashed password
                     if bcrypt.checkpw(developer['password'].encode('utf-8'), hashed_password):
-                        return {"success" : True, "two_factor_enabled" : user['twoFactorEnabled']}
+                        return {"success" : True, "two_factor_enabled" : user['dev_mfa_enabled']}
                     
                     else:
                         print(f"Login attempt failed: Incorrect password for email {developer['email']}")
