@@ -1,4 +1,4 @@
-import Consumer from '../model/consumerModel';
+import Consumer from '../model/consumerWebModel';
 
 class consumerController {
   // Register consumer

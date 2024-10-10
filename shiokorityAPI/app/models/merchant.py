@@ -140,16 +140,16 @@ class Merchant:
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['MERCHANT_SCHEMA'],
+                database=current_app.config['PAY_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             )
         return g.db
 
 
     # 130
-    def registerMerchant(self, merch_email, pass_hash, merch_name, merch_phone, merch_address, uen):
+    def registerMerchant(self, merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen):
 
-        pass_hash = bcrypt.hashpw(pass_hash.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        merch_pass = bcrypt.hashpw(merch_pass.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
         existing_merchant = self.getMerchantByEmail(merch_email)
 
@@ -160,10 +160,10 @@ class Merchant:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
                 sql_query = """
-                    INSERT INTO Merchant (merch_email, hashed_password, merchant_name, phone_number, address, date_created, date_updated_on, status, uen)
+                    INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
                     VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 1, %s)
                 """
-                cursor.execute(sql_query, (merch_email, pass_hash, merch_name, merch_phone, merch_address, uen))
+                cursor.execute(sql_query, (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen))
                 connection.commit()
                 return True, "Merchant created successfully"
 
@@ -172,14 +172,14 @@ class Merchant:
             return False, f"Error creating merchant: {e}"
 
     # 131
-    def login(self, merch_email, pass_hash):
+    def login(self, merch_email, merch_pass):
         # Login function using bcrypt
         try:
             merchant = self.getMerchantByEmail(merch_email)
             if not merchant:
                 return False, "Invalid email"
 
-            if not bcrypt.checkpw(pass_hash.encode('utf-8'), merchant['hashed_password'].encode('utf-8')):
+            if not bcrypt.checkpw(merch_pass.encode('utf-8'), merchant['merch_pass'].encode('utf-8')):
                 return False, "Invalid password"
 
             return True, merchant  # Login successful, return merchant data
@@ -208,7 +208,7 @@ class Merchant:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
                 sql_query = """
-                    SELECT merchant_id, merchant_name, merch_email, phone_number, address, uen 
+                    SELECT merchant_id, merch_name, merch_email, merch_phone, merch_address, merch_uen 
                     FROM Merchant 
                     WHERE merchant_id = %s
                 """
@@ -291,7 +291,7 @@ class Merchant:
         # Fetch merchant by ID from the database
         try:
             connection = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['MERCHANT_SCHEMA'],    
+                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'],    
                                   cursorclass=pymysql.cursors.DictCursor)
             
             with connection.cursor() as cursor:

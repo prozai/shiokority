@@ -15,15 +15,18 @@ def registerMerchant():
     data = request.get_json()
     # Extract data from request
     merch_email = data.get('merch_email')
-    password = data.get('password') # Plain-text password entered by the user
+    merch_pass = data.get('merch_pass') # Plain-text password entered by the user
     merch_name = data.get('merch_name')
     merch_phone = data.get('merch_phone')
     merch_address = data.get('merch_address')
-    uen = data.get('uen')
+    date_created = data.get('date_created')
+    date_updated_on = data.get('date_updated_on')
+    merch_status = data.get('merch_status')
+    merch_uen = data.get('merch_uen')
     
     # Call the Merchant model to create the new merchant
 
-    success, message = merchant_instance.registerMerchant(merch_email, password, merch_name, merch_phone, merch_address, uen)
+    success, message = merchant_instance.registerMerchant(merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
 
     
     if success:

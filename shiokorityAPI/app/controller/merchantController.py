@@ -3,7 +3,7 @@ from ..models.merchant import Merchant
 class MerchantController:
     
     def register_merchant(self, merchant):
-        return Merchant().createMerchant(merchant)
+        return Merchant().registerMerchant(merchant)
 
     def login(self, merch_email, password):
         return Merchant().login(merch_email, password)

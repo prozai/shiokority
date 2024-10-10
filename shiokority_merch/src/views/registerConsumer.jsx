@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import consumerController from '../controller/consumerController';
+import consumerController from '../controller/consumerWebController';
 
 const Register = () => {
   const [formData, setFormData] = useState({
