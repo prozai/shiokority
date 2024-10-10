@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import consumerController from '../controller/consumerController';
+import consumerController from '../controller/consumerWebController';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });

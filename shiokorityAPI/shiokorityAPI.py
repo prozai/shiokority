@@ -22,6 +22,9 @@ app.register_blueprint(adminBlueprint)
 from app.view.consumerView import consumerBlueprint
 app.register_blueprint(consumerBlueprint)
 
+from app.view.consumerWebView import consumerWebBlueprint
+app.register_blueprint(consumerWebBlueprint)
+
 from app.view.developerView import developerBlueprint
 app.register_blueprint(developerBlueprint, url_prefix='/developers')
 

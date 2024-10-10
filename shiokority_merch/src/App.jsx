@@ -17,6 +17,9 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/bankpage" element={<BankPage />} />
         <Route path="/transactions" element={<TransactionHistory />} />
+        <Route path="/login-consumer" element={<loginConsumer />} />
+        <Route path="/profile-consumer" element={<profileConsumer />} />
+        <Route path="/register-consumer" element={<registerConsumer />} />
 
         {/* Default route */}
         <Route path="/" element={<Login />} />
