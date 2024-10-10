@@ -83,6 +83,18 @@ class AdministratorController {
     }
   }
 
+  static async verify2FA(code) {
+    return await Administrator.verify2FA(code);
+  }
+
+  static async getQRcode() {
+    return await Administrator.getQRcode();
+  }
+
+  static async getSecretKey() {
+    return await Administrator.getSecretKey();
+  }
+
 
 }
 

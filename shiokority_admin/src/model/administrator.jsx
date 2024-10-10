@@ -57,6 +57,32 @@ class Administrator {
     }
   }
 
+  static async verify2FA(code) {
+    try {
+      const response = await axios.post(`${ADMIN_PREFIX}/2fa/verify`, { code });
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to verify 2FA');
+    }
+  }
+
+  static async getQRcode() {
+    try {
+      const response = await axios.get(`${ADMIN_PREFIX}/getQRcode`, { responseType: 'blob' });
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to get QR code');
+    }
+  }
+
+  static async getSecretKey() {
+    try {
+      const response = await axios.get(`${ADMIN_PREFIX}/getSecretKey`);
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to get secret key');
+    }
+  }
   
 }
 

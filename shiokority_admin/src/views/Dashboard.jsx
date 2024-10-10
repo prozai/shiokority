@@ -21,6 +21,10 @@ function Dashboard() {
     }
   };
 
+  const handleSetup2FA = () => {
+    navigate('/setup2FA');
+  };
+
   return (
     <div className="flex h-screen bg-gray-200">
       {/* Sidebar */}
@@ -35,6 +39,10 @@ function Dashboard() {
           <SidebarLink text="System Management" />
           <SidebarLink text="Predictive Analytics Tools" />
         </nav>
+
+        <button onClick={handleSetup2FA} className="mt-auto bg-[#0f1e28] hover:bg-[#0c1821] text-white font-bold py-2 px-4 rounded-full w-full">
+          Setup 2FA
+        </button>
         
         <button onClick={handleLogout} className="mt-auto bg-[#0f1e28] hover:bg-[#0c1821] text-white font-bold py-2 px-4 rounded-full w-full">
           Logout
