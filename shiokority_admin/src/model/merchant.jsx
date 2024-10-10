@@ -15,7 +15,7 @@ class Merchant {
   }
 
   static async createMerchant(merchantData) {
-    const response = await axios.post('/create-merchant', merchantData);
+    const response = await axios.post('/admin/create-merchant', merchantData);
     if (response.status !== 200) {
       throw new Error(response.data.message || 'Merchant creation failed!');
     }

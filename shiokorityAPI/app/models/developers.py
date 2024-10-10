@@ -7,13 +7,13 @@ class Developers():
     def registerDeveloper(self, developer, secret_key):
         try:
             with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['DEVELOPER_SCHEMA'],
+                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['DEV_SCHEMA'],
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
 
                 with connect.cursor() as cursor:
 
                     # Check if the email already exists
-                    cursor.execute("SELECT COUNT(*) as count FROM developer WHERE dev_email = %s", (developer['email'],))
+                    cursor.execute("SELECT COUNT(*) as count FROM Developer WHERE dev_email = %s", (developer['email'],))
                     result = cursor.fetchone()
                     
                     if result['count'] > 0:
@@ -47,13 +47,13 @@ class Developers():
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['DEVELOPER_SCHEMA'],
+                database=current_app.config['DEV_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             ) as connection:
                 with connection.cursor() as cursor:
                     # Query to retrieve the hashed password and status
                     sql_query = '''
-                        SELECT developer_id, dev_email, hashed_password, status, twoFactorEnabled FROM developer WHERE dev_email = %s
+                        SELECT developer_id, dev_email, hashed_password, status, twoFactorEnabled FROM Developer WHERE dev_email = %s
                     '''
                     cursor.execute(sql_query, (developer['email'],))
                     user = cursor.fetchone()
@@ -92,13 +92,13 @@ class Developers():
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['DEVELOPER_SCHEMA'],
+                database=current_app.config['DEV_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             ) as connection:
                 with connection.cursor() as cursor:
                     sql_query = '''
                         SELECT *
-                        FROM developer
+                        FROM Developer
                         WHERE dev_email = %s
                     '''
                     cursor.execute(sql_query, (email,))
@@ -124,13 +124,13 @@ class Developers():
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['DEVELOPER_SCHEMA'],
+                database=current_app.config['DEV_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             ) as connection:
                 with connection.cursor() as cursor:
                     sql_query = '''
-                        UPDATE developer
-                        SET twoFactorEnabled = 1
+                        UPDATE Developer
+                        SET dev_mfa_enabled = 1
                         WHERE dev_email = %s
                     '''
                     cursor.execute(sql_query, (email))
