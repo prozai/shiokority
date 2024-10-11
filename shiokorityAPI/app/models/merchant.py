@@ -147,9 +147,9 @@ class Merchant:
 
 
     # 130
-    def registerMerchant(self, merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen):
+    def registerMerchant(self, merch_name, merch_email, merch_phone, merch_address, merch_pass, merch_uen):
 
-        merch_pass = bcrypt.hashpw(merch_pass.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        hash_pass = bcrypt.hashpw(merch_pass.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
         existing_merchant = self.getMerchantByEmail(merch_email)
 
@@ -163,7 +163,7 @@ class Merchant:
                     INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
                     VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 1, %s)
                 """
-                cursor.execute(sql_query, (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen))
+                cursor.execute(sql_query, (merch_name, merch_email, merch_phone, merch_address, hash_pass, merch_uen))
                 connection.commit()
                 return True, "Merchant created successfully"
 

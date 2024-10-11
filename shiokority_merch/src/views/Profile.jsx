@@ -59,10 +59,10 @@ const Profile = () => {
       <h2>Merchant Profile</h2>
       {profileData ? (
         <div>
-          <p>Name: {profileData.name}</p>
-          <p>Email: {profileData.email}</p>
-          <p>Phone: {profileData.phone}</p>
-          <p>Address: {profileData.address}</p>
+          <p>Name: {profileData.merch_name}</p>
+          <p>Email: {profileData.merch_email}</p>
+          <p>Phone: {profileData.merch_phone}</p>
+          <p>Address: {profileData.merch_address}</p>
           <p>Current Balance: ${profileData.merch_amount}</p>   
 
 

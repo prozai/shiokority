@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-class Consumer {
+class consumerWeb {
   // Register a new consumer
   static async registerConsumer(consumer_data) {
     try {
@@ -43,4 +43,4 @@ class Consumer {
   }
 }
 
-export default Consumer;
+export default consumerWeb;

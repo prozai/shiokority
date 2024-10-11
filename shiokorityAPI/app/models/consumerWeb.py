@@ -2,7 +2,7 @@ import pymysql
 from flask import current_app, g
 import bcrypt
 
-class Consumer:
+class consumerWeb:
 
     def getDBConnection(self):
         if 'db' not in g:
