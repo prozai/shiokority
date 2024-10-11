@@ -7,13 +7,17 @@ consumerWebBlueprint = Blueprint('consumerWeb', __name__)
 consumerWeb_instance = consumerWeb()
 
 @consumerWebBlueprint.route('/register-consumerWeb', methods=['POST'])
-def register_consumer():
+def registerConsumer():
     data = request.get_json()
 
-    if not data.get('name') or not data.get('email'):
-        return jsonify({'success': False, 'message': 'Name and email are required'}), 400
+    # Extract data from request
+    cust_email = data.get('cust_email')
+    cust_pass = data.get('password') # Plain-text password entered by the user
+    cust_name = data.get('cust_name')
+    cust_phone = data.get('cust_phone')
+    cust_address = data.get('cust_address')
 
-    success, message = consumerWeb_instance.register_consumer(data)
+    success, message = consumerWeb_instance.registerConsumer(cust_email, cust_pass, cust_name, cust_phone, cust_address)
     
     if success:
         return jsonify({'success': True, 'message': message}), 201
@@ -21,7 +25,7 @@ def register_consumer():
         return jsonify({'success': False, 'message': message}), 400
 
 @consumerWebBlueprint.route('/login-consumer', methods=['POST'])
-def login_consumert():
+def loginConsumer():
     data = request.get_json()
 
     email = data['email']
@@ -54,7 +58,7 @@ def profile():
     
 
 @consumerWebBlueprint.route('/send-transaction', methods=['POST'])
-def send_transaction():
+def sendTransaction():
     data = request.get_json()
 
     consumer_email = data.get('consumer_email')
@@ -64,7 +68,7 @@ def send_transaction():
     if not consumer_email or not merch_email or not amount:
         return jsonify({'success': False, 'message': 'Consumer email, merchant email, and amount are required'}), 400
 
-    success, message = ConsumerWebController.send_transaction(consumer_email, merch_email, amount)
+    success, message = ConsumerWebController.sendTransaction(consumer_email, merch_email, amount)
 
     if success:
         return jsonify({'success': True, 'message': message}), 200

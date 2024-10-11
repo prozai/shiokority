@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import consumerController from '../controller/consumerWebController';
+import consumerController from '../controller/consumerController';
 
-const loginConsumer = () => {
+const LoginConsumer = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
@@ -48,4 +48,4 @@ const loginConsumer = () => {
   );
 };
 
-export default loginConsumer;
+export default LoginConsumer;

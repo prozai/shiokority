@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-class consumerWeb {
+class Consumer {
   // Register a new consumer
-  static async registerConsumer(consumer_data) {
+  static async registerConsumer(cust_data) {
     try {
-      const response = await axios.post('consumer/register-consumer', consumer_data);  // Assuming the backend API endpoint
+      const response = await axios.post('consumer/register-consumer', cust_data);  // Assuming the backend API endpoint
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Registration failed');
@@ -58,4 +58,4 @@ class consumerWeb {
   }
 }
 
-export default consumerWeb;
+export default Consumer;
