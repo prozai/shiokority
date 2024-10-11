@@ -15,18 +15,15 @@ def registerMerchant():
     data = request.get_json()
     # Extract data from request
     merch_email = data.get('merch_email')
-    merch_pass = data.get('merch_pass') # Plain-text password entered by the user
+    merch_pass = data.get('password') # Plain-text password entered by the user
     merch_name = data.get('merch_name')
     merch_phone = data.get('merch_phone')
     merch_address = data.get('merch_address')
-    date_created = data.get('date_created')
-    date_updated_on = data.get('date_updated_on')
-    merch_status = data.get('merch_status')
-    merch_uen = data.get('merch_uen')
+    merch_uen = data.get('uen')
     
     # Call the Merchant model to create the new merchant
 
-    success, message = merchant_instance.registerMerchant(merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
+    success, message = merchant_instance.registerMerchant(merch_name, merch_email, merch_phone, merch_address, merch_pass, merch_uen)
 
     
     if success:
@@ -39,7 +36,8 @@ def registerMerchant():
 @merchantBlueprint.route('/login', methods=['POST'])
 def login_merchant():
     data = request.get_json()
-    email = data['merch_email']
+
+    email = data['email']
     password = data['password'] # Plain-text password entered by the user
 
     # Fetch the merchant from the database
@@ -47,10 +45,10 @@ def login_merchant():
 
     # Verify the password using native bcrypt
     # The plain-text password (password) is compared with the hashed password (merchant['pass_hash'])
-    if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['hashed_password'].encode('utf-8')):
+    if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['merch_pass'].encode('utf-8')):
         # Store the merchant ID in the session upon successful login
-        session['merch_id'] = merchant['merchant_id']
-        return jsonify({'success': True, 'message': 'Login successful', 'merchant': {'merch_id': merchant['merchant_id']}}), 200
+        session['merch_id'] = merchant['merch_id']
+        return jsonify({'success': True, 'message': 'Login successful', 'merchant': {'merch_id': merchant['merch_id']}}), 200
     else:
         return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
 
@@ -68,10 +66,10 @@ def profile():
         return jsonify({
             'success': True,
             'merchant': {
-                'name': merchant['merchant_name'],
+                'name': merchant['merch_name'],
                 'email': merchant['merch_email'],
-                'phone': merchant['phone_number'],
-                'address': merchant['address'],
+                'phone': merchant['merch_phone'],
+                'address': merchant['merch_address'],
                 'merch_amount': 1234.56
             }
         }), 200

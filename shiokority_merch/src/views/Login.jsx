@@ -6,7 +6,7 @@ import ShiokorityMerchLogo from '../asset/image/ShiokorityMerch.png';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    merch_email: '',
+    email: '',
     password: ''
   });
   const [status, setStatus] = useState('');

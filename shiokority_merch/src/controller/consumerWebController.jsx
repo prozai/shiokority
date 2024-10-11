@@ -1,10 +1,10 @@
-import Consumer from '../model/consumerWebModel';
+import consumerWeb from '../model/consumerWebModel';
 
 class consumerController {
   // Register consumer
   static async registerConsumer(consumer_data) {
     try {
-      return await Consumer.registerConsumer(consumer_data);
+      return await consumerWeb.registerConsumer(consumer_data);
     } catch (error) {
       throw new Error(error.message || 'Registration failed');
     }
@@ -12,13 +12,13 @@ class consumerController {
 
   // Login consumer
   static async login(data) {
-    return await Consumer.login(data);
+    return await consumerWeb.login(data);
   }
 
   // Get consumer profile
   static async getProfile() {
     try {
-      return await Consumer.getProfile();
+      return await consumerWeb.getProfile();
     } catch (error) {
       throw new Error('Unable to fetch profile');
     }
@@ -27,7 +27,7 @@ class consumerController {
   // Send payment to merchant
   static async sendPayment(merch_email, amount) {
     try {
-      return await Consumer.sendPayment(merch_email, amount);
+      return await consumerWeb.sendPayment(merch_email, amount);
     } catch (error) {
       throw new Error('Payment failed');
     }
