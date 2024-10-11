@@ -34,7 +34,7 @@ def registerMerchant():
 
 # Login Merchant Endpoint
 @merchantBlueprint.route('/login', methods=['POST'])
-def login_merchant():
+def loginMerchant():
     data = request.get_json()
 
     email = data['email']
@@ -70,12 +70,12 @@ def profile():
 
 # Update Merchant Details Endpoint
 @merchantBlueprint.route('/update', methods=['PUT'])
-def update_merchant():
+def updateMerchant():
     if 'merch_id' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
 
     data = request.get_json()
-    result = merchant_instance.updateMerchantDetails(session['merch_id'], data)
+    result = merchant_instance.updateMerchant(session['merch_id'], data)
 
     if result:
         return jsonify({'success': True, 'message': 'Merchant details updated successfully'}), 200
@@ -112,7 +112,7 @@ def processPayment():
 
 # Route to fetch the merchant's transactions and balance
 @merchantBlueprint.route('/merchant/transactions', methods=['GET'])
-def merchant_transactions():
+def merchantTransactions():
     merch_id = request.args.get('merch_id')  # Assuming merchant ID is passed as a query parameter
 
     if merchant is None:
