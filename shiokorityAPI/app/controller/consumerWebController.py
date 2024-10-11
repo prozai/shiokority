@@ -1,7 +1,7 @@
-from ..models.consumer import Consumer
+from ..models.consumerWeb import Consumer
 from ..models.merchant import Merchant
 
-class ConsumerController:
+class ConsumerWebController:
     def register_consumer(self, consumer):
         return Consumer().createConsumer(consumer)
 
