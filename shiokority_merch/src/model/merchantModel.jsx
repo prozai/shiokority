@@ -44,7 +44,7 @@ class Merchant {
   // Get the merchant's profile details
   static async getProfile() {
     try {
-      const response = await axios.get('/profile', { withCredentials: true });
+      const response = await axios.get('merchant/profile', { withCredentials: true });
       return response.data;
     } catch (error) {
       throw new Error('Unable to fetch profile');
@@ -54,7 +54,7 @@ class Merchant {
   // Update merchant details
   static async updateProfile(data) {
     try {
-      const response = await axios.put('/update', data, { withCredentials: true });
+      const response = await axios.put('merchant/update', data, { withCredentials: true });
       return response.data;
     } catch (error) {
       throw new Error('Unable to update profile');
@@ -63,7 +63,7 @@ class Merchant {
   // Send payment to merchant (API call)
   static async processPayment(merch_email, amount) {
     try {
-      const response = await axios.post('/bankpage', {merch_email,amount});
+      const response = await axios.post('merchant/bankpage', {merch_email,amount});
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to process payment');
