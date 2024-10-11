@@ -9,7 +9,7 @@ def processPayment():
     try:
         data = request.get_json()
 
-        merchant_id = data.get('merchantId')
+        merchant_id = data.get('merch_id')
         amount = data.get('amount')
         
         if merchant_id is None or amount is None:

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import consumerController from '../controller/consumerController';
+import consumerWebController from '../controller/consumerWebController';
 
 const Profile = () => {
   const [profileData, setProfileData] = useState(null);
@@ -11,8 +11,8 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await consumerController.getProfile();
-        setProfileData(data.consumer);
+        const data = await consumerWebController.getProfileConsumer();
+        setProfileData(data);
       } catch (error) {
         setMessage(error.message);
       }
@@ -33,6 +33,11 @@ const Profile = () => {
     } catch (error) {
       setMessage(error.message);
     }
+  };
+
+  const handleLogout = async () => {
+    await consumerWebController.logout();
+    navigate('consumerWeb/login'); // Redirect to login after logout
   };
 
   return (

@@ -5,7 +5,7 @@ class Merchant {
   // # 130
   static async registerMerchant(merch_data) {
     try {
-      const response = await axios.post('/merchant/register-merchant', merch_data);  // Updated path
+      const response = await axios.post('merchant/register', merch_data);  // Updated path
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Registration failed');
@@ -15,7 +15,7 @@ class Merchant {
   // # 131
   static async login(data) {
     try {
-      const response = await axios.post('/merchant/login', data, { withCredentials: true });
+      const response = await axios.post('merchant/login', data, { withCredentials: true });
       localStorage.setItem('merch_token', response.data.token); // Assuming the API returns a token
       localStorage.setItem('merch_id', response.data.merchant.merch_id); // Store merchant ID after login
       return response.data;
@@ -28,7 +28,7 @@ class Merchant {
   // # 132
   static async logout() {
     try {
-      await axios.post('/merchant/logout', {}, { withCredentials: true });
+      await axios.post('merchant/logout', {}, { withCredentials: true });
       localStorage.removeItem('merch_token');
       localStorage.setItem('merch_id');
     } catch (error) {
@@ -73,7 +73,7 @@ class Merchant {
   // Fetch the merchant's transaction history
   static async getTransactionHistory() {
     try {
-      const response = await axios.get("/merchant/transactions");
+      const response = await axios.get("merchant/transactions");
       return response.data;
     } catch (error) {
       throw new Error('Failed to fetch transaction history and balance');

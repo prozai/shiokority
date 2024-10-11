@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import consumerController from '../controller/consumerWebController';
 
-const Login = () => {
+const loginConsumer = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await consumerController.login(formData);
-      navigate('/profile');  // Redirect to profile after login
+      navigate('/profile-consumer');  // Redirect to profile after login
     } catch (error) {
       setMessage(error.message);
     }

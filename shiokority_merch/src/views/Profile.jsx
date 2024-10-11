@@ -47,11 +47,11 @@ const Profile = () => {
 
   const handleLogout = async () => {
     await merchantController.logout();
-    navigate('merchant/login'); // Redirect to login after logout
+    navigate('/login'); // Redirect to login after logout
   };
 
   const handleViewTransactionHistory = () => {
-    navigate('merchant/transactions'); // Navigate to transaction history page
+    navigate('/transactions'); // Navigate to transaction history page
   };
   
   return (
