@@ -11,14 +11,19 @@ class consumerController {
   }
 
   // Login consumer
-  static async login(data) {
-    return await consumerWeb.login(data);
+  static async loginConsumer(data) {
+    return await consumerWeb.loginConsumer(data);
+  }
+
+  // Logout consumer
+  static async logoutConsumer() {
+    return await consumerWeb.logoutConsumer();
   }
 
   // Get consumer profile
-  static async getProfile() {
+  static async getProfileConsumer() {
     try {
-      return await consumerWeb.getProfile();
+      return await consumerWeb.getProfileConsumer();
     } catch (error) {
       throw new Error('Unable to fetch profile');
     }
