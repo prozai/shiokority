@@ -208,9 +208,9 @@ class Merchant:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
                 sql_query = """
-                    SELECT merchant_id, merch_name, merch_email, merch_phone, merch_address, merch_uen 
+                    SELECT merch_id, merch_name, merch_email, merch_phone, merch_address, merch_uen 
                     FROM Merchant 
-                    WHERE merchant_id = %s
+                    WHERE merch_id = %s
                 """
                 cursor.execute(sql_query, (merch_id,))
                 merchant = cursor.fetchone()

@@ -63,16 +63,7 @@ def profile():
     merchant = merchant_instance.getMerchantByID(session['merch_id'])
 
     if merchant:
-        return jsonify({
-            'success': True,
-            'merchant': {
-                'name': merchant['merch_name'],
-                'email': merchant['merch_email'],
-                'phone': merchant['merch_phone'],
-                'address': merchant['merch_address'],
-                'merch_amount': 1234.56
-            }
-        }), 200
+        return jsonify(merchant), 200
     else:
         return jsonify({'success': False, 'message': 'Merchant not found'}), 404
 

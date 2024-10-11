@@ -13,7 +13,7 @@ const Profile = () => {
     const fetchProfile = async () => {
       try {
         const data = await merchantController.getProfile();
-        setProfileData(data.merchant);
+        setProfileData(data);
         // Fetch transactions and balance after profile data is available
         if (data.merchant?.merch_id) {
           fetchTransactionHistory(data.merchant.merch_id);
@@ -47,11 +47,11 @@ const Profile = () => {
 
   const handleLogout = async () => {
     await merchantController.logout();
-    navigate('/login'); // Redirect to login after logout
+    navigate('merchant/login'); // Redirect to login after logout
   };
 
   const handleViewTransactionHistory = () => {
-    navigate('/transactions'); // Navigate to transaction history page
+    navigate('merchant/transactions'); // Navigate to transaction history page
   };
   
   return (
@@ -63,7 +63,7 @@ const Profile = () => {
           <p>Email: {profileData.merch_email}</p>
           <p>Phone: {profileData.merch_phone}</p>
           <p>Address: {profileData.merch_address}</p>
-          <p>Current Balance: ${profileData.merch_amount}</p>   
+          <p>UEN: {profileData.merch_uen}</p>   
 
 
 
