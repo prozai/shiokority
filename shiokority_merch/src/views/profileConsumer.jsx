@@ -28,7 +28,7 @@ const ProfileConsumer = () => {
   const handleSendPayment = async (e) => {
     e.preventDefault();
     try {
-      const response = await consumerController.sendPayment(profileData.cust_email, paymentData.merch_email, paymentData.merch_amount);
+      const response = await consumerController.sendPayment(profileData.cust_email, paymentData.merch_email, paymentData.merch_amount );
       setMessage(response.message);
     } catch (error) {
       setMessage(error.message);
