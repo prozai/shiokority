@@ -1,7 +1,6 @@
-from flask import Blueprint, request, session, jsonify, send_file
+from flask import Blueprint, request, session, jsonify
 from werkzeug.exceptions import BadRequest
 from ..controller.administratorController import AdminController
-from ..auth.TOTP import generate_totp_uri, create_qr_code, generate_secret, encrypt_secret, decrypt_secret, get_totp_token
 
 adminBlueprint = Blueprint('adminBlueprint', __name__)
 
@@ -24,7 +23,6 @@ def adminLogin():
         admin = admin_controller.validate_admin_login(email, password)
         
         if admin:
-            session['email'] = email
             session['loggedIn'] = True
             return jsonify(success=True), 200
         else:
@@ -189,39 +187,3 @@ def submitUserUpdate(user_id):
     except Exception as e:
         print(f"Error updating user details: {e}")
         return jsonify({"error": "Failed to update user details"}), 500
-
-@adminBlueprint.route('/getQRcode', methods=['GET'])
-def getQRcode():
-    
-    # need get secret key from database
-    user = admin_controller.getAdminTokenByEmail(session['email'])
-    
-    totp_uri = generate_totp_uri(session['email'], decrypt_secret(user['admin_secret_key']))
-    qr_code = create_qr_code(totp_uri)
-    
-    return send_file(qr_code, mimetype='image/png')
-
-@adminBlueprint.route('/getSecretKey', methods=['GET'])
-def getSecretKey():
-    user = admin_controller.getAdminTokenByEmail(session['email'])
-
-    de_secret_key = decrypt_secret(user['admin_secret_key'])
-
-    return jsonify(secret_key=de_secret_key)
-    
-@adminBlueprint.route('/2fa/verify', methods=['POST'])
-def verify2FA():
-    data = request.get_json()
-
-    if not data:
-        raise BadRequest('No data provided')
-    
-    user = admin_controller.getAdminTokenByEmail(session['email'])
-
-    server_token = get_totp_token(decrypt_secret(user['admin_secret_key']))
-
-    if server_token == data['code']:
-        update2FA = admin_controller.update2FAbyEmail(session['email'])
-        return jsonify(success=update2FA), 200
-    else:
-        return jsonify(success=False), 401
