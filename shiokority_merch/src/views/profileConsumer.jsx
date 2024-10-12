@@ -28,7 +28,7 @@ const ProfileConsumer = () => {
   const handleSendPayment = async (e) => {
     e.preventDefault();
     try {
-      const response = await consumerController.sendPayment(paymentData.merch_email, paymentData.amount);
+      const response = await consumerController.sendPayment(profileData.cust_email, paymentData.merch_email, paymentData.merch_amount);
       setMessage(response.message);
     } catch (error) {
       setMessage(error.message);
@@ -45,9 +45,10 @@ const ProfileConsumer = () => {
       <h2>Consumer Profile</h2>
       {profileData ? (
         <div>
-          <p>Name: {profileData.first_name} {profileData.last_name}</p>
-          <p>Email: {profileData.email}</p>
-          <p>Address: {profileData.address}</p>
+          <p>Name: {profileData.cust_fname} {profileData.cust_lname}</p>
+          <p>Email: {profileData.cust_email}</p>
+          <p>Phone: {profileData.cust_phone}</p>
+          <p>Address: {profileData.cust_address}</p>
 
           <h3>Send Payment</h3>
           <form onSubmit={handleSendPayment}>
@@ -61,9 +62,9 @@ const ProfileConsumer = () => {
             />
             <input
               type="number"
-              name="amount"
+              name="merch_amount"
               placeholder="Payment Amount"
-              value={paymentData.amount}
+              value={paymentData.merch_amount}
               onChange={handleChange}
               required
             />

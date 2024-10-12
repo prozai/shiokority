@@ -16,6 +16,7 @@ class Consumer {
     try {
       const response = await axios.post('consumer/login-consumer', data, { withCredentials: true });
       localStorage.setItem('cust_token', response.data.token); // Save token or session management
+      localStorage.setItem('cust_id', response.data.customer.cust_id);
       return response.data;
     } catch (error) {
       throw new Error('Invalid email or password');
@@ -48,9 +49,9 @@ class Consumer {
   }
 
   // Send payment to merchant (API call)
-  static async sendPayment(merch_email, amount) {
+  static async sendPayment(cust_email, merch_email, merch_amount) {
     try {
-      const response = await axios.post('consumer/send-payment', { merch_email, amount });
+      const response = await axios.post('consumer/send-payment', { cust_email, merch_email, merch_amount });
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to send payment');
