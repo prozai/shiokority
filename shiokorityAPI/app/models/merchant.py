@@ -145,17 +145,10 @@ class Merchant:
             )
         return g.db
 
-
     # 130
-<<<<<<< HEAD
-    def registerMerchant(self, merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen):
-
-        merch_pass = bcrypt.hashpw(merch_pass.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-=======
     def registerMerchant(self, merch_name, merch_email, merch_phone, merch_address, merch_pass, merch_uen):
 
         hash_pass = bcrypt.hashpw(merch_pass.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
->>>>>>> c1bf434226944f602256a0d7343f0a468bf8b8a3
         
         existing_merchant = self.getMerchantByEmail(merch_email)
 
@@ -169,11 +162,9 @@ class Merchant:
                     INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
                     VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 1, %s)
                 """
-<<<<<<< HEAD
-                cursor.execute(sql_query, (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen))
-=======
+
                 cursor.execute(sql_query, (merch_name, merch_email, merch_phone, merch_address, hash_pass, merch_uen))
->>>>>>> c1bf434226944f602256a0d7343f0a468bf8b8a3
+
                 connection.commit()
                 return True, "Merchant created successfully"
 
@@ -218,11 +209,7 @@ class Merchant:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
                 sql_query = """
-<<<<<<< HEAD
-                    SELECT merchant_id, merch_name, merch_email, merch_phone, merch_address, merch_uen 
-=======
                     SELECT merch_id, merch_name, merch_email, merch_phone, merch_address, merch_uen 
->>>>>>> c1bf434226944f602256a0d7343f0a468bf8b8a3
                     FROM Merchant 
                     WHERE merch_id = %s
                 """
