@@ -83,15 +83,20 @@ class Consumer():
         except pymysql.MySQLError as e:
             return False, "Error logging in"
 
-    def sendPayment(self, cust_email, merch_id, merch_amount):
+    def sendPayment(self, cust_email, merch_email, merch_amount):
         connection = self.getDBConnection()
         try:
             with connection.cursor() as cursor:
                 sql_query = """
-                    INSERT INTO Payment (cust_email, merch_id, merch_amount, payment_date, payment_status, date_created, date_updated_on)
-                    VALUES (%s, %s, %s, NOW(), 'pending', NOW(), NOW())
+                    UPDATE Merchant
+                    SET merch_amount =  merch_amount + %s ,
+                    date_updated_on = NOW(),
+                    cust_email = %s,
+                    payment_date = NOW(),
+                    payment_status = 'pending'
+                    WHERE merch_email = %s
                 """
-                cursor.execute(sql_query, (cust_email, merch_id, merch_amount))
+                cursor.execute(sql_query, (cust_email, merch_email, merch_amount))
                 connection.commit()
                 return True, "Payment processed"
         except pymysql.MySQLError as e:

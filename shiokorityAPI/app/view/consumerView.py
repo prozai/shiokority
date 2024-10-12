@@ -97,9 +97,9 @@ def sendPayment():
     if not cust_email or not merch_email or not merch_amount:
         return jsonify({'success': False, 'message': 'Consumer email, merchant email, and amount are required'}), 400
 
-    success, message = ConsumerController().sendPayment(cust_email, merch_email, merch_amount)
+    success = ConsumerController().sendPayment(cust_email, merch_email, merch_amount)
 
     if success:
-        return jsonify({'success': True, 'message': message}), 200
+        return jsonify({'success': True}), 200
     else:
-        return jsonify({'success': False, 'message': message}), 400
+        return jsonify({'success': False}), 400
