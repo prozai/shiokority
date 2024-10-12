@@ -9,8 +9,8 @@ class ConsumerController():
     def process_payment(self, merchant_id, amount):
         return Consumer().process_payment(merchant_id, amount)
 
-    def register_consumer(self, customer):
-        return Consumer().createConsumer(customer)
+    def registerConsumer(self, customer):
+        return Consumer().registerConsumer(customer)
     
     def login(self, cust_email, password):
         return Consumer().login(cust_email, password)

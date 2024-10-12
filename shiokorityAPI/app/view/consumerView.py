@@ -37,7 +37,6 @@ def processPayment():
 @consumerBlueprint.route('/register-consumer', methods=['POST'])
 def registerConsumer():
     data = request.get_json()
-
     # Extract data from request
     cust_email = data.get('cust_email')
     cust_pass = data.get('cust_pass') # Plain-text password entered by the user
