@@ -31,21 +31,8 @@ def login():
         return jsonify(ifLogin)
         
     session['email'] = data.get('email')
+
     return jsonify(ifLogin)
-
-@developerBlueprint.route('/auth/2FA', methods=['POST'])
-def auth2FA():
-    data = request.get_json()
-
-    if not data:
-        raise BadRequest('No data provided')
-    
-    user = DevelopersController().getDeveloperByEmail(session['email'])
-
-    if user.verify_totp(data['token']):
-        return jsonify(success=True), 200
-    else:
-        return jsonify(success=False), 401
 
 @developerBlueprint.route('/logout', methods=['POST'])
 def logout():
@@ -58,7 +45,7 @@ def getQRcode():
     # need get secret key from database
     user = DevelopersController().getDeveloperByEmail(session['email'])
     
-    totp_uri = generate_totp_uri(session['email'], decrypt_secret(user['secret_key']))
+    totp_uri = generate_totp_uri(session['email'], decrypt_secret(user['dev_secret_key']))
     qr_code = create_qr_code(totp_uri)
     
     return send_file(qr_code, mimetype='image/png')
@@ -67,7 +54,7 @@ def getQRcode():
 def getSecretKey():
     user = DevelopersController().getDeveloperByEmail(session['email'])
 
-    de_secret_key = decrypt_secret(user['secret_key'])
+    de_secret_key = decrypt_secret(user['dev_secret_key'])
 
     return jsonify(secret_key=de_secret_key)
     
@@ -80,7 +67,7 @@ def verify2FA():
     
     user = DevelopersController().getDeveloperByEmail(session['email'])
 
-    server_token = get_totp_token(decrypt_secret(user['secret_key']))
+    server_token = get_totp_token(decrypt_secret(user['dev_secret_key']))
 
     if server_token == data['code']:
         update2FA = DevelopersController().update2FAbyEmail(session['email'])

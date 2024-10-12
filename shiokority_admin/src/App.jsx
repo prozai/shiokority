@@ -2,9 +2,11 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Dashboard from './views/Dashboard'
 import Login from './views/Login'
 import EditMerchant from './views/EditMerchant'
+import ViewMerchant from './views/ViewMerchant'; // Import the ViewMerchant component
+import CreateMerchant from './views/CreateMerchant'; // Import CreateMerchant component
 import AdministratorController from './controller/administratorController';
-//import './index.css';
-
+import Setup2FA from './views/Setup2FA';
+import Verify2FA from './views/Verify2FA';
 
 const ProtectedRoute = () => {
   if (!AdministratorController.isLoggedIn()) {
@@ -22,7 +24,11 @@ function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/user-management" element={<ViewMerchant />} /> {/* Add this route */}
         <Route path="/edit-merchant/:merchId" element={<EditMerchant />} />
+        <Route path="/create-merchant" element={<CreateMerchant />} /> {/* Add route for Create Merchant */}
+        <Route path="/Setup2FA" element={<Setup2FA />} />
+        <Route path="/Verify2FA" element={<Verify2FA />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Route>
       
