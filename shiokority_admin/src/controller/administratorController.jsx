@@ -73,6 +73,17 @@ class AdministratorController {
     }
   }
 
+  // Fetch user by ID
+  static async getUserById(cust_id) {
+    try {
+      const user = await Administrator.getUserById(cust_id);  // Fetch user details from the model
+      return user;
+    } catch (error) {
+      console.error('Error in getUserById:', error);
+      throw error;
+    }
+  }
+
   static async updateUser(userId, userData) {
     try {
       const result = await Administrator.updateUser(userId, userData);  // Calls the model method to update the user

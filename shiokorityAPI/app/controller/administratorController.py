@@ -26,8 +26,11 @@ class AdminController:
     def get_all_users(self):
         return Administrator.get_all_users(self)
 
-    def submit_user_update(self, user_id, email=None, first_name=None, last_name=None, status=None):
-        return Administrator().update_user(user_id, email, first_name, last_name, status)
+    def get_user_by_id(self, cust_id):
+        return Administrator().getUserById(cust_id)
+
+    def submit_user_update(self, user_id, email=None, first_name=None, last_name=None, address=None, phone=None, status=None):
+        return Administrator().update_user(user_id, email, first_name, last_name, address, phone, status)
     
     def getAdminTokenByEmail(self, email):
         return Administrator().getAdminTokenByEmail(email)

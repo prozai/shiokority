@@ -3,7 +3,7 @@ import axios from 'axios';
 const ADMIN_PREFIX = '/admin';
 
 class Administrator {
-  
+    
   static async login(data) {
     try {
       const response = await axios.post(`${ADMIN_PREFIX}/auth/login`, data);      
@@ -44,6 +44,20 @@ class Administrator {
       return response.data;
     } catch (error) {
       console.error('Error fetching users (2): ', error); // Updated error message
+      throw error;
+    }
+  }
+
+  // Fetch a user by ID
+  static async getUserById(cust_id) {
+    try {
+      const response = await axios.get(`${ADMIN_PREFIX}/get-user/${cust_id}`);
+      if (response.status !== 200) {
+        throw new Error('User not found');
+      }
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user by ID:', error);
       throw error;
     }
   }

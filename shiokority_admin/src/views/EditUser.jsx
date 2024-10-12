@@ -1,69 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import AdministratorController from '../controller/administratorController'; // Assuming you have a controller
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const EditUser = () => {
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const { cust_id } = useParams(); // Get the cust_id from the URL
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
   const [status, setStatus] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Fetch all users when component is loaded
+  // Fetch user details based on cust_id when component loads
   useEffect(() => {
-    const fetchUsers = async () => {
-      setStatusMessage('Loading users...');
+    const fetchUserDetails = async () => {
+      setStatusMessage('Loading user details...');
       try {
-        const userList = await AdministratorController.getAllUsers();
-        setUsers(userList);
+        const user = await AdministratorController.getUserById(cust_id);
+        if (user) {
+          setEmail(user.cust_email);
+          setFirstName(user.cust_fname);
+          setLastName(user.cust_lname);
+          setAddress(user.cust_address);
+          setPhone(user.cust_phone);
+          setStatus(user.cust_status);
+        }
         setStatusMessage('');
       } catch (error) {
-        if (error.response && error.response.status === 403) {
-          setError('You are not authorized to view the user list.');
-          navigate('/login');
-        } else {
-          setError('Failed to load the user list. Please try again later.');
-        }
+        setError('Failed to load user details. Please try again later.');
       }
     };
 
-    fetchUsers();
-  }, [navigate]);
+    fetchUserDetails();
+  }, [cust_id]);
 
-  // Handle when the user clicks to edit a particular user
-  const handleEdit = (user) => {
-    setSelectedUser(user.user_id);
-    setEmail(user.user_email);
-    setFirstName(user.first_name);
-    setLastName(user.last_name);
-    setStatus(user.status);
-  };
-
-  // Handle when the user updates a particular user and saves the changes
+  // Handle when the user updates the user details and saves the changes
   const handleUpdateUser = async (event) => {
     event.preventDefault();
     setStatusMessage('Updating user...');
 
     try {
-      const response = await AdministratorController.updateUser(selectedUser, {
+      const response = await AdministratorController.updateUser(cust_id, {
         email,
         first_name: firstName,
         last_name: lastName,
+        address,
+        phone,
         status
       });
 
       if (response.success) {
-        setUsers(users.map(user =>
-          user.user_id === selectedUser
-            ? { ...user, user_email: email, first_name: firstName, last_name: lastName, status }
-            : user
-        ));
-        setSelectedUser(null);
         setStatusMessage('User updated successfully.');
+        navigate('/dashboard'); // Redirect back to the user list or another page
       } else {
         setError('Failed to update user: ' + response.message);
       }
@@ -74,88 +65,68 @@ const EditUser = () => {
 
   return (
     <div>
-      <h2>View Users</h2>
       {statusMessage && <p>{statusMessage}</p>}
       {error && <p>{error}</p>}
+      <h2>Editing user with ID: {cust_id}</h2>
       {!error && (
-        <>
-          <div>
-            <table>
-              <thead>
-                <tr>
-                  <th>User ID</th>
-                  <th>Email</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Address</th>
-                  <th>Phone</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.user_id}>
-                    <td>{user.cust_id}</td>
-                    <td>{user.cust_email}</td>
-                    <td>{user.cust_fname}</td>
-                    <td>{user.cust_lname}</td>
-                    <td>{user.cust_address}</td>
-                    <td>{user.cust_phone}</td>
-                    <td>{user.status ? 'Active' : 'Deactivated'}</td>
-                    <td>
-                      <button onClick={() => handleEdit(user)}>Edit</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {selectedUser && (
+        <div>
+          <form onSubmit={handleUpdateUser}>
             <div>
-              <h3>Edit User</h3>
-              <form onSubmit={handleUpdateUser}>
-                <div>
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label>First Name</label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label>Last Name</label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label>Status</label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                  >
-                    <option value="1">Active</option>
-                    <option value="0">Deactivate</option>
-                  </select>
-                </div>
-                <button type="submit">Update User</button>
-                <button type="button" onClick={() => setSelectedUser(null)}>Cancel</button>
-              </form>
+              <label>Email: </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
-          )}
-        </>
+            <div>
+              <label>First Name: </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label>Last Name: </label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label>Address: </label>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+            <div>
+              <label>Phone: </label>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+            <div>
+              <label>Status: </label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+              >
+                <option value="1">Active</option>
+                <option value="0">Deactivate</option>
+              </select>
+            </div>
+            <button type="submit">Update User</button>
+            <button type="button" onClick={() => navigate('/dashboard')}>
+              Cancel
+            </button>
+          </form>
+        </div>
       )}
     </div>
   );

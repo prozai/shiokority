@@ -5,6 +5,8 @@ import EditMerchant from './views/EditMerchant'
 import AdministratorController from './controller/administratorController';
 import Setup2FA from './views/Setup2FA';
 import Verify2FA from './views/Verify2FA';
+import ViewUser from './views/ViewUser';
+import EditUser from './views/EditUser';
 
 const ProtectedRoute = () => {
   if (!AdministratorController.isLoggedIn()) {
@@ -25,6 +27,7 @@ function App() {
         <Route path="/edit-merchant/:merchId" element={<EditMerchant />} />
         <Route path="/Setup2FA" element={<Setup2FA />} />
         <Route path="/Verify2FA" element={<Verify2FA />} />
+        <Route path="/EditUser/:cust_id" element={<EditUser />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Route>
       

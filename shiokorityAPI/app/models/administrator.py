@@ -59,7 +59,6 @@ class Administrator():
     #136
     def addUser(self, user):
         connection = None
-        
         try:
             # Establish a connection to the database
             connection = pymysql.connect(
@@ -81,9 +80,7 @@ class Administrator():
                 '''
                 cursor.execute(sql_query, (user['email'], hashed_password, user['first_name'], user['last_name'], user['status'], user['address'], user['phone']))
                 connection.commit()
-                
-                # Return the new user ID
-                return cursor.lastrowid
+                return True
 
         except MySQLError as e:
             print(f"Database error during user creation: {str(e)}")
@@ -111,26 +108,54 @@ class Administrator():
                     sqlQuery = "SELECT * FROM Customer"
                     cursor.execute(sqlQuery)
                     users = cursor.fetchall()
-                
                 if not users:
-                    return []
-
+                    return False
                 return users
         except pymysql.MySQLError as e:
             print(f"Error fetching users: {e}")
-            return []
+            return False
 
+    def getUserById(self, user_id):
+        try:
+            with pymysql.connect(
+                host=current_app.config['MYSQL_HOST'],
+                user=current_app.config['MYSQL_USER'],
+                password=current_app.config['MYSQL_PASSWORD'],
+                database=current_app.config['PAY_SCHEMA'],
+                cursorclass=pymysql.cursors.DictCursor
+            ) as connection:
+                with connection.cursor() as cursor:
+                    # Query to retrieve user details by user_id
+                    sql_query = '''
+                        SELECT cust_id, cust_email, cust_fname, cust_lname, cust_status, cust_address, cust_phone, date_created, date_updated_on
+                        FROM Customer
+                        WHERE cust_id = %s
+                    '''
+                    cursor.execute(sql_query, (user_id,))
+                    user = cursor.fetchone()
+                    
+                    # Return the user data if found, otherwise None
+                    if user:
+                        return user
+                    else:
+                        return False
+        except MySQLError as e:
+            print(f"Database error during user retrieval: {str(e)}")
+            return False
+        except Exception as e:
+            print(f"Unexpected error during user retrieval: {str(e)}")
+            return False
 
     #141
     #138
-    def update_user(self, user_id, email=None, first_name=None, last_name=None, status=None):
+    def update_user(self, cust_id, email=None, first_name=None, last_name=None, address=None, phone=None, status=None):
         try:
             # Establish a connection to the database
             connection = pymysql.connect(
                 host=current_app.config['MYSQL_HOST'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['USER_SCHEMA'],
+                database=current_app.config['PAY_SCHEMA'],
                 cursorclass=pymysql.cursors.DictCursor
             )
 
@@ -139,19 +164,27 @@ class Administrator():
             params = []
 
             if email:
-                updates.append("user_email = %s")
+                updates.append("cust_email = %s")
                 params.append(email)
 
             if first_name:
-                updates.append("first_name = %s")
+                updates.append("cust_fname = %s")
                 params.append(first_name)
 
             if last_name:
-                updates.append("last_name = %s")
+                updates.append("cust_lname = %s")
                 params.append(last_name)
 
+            if address:
+                updates.append("cust_address = %s")
+                params.append(address)
+
+            if phone:
+                updates.append("cust_phone = %s")
+                params.append(phone)
+
             if status is not None:
-                updates.append("status = %s")
+                updates.append("cust_status = %s")
                 params.append(status)
 
             # Ensure there are fields to update
@@ -161,10 +194,10 @@ class Administrator():
             # Add the `date_updated_on` field
             updates.append("date_updated_on = NOW()")
 
-            params.append(user_id)
+            params.append(cust_id)
 
             # Prepare the SQL query
-            sql_query = f"UPDATE User_Profile SET {', '.join(updates)} WHERE user_id = %s"
+            sql_query = f"UPDATE Customer SET {', '.join(updates)} WHERE cust_id = %s"
 
             with connection.cursor() as cursor:
                 # Execute the query with the provided params
