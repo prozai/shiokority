@@ -2,23 +2,28 @@ import Consumer from '../model/consumerModel';
 
 class consumerController {
   // Register consumer
-  static async registerConsumer(consumer_data) {
+  static async registerConsumer(cust_data) {
     try {
-      return await Consumer.registerConsumer(consumer_data);
+      return await Consumer.registerConsumer(cust_data);
     } catch (error) {
       throw new Error(error.message || 'Registration failed');
     }
   }
 
   // Login consumer
-  static async login(data) {
-    return await Consumer.login(data);
+  static async loginConsumer(data) {
+    return await Consumer.loginConsumer(data);
+  }
+
+  // Logout consumer
+  static async logoutConsumer() {
+    return await Consumer.logoutConsumer();
   }
 
   // Get consumer profile
-  static async getProfile() {
+  static async getProfileConsumer() {
     try {
-      return await Consumer.getProfile();
+      return await Consumer.getProfileConsumer();
     } catch (error) {
       throw new Error('Unable to fetch profile');
     }

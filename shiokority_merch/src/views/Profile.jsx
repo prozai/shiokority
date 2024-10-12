@@ -13,7 +13,7 @@ const Profile = () => {
     const fetchProfile = async () => {
       try {
         const data = await merchantController.getProfile();
-        setProfileData(data.merchant);
+        setProfileData(data);
         // Fetch transactions and balance after profile data is available
         if (data.merchant?.merch_id) {
           fetchTransactionHistory(data.merchant.merch_id);
@@ -59,11 +59,11 @@ const Profile = () => {
       <h2>Merchant Profile</h2>
       {profileData ? (
         <div>
-          <p>Name: {profileData.name}</p>
-          <p>Email: {profileData.email}</p>
-          <p>Phone: {profileData.phone}</p>
-          <p>Address: {profileData.address}</p>
-          <p>Current Balance: ${profileData.merch_amount}</p>   
+          <p>Name: {profileData.merch_name}</p>
+          <p>Email: {profileData.merch_email}</p>
+          <p>Phone: {profileData.merch_phone}</p>
+          <p>Address: {profileData.merch_address}</p>
+          <p>UEN: {profileData.merch_uen}</p>   
 
 
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import consumerController from '../controller/consumerController';
 
-const Profile = () => {
+const ProfileConsumer = () => {
   const [profileData, setProfileData] = useState(null);
   const [paymentData, setPaymentData] = useState({ merch_email: '', amount: 0 });
   const [message, setMessage] = useState('');
@@ -11,8 +11,8 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await consumerController.getProfile();
-        setProfileData(data.consumer);
+        const data = await consumerController.getProfileConsumer();
+        setProfileData(data);
       } catch (error) {
         setMessage(error.message);
       }
@@ -33,6 +33,11 @@ const Profile = () => {
     } catch (error) {
       setMessage(error.message);
     }
+  };
+
+  const handleLogout = async () => {
+    await consumerController.logout();
+    navigate('/login-consumer'); // Redirect to login after logout
   };
 
   return (
@@ -66,6 +71,7 @@ const Profile = () => {
           </form>
 
           {message && <p>{message}</p>}
+          <button onClick={handleLogout}>Logout</button>
         </div>
       ) : (
         <p>{message || 'Loading profile...'}</p>
@@ -74,4 +80,4 @@ const Profile = () => {
   );
 };
 
-export default profileConsumer;
+export default ProfileConsumer;

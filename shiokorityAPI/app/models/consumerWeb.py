@@ -4,6 +4,7 @@ import bcrypt
 
 class Consumer:
 
+
     def getDBConnection(self):
         if 'db' not in g:
             g.db = pymysql.connect(
@@ -14,6 +15,7 @@ class Consumer:
                 cursorclass=pymysql.cursors.DictCursor
             )
         return g.db
+
 
     def registerConsumer(self, email, password, name, phone, address):
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -58,3 +60,4 @@ class Consumer:
                 return True, "Payment processed"
         except pymysql.MySQLError as e:
             return False, f"Error processing payment: {e}"
+
