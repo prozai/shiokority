@@ -85,18 +85,20 @@ class Consumer():
 
     def sendPayment(self, cust_email, merch_email, merch_amount):
         connection = self.getDBConnection()
+
+        print(f'cust_email: {cust_email}, merch_email: {merch_email}, merch_amount: {merch_amount}')
         try:
             with connection.cursor() as cursor:
                 sql_query = """
-                    UPDATE Merchant
-                    SET merch_amount =  merch_amount + %s ,
+                    UPDATE shiokority_pay.Merchant
+                    SET merch_amount = merch_amount + %s,
                     date_updated_on = NOW(),
                     cust_email = %s,
                     payment_date = NOW(),
-                    payment_status = 'pending'
-                    WHERE merch_email = %s
+                    payment_status = 1
+                    WHERE merch_email = %s;
                 """
-                cursor.execute(sql_query, (cust_email, merch_email, merch_amount))
+                cursor.execute(sql_query, (merch_amount, cust_email, merch_email))
                 connection.commit()
                 return True, "Payment processed"
         except pymysql.MySQLError as e:
