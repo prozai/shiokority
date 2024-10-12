@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import consumerController from '../controller/consumerController';
 
-const Register = () => {
+
+const RegisterConsumer = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    first_name: '',
-    last_name: ''
+    cust_email: '',
+    cust_pass: '',
+    cust_fname: '',
+    cust_lname: '',
+    cust_phone: '',
+    cust_address: ''
   });
   const [message, setMessage] = useState('');
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,6 +25,9 @@ const Register = () => {
     try {
       const response = await consumerController.registerConsumer(formData);
       setMessage(response.message);
+      if (response.success) {
+        navigate('/login-consumer'); // Redirect to login page on successful registration
+      }
     } catch (error) {
       setMessage(error.message);
     }
@@ -30,35 +39,49 @@ const Register = () => {
       <form onSubmit={handleSubmit}>
         <input
           type="email"
-          name="email"
+          name="cust_email"
           placeholder="Email"
-          value={formData.email}
+          value={formData.cust_email}
           onChange={handleChange}
           required
         />
         <input
           type="password"
-          name="password"
+          name="cust_pass"
           placeholder="Password"
-          value={formData.password}
+          value={formData.cust_pass}
           onChange={handleChange}
           required
         />
         <input
           type="text"
-          name="first_name"
+          name="cust_fname"
           placeholder="First Name"
-          value={formData.first_name}
+          value={formData.cust_fname}
           onChange={handleChange}
           required
         />
         <input
           type="text"
-          name="last_name"
+          name="cust_lname"
           placeholder="Last Name"
-          value={formData.last_name}
+          value={formData.cust_lname}
           onChange={handleChange}
           required
+        />
+        <input
+          type="text"
+          name="cust_phone"
+          placeholder="Phone"
+          value={formData.cust_phone}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="cust_address"
+          placeholder="Address"
+          value={formData.cust_address}
+          onChange={handleChange}
         />
         <button type="submit">Register</button>
       </form>
@@ -67,4 +90,4 @@ const Register = () => {
   );
 };
 
-export default registerConsumer;
+export default RegisterConsumer;

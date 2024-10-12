@@ -15,16 +15,18 @@ def registerMerchant():
     data = request.get_json()
     # Extract data from request
     merch_email = data.get('merch_email')
-    password = data.get('password') # Plain-text password entered by the user
+    merch_pass = data.get('merch_pass') # Plain-text password entered by the user
     merch_name = data.get('merch_name')
     merch_phone = data.get('merch_phone')
     merch_address = data.get('merch_address')
-    uen = data.get('uen')
+    date_created = data.get('date_created')
+    date_updated_on = data.get('date_updated_on')
+    merch_status = data.get('merch_status')
+    merch_uen = data.get('merch_uen')
     
     # Call the Merchant model to create the new merchant
 
-    success, message = merchant_instance.registerMerchant(merch_email, password, merch_name, merch_phone, merch_address, uen)
-
+    success, message = merchant_instance.registerMerchant(merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
     
     if success:
         return jsonify({'success': True, 'message': message}), 201  # 201 = Created
@@ -34,9 +36,10 @@ def registerMerchant():
 
 # Login Merchant Endpoint
 @merchantBlueprint.route('/login', methods=['POST'])
-def login_merchant():
+def loginMerchant():
     data = request.get_json()
-    email = data['merch_email']
+
+    email = data['email']
     password = data['password'] # Plain-text password entered by the user
 
     # Fetch the merchant from the database
@@ -44,10 +47,10 @@ def login_merchant():
 
     # Verify the password using native bcrypt
     # The plain-text password (password) is compared with the hashed password (merchant['pass_hash'])
-    if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['hashed_password'].encode('utf-8')):
+    if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['merch_pass'].encode('utf-8')):
         # Store the merchant ID in the session upon successful login
-        session['merch_id'] = merchant['merchant_id']
-        return jsonify({'success': True, 'message': 'Login successful', 'merchant': {'merch_id': merchant['merchant_id']}}), 200
+        session['merch_id'] = merchant['merch_id']
+        return jsonify({'success': True, 'message': 'Login successful', 'merchant': {'merch_id': merchant['merch_id']}}), 200
     else:
         return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
 
@@ -62,28 +65,19 @@ def profile():
     merchant = merchant_instance.getMerchantByID(session['merch_id'])
 
     if merchant:
-        return jsonify({
-            'success': True,
-            'merchant': {
-                'name': merchant['merchant_name'],
-                'email': merchant['merch_email'],
-                'phone': merchant['phone_number'],
-                'address': merchant['address'],
-                'merch_amount': 1234.56
-            }
-        }), 200
+        return jsonify(merchant), 200
     else:
         return jsonify({'success': False, 'message': 'Merchant not found'}), 404
 
 
 # Update Merchant Details Endpoint
 @merchantBlueprint.route('/update', methods=['PUT'])
-def update_merchant():
+def updateMerchant():
     if 'merch_id' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
 
     data = request.get_json()
-    result = merchant_instance.updateMerchantDetails(session['merch_id'], data)
+    result = merchant_instance.updateMerchant(session['merch_id'], data)
 
     if result:
         return jsonify({'success': True, 'message': 'Merchant details updated successfully'}), 200
@@ -120,7 +114,7 @@ def processPayment():
 
 # Route to fetch the merchant's transactions and balance
 @merchantBlueprint.route('/merchant/transactions', methods=['GET'])
-def merchant_transactions():
+def merchantTransactions():
     merch_id = request.args.get('merch_id')  # Assuming merchant ID is passed as a query parameter
 
     if merchant is None:
