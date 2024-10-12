@@ -1,4 +1,4 @@
-// src/views/MerchantEdit.js
+// src/views/EditMerchant.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
@@ -43,11 +43,7 @@ const MerchantEdit = () => {
         try {
             const isSuccess = await AdministratorController.updateMerchant(merchId, merchant);
             
-            if (isSuccess.success) {
-                setStatusMessage('Merchant updated successfully');
-            } else {
-                setStatusMessage('Failed to update merchant');
-            }
+            setStatusMessage(isSuccess.success ? 'Merchant updated successfully' : 'Failed to update merchant');
         } catch (error) {
             console.error("Error updating merchant in view", error);
             setStatusMessage('An error occurred while updating merchant');
@@ -56,65 +52,28 @@ const MerchantEdit = () => {
         }
     };
 
-
     return (
-        <div>
-            <h2>Edit Merchant</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Name:</label>
-                    <input 
-                        type="text"         
-                        name="merch_name" 
-                        value={merchant.merch_name} 
-                        onChange={handleChange} 
-                    />
-                </div>
-                <div>
-                    <label>Email:</label>
-                    <input 
-                        type="email" 
-                        name="merch_email" 
-                        value={merchant.merch_email} 
-                        onChange={handleChange} 
-                    />
-                </div>
-                <div>
-                    <label>Phone:</label>
-                    <input 
-                        type="text" 
-                        name="merch_phone" 
-                        value={merchant.merch_phone} 
-                        onChange={handleChange} 
-                    />
-                </div>
-                <div>
-                    <label>Address:</label>
-                    <input 
-                    type="text"
-                    name="merch_address"
-                    value={merchant.merch_address}
-                    onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label>UEN:</label>
-                    <input 
-                    type="text"
-                    name="merch_uen"
-                    value={merchant.merch_uen}
-                    onChange={handleChange}
-                    />
-                </div>            
-
-                <br />
-                <button type="submit" disabled={isLoading}>
+        <div className="min-h-screen flex justify-center items-center bg-[#153247] p-6">
+            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+                <h3 className="text-2xl font-bold mb-6 text-[#153247]">Edit Merchant</h3>
+                {['merch_name', 'merch_email', 'merch_phone', 'merch_address', 'merch_uen'].map((field) => (
+                    <div className="mb-4" key={field}>
+                        <label className="block text-gray-700 text-sm font-bold mb-2 capitalize">{field.replace('merch_', '').replace('_', ' ')}</label>
+                        <input
+                            type="text"
+                            name={field}
+                            value={merchant[field]}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            required
+                        />
+                    </div>
+                ))}
+                <button type="submit" disabled={isLoading} className="bg-[#153247] text-white py-2 px-4 rounded w-full hover:bg-green-600 font-semibold">
                     {isLoading ? 'Updating...' : 'Update'}
                 </button>
-                
+                {statusMessage && <p className="mt-4 text-center text-gray-600">{statusMessage}</p>}
             </form>
-            <br />
-            {statusMessage && <div className="status-message">{statusMessage}</div>}
         </div>
     );
 };

@@ -1,13 +1,14 @@
 // src/views/ViewMerchant.jsx
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
-import AdministratorController from '../controller/administratorController';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
+import AdministratorController from '../controller/administratorController';
+
 
 const ViewMerchants = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['merchant'],
@@ -26,7 +27,7 @@ const ViewMerchants = () => {
   };
 
   const handleAddMerchant = () => {
-    navigate('/create-merchant'); // Navigate to Create Merchant page
+    navigate('/create-merchant');
   };
 
   if (isLoading) return <p>Loading...</p>;
@@ -35,24 +36,25 @@ const ViewMerchants = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h3 className="text-2xl font-bold mb-4">User Management</h3>
-      
+
+{/* Links for toggling between Merchant and User Lists */}
+      <div className="mb-4">
+        <Link to="/user-management" className=" text-blue-600 hover:underline">Merchant List</Link>
+                <span className="mx-2">/</span>
+        <Link to="/user-management/users" className="text-blue-600 hover:underline">User List</Link>
+      </div>
+
+{/* Search and Add Merchant Button */}
       <div className="bg-white p-6 rounded-lg shadow-md">
-        {/* Search and Add Merchant Button */}
         <div className="flex justify-between items-center mb-4">
-          <input
-            type="text"
-            placeholder="Search ID"
-            className="border rounded-lg p-2 w-1/4 focus:outline-none focus:ring focus:ring-indigo-500"
-          />
-          <button
-            onClick={handleAddMerchant} // Add onClick handler
-            className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
-          >
+          <input type="text" placeholder="Search ID" className="border rounded-lg p-2 w-1/4" />
+          <button onClick={handleAddMerchant} className="bg-[#153247] text-white py-2 px-4 rounded-lg hover:bg-green-600">
             + Add Merchant
           </button>
         </div>
 
         {/* Merchant Table */}
+
         <table className="w-full text-left">
           <thead>
             <tr className="text-gray-600">

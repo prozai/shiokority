@@ -1,133 +1,101 @@
+// src/views/EditUser.jsx
 import React, { useState, useEffect } from 'react';
-import AdministratorController from '../controller/administratorController'; // Assuming you have a controller
+import AdministratorController from '../controller/administratorController';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const EditUser = () => {
-  const { cust_id } = useParams(); // Get the cust_id from the URL
-  const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
-  const [status, setStatus] = useState('');
+  const { cust_id } = useParams();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    first_name: '',
+    last_name: '',
+    address: '',
+    phone: '',
+    status: ''
+  });
   const [statusMessage, setStatusMessage] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
-  // Fetch user details based on cust_id when component loads
   useEffect(() => {
     const fetchUserDetails = async () => {
       setStatusMessage('Loading user details...');
       try {
         const user = await AdministratorController.getUserById(cust_id);
         if (user) {
-          setEmail(user.cust_email);
-          setFirstName(user.cust_fname);
-          setLastName(user.cust_lname);
-          setAddress(user.cust_address);
-          setPhone(user.cust_phone);
-          setStatus(user.cust_status);
+          setFormData({
+            email: user.cust_email,
+            first_name: user.cust_fname,
+            last_name: user.cust_lname,
+            address: user.cust_address,
+            phone: user.cust_phone,
+            status: user.cust_status
+          });
         }
         setStatusMessage('');
       } catch (error) {
-        setError('Failed to load user details. Please try again later.');
+        setError('Failed to load user details.');
       }
     };
 
     fetchUserDetails();
   }, [cust_id]);
 
-  // Handle when the user updates the user details and saves the changes
-  const handleUpdateUser = async (event) => {
-    event.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setStatusMessage('Updating user...');
-
     try {
-      const response = await AdministratorController.updateUser(cust_id, {
-        email,
-        first_name: firstName,
-        last_name: lastName,
-        address,
-        phone,
-        status
-      });
-
-      if (response.success) {
-        setStatusMessage('User updated successfully.');
-        navigate('/dashboard'); // Redirect back to the user list or another page
-      } else {
-        setError('Failed to update user: ' + response.message);
-      }
-    } catch (error) {
-      setError('An error occurred while updating the user.');
+      const response = await AdministratorController.updateUser(cust_id, formData);
+      setStatusMessage(response.success ? 'User updated successfully.' : 'Failed to update user.');
+      if (response.success) navigate('/dashboard');
+    } catch {
+      setError('Error occurred while updating the user.');
     }
   };
 
   return (
-    <div>
-      {statusMessage && <p>{statusMessage}</p>}
-      {error && <p>{error}</p>}
-      <h2>Editing user with ID: {cust_id}</h2>
-      {!error && (
-        <div>
-          <form onSubmit={handleUpdateUser}>
-            <div>
-              <label>Email: </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>First Name: </label>
-              <input
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Last Name: </label>
-              <input
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Address: </label>
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Phone: </label>
-              <input
-                type="text"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Status: </label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <option value="1">Active</option>
-                <option value="0">Deactivate</option>
-              </select>
-            </div>
-            <button type="submit">Update User</button>
-            <button type="button" onClick={() => navigate('/dashboard')}>
-              Cancel
-            </button>
-          </form>
+    <div className="min-h-screen flex justify-center items-center bg-[#153247] p-6">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h3 className="text-2xl font-bold mb-6 text-[#153247]">Edit User</h3>
+        {['email', 'first_name', 'last_name', 'address', 'phone'].map((field) => (
+          <div className="mb-4" key={field}>
+            <label className="block text-gray-700 text-sm font-bold mb-2 capitalize">{field.replace('_', ' ')}</label>
+            <input
+              type={field === 'email' ? 'email' : 'text'}
+              name={field}
+              value={formData[field]}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+          </div>
+        ))}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">Status</label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="1">Active</option>
+            <option value="0">Deactivated</option>
+          </select>
         </div>
-      )}
+        <button type="submit" className="bg-[#153247] text-white py-2 px-4 rounded w-full hover:bg-green-600 font-semibold">
+          Update 
+        </button>
+        <button type="button" onClick={() => navigate('/dashboard')} className="bg-gray-400 text-white py-2 px-4 rounded w-full mt-2 hover:bg-gray-500 font-semibold">
+          Cancel
+        </button>
+        {statusMessage && <p className="mt-4 text-center text-gray-600">{statusMessage}</p>}
+        {error && <p className="mt-4 text-center text-red-600">{error}</p>}
+      </form>
     </div>
   );
 };
