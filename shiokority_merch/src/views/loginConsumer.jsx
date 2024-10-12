@@ -14,7 +14,7 @@ const LoginConsumer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await consumerController.login(formData);
+      await consumerController.loginConsumer(formData);
       navigate('/profile-consumer');  // Redirect to profile after login
     } catch (error) {
       setMessage(error.message);

@@ -7,7 +7,7 @@ import bcrypt
 consumerBlueprint = Blueprint('consumerBlueprint', __name__)
 consumer_instance = Consumer()
 
-@consumerBlueprint.route('/consumer/process-payment', methods=['POST'])
+@consumerBlueprint.route('/process-payment', methods=['POST'])
 def processPayment():
     try:
         data = request.get_json()
@@ -40,9 +40,9 @@ def registerConsumer():
 
     # Extract data from request
     cust_email = data.get('cust_email')
-    cust_pass = data.get('password') # Plain-text password entered by the user
+    cust_pass = data.get('cust_pass') # Plain-text password entered by the user
     cust_fname = data.get('cust_fname')
-    cust_lname = data.get('cust_fname')
+    cust_lname = data.get('cust_lname')
     cust_phone = data.get('cust_phone')
     cust_address = data.get('cust_address')
 
@@ -73,7 +73,7 @@ def loginConsumer():
 
 
 # Fetch Consumer Profile Endpoint
-@consumerBlueprint.route('/profile', methods=['GET'])
+@consumerBlueprint.route('/profile-consumer', methods=['GET'])
 def profile():
     if 'cust_id' not in session:
         return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
@@ -86,18 +86,18 @@ def profile():
         return jsonify({'success': False, 'message': 'Consumer not found'}), 404
     
 
-@consumerBlueprint.route('/send-transaction', methods=['POST'])
-def sendTransaction():
+@consumerBlueprint.route('/send-payment', methods=['POST'])
+def sendPayment():
     data = request.get_json()
-
-    consumer_email = data.get('consumer_email')
+    print(data)
+    cust_email = data.get('cust_email')
     merch_email = data.get('merch_email')
-    amount = data.get('amount')
+    merch_amount = data.get('merch_amount')
 
-    if not consumer_email or not merch_email or not amount:
+    if not cust_email or not merch_email or not merch_amount:
         return jsonify({'success': False, 'message': 'Consumer email, merchant email, and amount are required'}), 400
 
-    success, message = ConsumerController.sendTransaction(consumer_email, merch_email, amount)
+    success, message = ConsumerController().sendPayment(cust_email, merch_email, merch_amount)
 
     if success:
         return jsonify({'success': True, 'message': message}), 200
