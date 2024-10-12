@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import consumerController from '../controller/consumerController';
 
+
 const RegisterConsumer = () => {
   const [formData, setFormData] = useState({
     cust_email: '',

@@ -25,7 +25,6 @@ function App() {
         <Route path="/login-consumer" element={<LoginConsumer />} />
         <Route path="/profile-consumer" element={<ProfileConsumer />} />
         <Route path="/register-consumer" element={<RegisterConsumer />} />
-        
 
         {/* Default route */}
         <Route path="/" element={<Login />} />
