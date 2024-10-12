@@ -9,16 +9,15 @@ const AdminAddUser = () => {
     last_name: '',
     address: '',
     phone: '',
-    status: true // Default to 'true' for active status
+    status: true
   });
   const [statusMessage, setStatusMessage] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prevData) => ({
       ...prevData,
-      [name]: name === 'status' ? value === 'true' : value // Convert 'status' to boolean
+      [name]: value
     }));
   };
 
@@ -45,6 +44,7 @@ const AdminAddUser = () => {
             type="email"
             id="email"
             name="email"
+            placeholder="User Email"
             value={formData.email}
             onChange={handleChange}
             required
@@ -56,6 +56,7 @@ const AdminAddUser = () => {
             type="password"
             id="password"
             name="password"
+            placeholder="User Password"
             value={formData.password}
             onChange={handleChange}
             required
@@ -67,6 +68,7 @@ const AdminAddUser = () => {
             type="text"
             id="first_name"
             name="first_name"
+            placeholder="User First Name"
             value={formData.first_name}
             onChange={handleChange}
           />
@@ -77,6 +79,7 @@ const AdminAddUser = () => {
             type="text"
             id="last_name"
             name="last_name"
+            placeholder="User Last Name"
             value={formData.last_name}
             onChange={handleChange}
           />
@@ -87,6 +90,7 @@ const AdminAddUser = () => {
             type="text"
             id="address"
             name="address"
+            placeholder="User Address"
             value={formData.address}
             onChange={handleChange}
           />
@@ -97,6 +101,7 @@ const AdminAddUser = () => {
             type="text"
             id="phone"
             name="phone"
+            placeholder="User Phone Number"
             value={formData.phone}
             onChange={handleChange}
           />

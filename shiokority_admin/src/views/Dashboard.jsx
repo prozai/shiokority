@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
+import CreateMerchant from './CreateMerchant';
+import ViewMerchant from './ViewMerchant';
+import CreateUser from './CreateUser';import { FiHome, FiSettings, FiBell, FiUser } from 'react-icons/fi';
 import { FiHome, FiSettings, FiBell, FiUser } from 'react-icons/fi';
 import ShiokorityAdminLogo from '../asset/image/ShiokorityAdmin.png';
+import ViewUser from './ViewUser';
 
 function Dashboard() {
   const [status, setStatus] = useState('');
@@ -103,8 +107,11 @@ function Dashboard() {
         
         {/* Status Message */}
         {status && <p className="mt-4 text-center text-red-500">{status}</p>}
-        
-      
+        <CreateMerchant />
+        <ViewMerchant />
+        <CreateUser />
+        <ViewUser />
+
       </main>
     </div>
   );

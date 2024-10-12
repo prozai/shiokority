@@ -138,17 +138,18 @@ def updateMerchantStatus(merch_id):
 @adminBlueprint.route("/add-user", methods=['POST'])
 def addUser():
     if request.method == 'POST':
-            data = request.get_json()  # Get the JSON data from the request
+        data = request.get_json()  # Get the JSON data from the request
 
-            if not data:
-                raise BadRequest("No input data provided")
+        if not data:
+            raise BadRequest("No input data provided")
 
-            createdUser = admin_controller.addUser(data)
+        createdUser = admin_controller.addUser(data)
 
-            if createdUser:
-                return jsonify(success=True), 200
-            else:
-                return jsonify(success=False), 400
+        if createdUser:
+            return jsonify(success=True), 200
+        else:
+            return jsonify(success=False), 400
+
 
 
 @adminBlueprint.route('/get-users', methods=['GET'])
@@ -164,8 +165,22 @@ def getAllUser():
         print(f"An error occurred: {e}")  # Log the error
         return jsonify({"error": "An unexpected error occurred"}), 500
 
+@adminBlueprint.route('/get-user/<string:cust_id>', methods=['GET'])
+def getUserById(cust_id):
+    try:
+        user = admin_controller.get_user_by_id(cust_id)  # Assuming you have this method in your controller
 
-@adminBlueprint.route('/users/<int:user_id>/update', methods=['PUT'])
+        if user:
+            return jsonify(user), 200
+        else:
+            return jsonify(success=False, message="User not found"), 404
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return jsonify(success=False, message="An unexpected error occurred"), 500
+
+
+@adminBlueprint.route('/users/<string:user_id>/update', methods=['PUT'])
 def submitUserUpdate(user_id):
     try:
         data = request.get_json()
@@ -174,10 +189,12 @@ def submitUserUpdate(user_id):
         email = data.get('email', None)
         first_name = data.get('first_name', None)
         last_name = data.get('last_name', None)
+        address = data.get('address', None)
+        phone = data.get('phone', None)
         status = data.get('status', None)
 
         # Update the user with the new details
-        updateStatus = admin_controller.submit_user_update(user_id, email, first_name, last_name, status)
+        updateStatus = admin_controller.submit_user_update(user_id, email, first_name, last_name, address, phone, status)
 
         if updateStatus:
             return jsonify(success=True), 200
