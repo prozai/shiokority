@@ -201,7 +201,7 @@ class Merchant:
 
         except pymysql.MySQLError as e:
             print(f"Error fetching merchant by email: {e}")
-            return None
+            return False
 
     def getMerchantByID(self, merch_id):
         # Fetch merchant by ID from the database
@@ -320,7 +320,7 @@ class Merchant:
                 update_query = """
                     UPDATE Merchant 
                     SET merch_amount = merch_amount + %s 
-                    WHERE merch_amount = %s
+                    WHERE merch_email = %s
                 """
                 cursor.execute(update_query, (amount, merch_email))
                 connection.commit()

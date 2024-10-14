@@ -66,6 +66,10 @@ const ProfileConsumer = () => {
                 <p className="text-sm text-gray-600">Address</p>
                 <p className="font-semibold">{profileData.cust_address}</p>
               </div>
+              <div className="bg-gray-50 rounded-lg p-4 shadow">
+                <p className="text-sm text-gray-600">Balance</p>
+                <p className="font-semibold">{profileData.cust_amount}</p>
+              </div>
 
               <div className="mt-8">
                 <h3 className="text-2xl font-bold mb-4 text-gray-800">Send Payment</h3>

@@ -15,8 +15,8 @@ class ConsumerController():
     def login(self, cust_email, password):
         return Consumer().login(cust_email, password)
     
-    def processPayment(self, cust_email, merch_email, merch_amount):
-        return Consumer().processPayment(cust_email, merch_email, merch_amount) 
+    def processPayment(self, cust_email, merch_email, amount):
+        return Consumer().processPayment(cust_email, merch_email, amount) 
 
     def getConsumerByEmail(self, cust_email):
         return Consumer().getConsumerByEmail(cust_email)

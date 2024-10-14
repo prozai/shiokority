@@ -78,7 +78,7 @@ def profile():
         return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
 
     consumer = consumer_instance.getConsumerByID(session['cust_id'])
-
+    
     if consumer:
         return jsonify(consumer), 200
     else:
@@ -94,9 +94,9 @@ def sendPayment():
 
     cust_email = data.get('cust_email')
     merch_email = data.get('merch_email')
-    merch_amount = data.get('merch_amount')
+    amount = data.get('merch_amount')
 
-    success, message = consumer_instance.processPayment(cust_email, merch_email, merch_amount)
+    success, message = consumer_instance.processPayment(cust_email, merch_email, amount)
 
     if success:
         return jsonify({'success': True, 'message':message}), 200

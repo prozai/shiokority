@@ -34,7 +34,7 @@ class consumerController {
     try {
       return await Consumer.sendPayment(cust_email, merch_email, merch_amount);
     } catch (error) {
-      throw new Error('Payment failed');
+      throw new Error(error.message);
     }
   }
 }

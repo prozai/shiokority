@@ -5,6 +5,7 @@ import bcrypt
 from .merchant import Merchant
 from .transaction import Transaction
 from ..auth.databaseConnection import getDBConnection
+from decimal import Decimal
 
 class Consumer():
 
@@ -75,8 +76,8 @@ class Consumer():
         except pymysql.MySQLError as e:
             return False, "Error logging in"
 
-    def processPayment(self, cust_email, merch_email, merch_amount):
-        
+    def processPayment(self, cust_email, merch_email, amount):
+        #0. need to check if the shiokority_pay.Consumer exists
         #1. need to check if the shiokority_pay.Consumer has enough money
         #2. need to check if the shiokority_pay.Merchant exists
         #3. need to check if the shiokority_pay.Merchant is active
@@ -84,61 +85,56 @@ class Consumer():
         #5. need to update the amount to the shiokority_pay.Merchant
         #6. need to insert the transaction into the shiokority._api.Payment table
        
-        # Check if the consumer has enough money
+        # Check if the consumer has enough money and Check if the consumer exists
         consumer = self.getConsumerByEmail(cust_email)
 
         if not consumer:
+            print("Consumer not found")
             return False, "Consumer not found"
-        
-        if consumer['cust_amount'] < merch_amount:
+
+        if consumer['cust_amount'] < Decimal(amount):
+            print("Insufficient funds")
             return False, "Insufficient funds"
         
         # Check if the merchant exists
-        merchant = self.getMerchantByEmail(merch_email)
+        merchant = Merchant().getMerchantByEmail(merch_email)
 
         if not merchant:
+            print("Merchant not found")
             return False, "Merchant not found"
         
         if merchant['merch_status'] != 1:
+            print("Merchant is inactive")
             return False, "Merchant is inactive"
         
         # Deduct the amount from the consumer
-        success, message = self.customerDeductAmount(cust_email, merch_amount)
+        success, message = self.customerDeductAmount(cust_email, amount)
 
         if not success:
+            print("Error deducting amount")
             return False, message
         
         # Update the amount to the merchant
-        success, message = Merchant().updateMerchantBalance(merch_email, merch_amount)
+        success, message = Merchant().updateMerchantBalance(merch_email, amount)
         
         if not success:
+            print("Error updating merchant balance")
             return False, message
+        
+        transactionData = {
+            'amount': amount,
+            'cust_id': consumer['cust_id'],
+            'merch_id': merchant['merch_id']
+        }
 
         # Insert the transaction into the Payment table
-        success, message = Transaction.insertPaymentTransaction(cust_email, merch_email, merch_amount)
+        success, message = Transaction().insertPaymentTransaction(transactionData)
 
         if not success:
             return False, message
         
-        # connection = getDBConnection(current_app.config['PAY_SCHEMA'])
-        # try:
-        #     with connection.cursor() as cursor:
-        #         sql_query = """
-        #             UPDATE Merchant
-        #             SET merch_amount = merch_amount + %s,
-        #             date_updated_on = NOW(),
-        #             cust_email = %s,
-        #             payment_date = NOW(),
-        #             payment_status = 1
-        #             WHERE merch_email = %s;
-        #         """
-        #         cursor.execute(sql_query, (merch_amount, cust_email, merch_email))
-        #         connection.commit()
-                
-        #         return True, "Payment processed"
-        # except pymysql.MySQLError as e:
-        #     print(f"Error processing payment: {e}")
-        #     return False, f"Error processing payment: {e}"
+        return True, "Payment processed successfully"
+    
 
     def getConsumerByEmail(self, cust_email):
         # Fetch consumer by email - used in login and create
@@ -160,7 +156,8 @@ class Consumer():
             connection = getDBConnection(current_app.config['PAY_SCHEMA'])
             with connection.cursor() as cursor:
                 sql_query = """
-                    SELECT cust_id, cust_fname, cust_lname, cust_email, cust_phone, cust_address, cust_phone
+                    SELECT 
+                    *
                     FROM Customer 
                     WHERE cust_id = %s
                 """
