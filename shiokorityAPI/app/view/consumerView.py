@@ -1,51 +1,46 @@
 from flask import Blueprint, request, jsonify, session
 from werkzeug.exceptions import BadRequest
-from ..models.consumer import Consumer
 from ..controller.consumerController import ConsumerController
 import bcrypt
 
 consumerBlueprint = Blueprint('consumerBlueprint', __name__)
-consumer_instance = Consumer()
+consumer_instance = ConsumerController()
 
-@consumerBlueprint.route('/process-payment', methods=['POST'])
-def processPayment():
-    try:
-        data = request.get_json()
+# @consumerBlueprint.route('/consumer/process-payment', methods=['POST'])
+# def processPayment():
+#     try:
+#         data = request.get_json()
 
-        merchant_id = data.get('merch_id')
-        amount = data.get('amount')
+#         merchant_id = data.get('merch_id')
+#         amount = data.get('amount')
         
-        if merchant_id is None or amount is None:
-            raise BadRequest("Merchant ID and amount are required")
+#         if merchant_id is None or amount is None:
+#             raise BadRequest("Merchant ID and amount are required")
         
-        checkMerchant = ConsumerController().validateMerchant(merchant_id)
+#         checkMerchant = ConsumerController().validateMerchant(merchant_id)
 
-        if not checkMerchant:
-            return jsonify(success=False, message="Merchant not found or not valid")
+#         if not checkMerchant:
+#             return jsonify(success=False, message="Merchant not found or not valid")
     
-        paymentStatus = ConsumerController().process_payment(merchant_id, amount)
+#         paymentStatus = ConsumerController().process_payment(merchant_id, amount)
 
-        return jsonify(paymentStatus)
+#         return jsonify(paymentStatus)
 
-    except BadRequest as e:
-        return jsonify(success=False, message=str(e)), 400
+#     except BadRequest as e:
+#         return jsonify(success=False, message=str(e)), 400
     
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        return jsonify(success=False, message="An unexpected error occurred"), 500
+#     except Exception as e:
+#         print(f"An error occurred: {str(e)}")
+#         return jsonify(success=False, message="An unexpected error occurred"), 500
     
 @consumerBlueprint.route('/register-consumer', methods=['POST'])
 def registerConsumer():
     data = request.get_json()
-    # Extract data from request
-    cust_email = data.get('cust_email')
-    cust_pass = data.get('cust_pass') # Plain-text password entered by the user
-    cust_fname = data.get('cust_fname')
-    cust_lname = data.get('cust_lname')
-    cust_phone = data.get('cust_phone')
-    cust_address = data.get('cust_address')
 
-    success, message = consumer_instance.registerConsumer(cust_email, cust_pass, cust_fname, cust_lname, cust_phone, cust_address)
+    if not data:
+        return jsonify({'success': False, 'message': 'Consumer email, password, first name, last name, phone number, and address are required'}), 400
+
+    success, message = consumer_instance.registerConsumer(data)
     
     if success:
         return jsonify({'success': True, 'message': message}), 201
@@ -61,7 +56,7 @@ def loginConsumer():
 
     # Fetch the consumer from the database
     consumer = consumer_instance.getConsumerByEmail(email)
-
+    
     # Verify the password using native bcrypt
     if consumer and bcrypt.checkpw(password.encode('utf-8'), consumer['cust_pass'].encode('utf-8')):
         # Store the consumer ID in the session upon successful login
@@ -70,6 +65,11 @@ def loginConsumer():
     else:
         return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
 
+
+@consumerBlueprint.route('/logout-consumer', methods=['POST'])
+def logoutConsumer():
+    session.clear()
+    return jsonify({'success': True, 'message': 'Logout successful'}), 200
 
 # Fetch Consumer Profile Endpoint
 @consumerBlueprint.route('/profile-consumer', methods=['GET'])
@@ -88,17 +88,17 @@ def profile():
 @consumerBlueprint.route('/send-payment', methods=['POST'])
 def sendPayment():
     data = request.get_json()
-    print(data)
+
+    if not data:
+        return jsonify({'success': False, 'message': 'Consumer email, merchant email, and amount are required'}), 400
+
     cust_email = data.get('cust_email')
     merch_email = data.get('merch_email')
     merch_amount = data.get('merch_amount')
 
-    if not cust_email or not merch_email or not merch_amount:
-        return jsonify({'success': False, 'message': 'Consumer email, merchant email, and amount are required'}), 400
-
-    success = ConsumerController().sendPayment(cust_email, merch_email, merch_amount)
+    success, message = consumer_instance.processPayment(cust_email, merch_email, merch_amount)
 
     if success:
-        return jsonify({'success': True}), 200
+        return jsonify({'success': True, 'message':message}), 200
     else:
-        return jsonify({'success': False}), 400
+        return jsonify({'success': False, 'message':message}), 400
