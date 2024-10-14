@@ -109,7 +109,7 @@ const MerchantForm = () => {
 
         <button
           type="submit"
-          className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full font-semibold"
+          className="bg-[#153247] text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full font-semibold"
         >
           + Add Merchant
         </button>

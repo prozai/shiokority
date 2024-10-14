@@ -1,6 +1,9 @@
+// src/views/ViewUser.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import AdministratorController from '../controller/administratorController';
-import { useNavigate } from 'react-router-dom';
+
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -8,7 +11,6 @@ const UserList = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Fetch all users when component is loaded
   useEffect(() => {
     const fetchUsers = async () => {
       setStatusMessage('Loading users...');
@@ -29,50 +31,65 @@ const UserList = () => {
     fetchUsers();
   }, [navigate]);
 
-  // Handle when the user clicks to edit a particular user
-  const handleEdit = (user) => {
-    navigate(`/EditUser/${user.cust_id}`);
+  const handleAddUsers = () => {
+    navigate('/create-user');
   };
 
   return (
-    <div>
-      <h2>View Users</h2>
-      {statusMessage && <p>{statusMessage}</p>}
-      {error && <p>{error}</p>}
-      {!error && (
-        <div>
-          <table>
-            <thead>
-              <tr>
-                <th>User ID</th>
-                <th>Email</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Address</th>
-                <th>Phone</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.cust_id}>
-                  <td>{user.cust_id}</td>
-                  <td>{user.cust_email}</td>
-                  <td>{user.cust_fname}</td>
-                  <td>{user.cust_lname}</td>
-                  <td>{user.cust_address}</td>
-                  <td>{user.cust_phone}</td>
-                  <td>{user.cust_status ? 'Active' : 'Deactivated'}</td>
-                  <td>
-                    <button onClick={() => handleEdit(user)}>Edit</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h3 className="text-2xl font-bold mb-4">User Management</h3>
+
+      <div className="mb-4">
+        <Link to="/user-management" className="text-blue-600 hover:underline">Merchant List</Link>
+        <span className="mx-2">/</span>
+        <Link to="/user-management/users" className="text-blue-600 hover:underline">User List</Link>
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="flex justify-between items-center mb-4">
+          <input type="text" placeholder="Search ID" className="border rounded-lg p-2 w-1/4" />
+          <button onClick={handleAddUsers} className="bg-[#153247] text-white py-2 px-4 rounded-lg hover:bg-green-600">
+            + Add Users
+          </button>
         </div>
-      )}
+
+        <table className="w-full text-left">
+          <thead>
+            <tr className="text-gray-600">
+              <th className="py-2 px-4 border-b">User ID</th>
+              <th className="py-2 px-4 border-b">Email</th>
+              <th className="py-2 px-4 border-b">First Name</th>
+              <th className="py-2 px-4 border-b">Last Name</th>
+              <th className="py-2 px-4 border-b">Address</th>
+              <th className="py-2 px-4 border-b">Phone</th>
+              <th className="py-2 px-4 border-b">Status</th>
+              <th className="py-2 px-4 border-b">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map(user => (
+              <tr key={user.cust_id} className="hover:bg-gray-100">
+                <td className="py-2 px-4 border-b">{user.cust_id}</td>
+                <td className="py-2 px-4 border-b">{user.cust_email}</td>
+                <td className="py-2 px-4 border-b">{user.cust_fname}</td>
+                <td className="py-2 px-4 border-b">{user.cust_lname}</td>
+                <td className="py-2 px-4 border-b">{user.cust_address}</td>
+                <td className="py-2 px-4 border-b">{user.cust_phone}</td>
+                <td className="py-2 px-4 border-b">
+                  <span className={`px-2 py-1 rounded-full text-xs ${user.cust_status ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+                    {user.cust_status ? 'Active' : 'Deactivated'}
+                  </span>
+                </td>
+                <td className="py-2 px-4 border-b">
+                  <Link to={`/edit-user/${user.cust_id}`} className="text-blue-600 hover:text-blue-800">
+                    <FiEdit />
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
