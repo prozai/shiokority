@@ -40,14 +40,6 @@ def registerConsumer():
     if not data:
         return jsonify({'success': False, 'message': 'Consumer email, password, first name, last name, phone number, and address are required'}), 400
 
-    # Extract data from request
-    cust_email = data.get('cust_email')
-    cust_pass = data.get('password') # Plain-text password entered by the user
-    cust_fname = data.get('cust_fname')
-    cust_lname = data.get('cust_fname')
-    cust_phone = data.get('cust_phone')
-    cust_address = data.get('cust_address')
-
     success, message = consumer_instance.registerConsumer(data)
     
     if success:
@@ -64,7 +56,7 @@ def loginConsumer():
 
     # Fetch the consumer from the database
     consumer = consumer_instance.getConsumerByEmail(email)
-
+    
     # Verify the password using native bcrypt
     if consumer and bcrypt.checkpw(password.encode('utf-8'), consumer['cust_pass'].encode('utf-8')):
         # Store the consumer ID in the session upon successful login
@@ -73,6 +65,11 @@ def loginConsumer():
     else:
         return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
 
+
+@consumerBlueprint.route('/logout-consumer', methods=['POST'])
+def logoutConsumer():
+    session.clear()
+    return jsonify({'success': True, 'message': 'Logout successful'}), 200
 
 # Fetch Consumer Profile Endpoint
 @consumerBlueprint.route('/profile-consumer', methods=['GET'])
@@ -95,14 +92,11 @@ def sendPayment():
     if not data:
         return jsonify({'success': False, 'message': 'Consumer email, merchant email, and amount are required'}), 400
 
-    consumer_email = data.get('consumer_email')
+    cust_email = data.get('cust_email')
     merch_email = data.get('merch_email')
     merch_amount = data.get('merch_amount')
 
-    if not consumer_email or not merch_email or not amount:
-        return jsonify({'success': False, 'message': 'Consumer email, merchant email, and amount are required'}), 400
-
-    success, message = ConsumerController.sendTransaction(consumer_email, merch_email, amount)
+    success, message = consumer_instance.processPayment(cust_email, merch_email, merch_amount)
 
     if success:
         return jsonify({'success': True}), 200

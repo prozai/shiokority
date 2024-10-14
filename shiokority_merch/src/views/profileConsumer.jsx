@@ -9,18 +9,18 @@ const ProfileConsumer = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const data = await consumerController.getProfileConsumer();
-        setProfileData(data);
-      } catch (error) {
-        setMessage(error.message);
-      }
-    };
-
     fetchProfile();
   }, []);
 
+  const fetchProfile = async () => {
+    try {
+      const data = await consumerController.getProfileConsumer();
+      setProfileData(data);
+    } catch (error) {
+      setMessage(error.message);
+    }
+  };
+  
   const handleChange = (e) => {
     setPaymentData({ ...paymentData, [e.target.name]: e.target.value });
   };
@@ -36,7 +36,7 @@ const ProfileConsumer = () => {
   };
 
   const handleLogout = async () => {
-    await consumerController.logout();
+    await consumerController.logoutConsumer();
     navigate('/login-consumer'); // Redirect to login after logout
   };
 
