@@ -1,7 +1,7 @@
 from flask import current_app
 import pymysql
 
-def getDBConnection(self, schema_name):
+def getDBConnection(schema_name):
         config = {
         'host': current_app.config['MYSQL_HOST'],
         'user': current_app.config['MYSQL_USER'],
