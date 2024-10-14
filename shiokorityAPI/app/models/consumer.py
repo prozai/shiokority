@@ -60,7 +60,7 @@ class Consumer():
                     INSERT INTO Customer (cust_fname, cust_lname, cust_email, cust_pass, cust_address, cust_phone, date_created, date_updated_on, cust_status)
                     VALUES (%s, %s, %s, %s, %s, %s NOW(), NOW(), 1)
                 """
-                cursor.execute(sql_query, (cust_fname, cust_lname, cust_email, hash_pass, cust_address, cust_phone))
+                cursor.execute(sql_query, (customer['cust_fname'], customer['cust_lname'], customer['cust_email'], hash_pass, customer['cust_address'], customer['cust_phone']))
                 connection.commit()
                 return True, "Consumer created successfully"
             
@@ -82,12 +82,12 @@ class Consumer():
         except pymysql.MySQLError as e:
             return False, "Error logging in"
 
-    def processPayment(self, cust_email, merch_id, amount):
+    def processPayment(self, cust_email, merch_email, merch_amount):
         connection = self.getDBConnection(current_app.config['PAY_SCHEMA'])
         try:
             with connection.cursor() as cursor:
                 sql_query = """
-                    UPDATE shiokority_pay.Merchant
+                    UPDATE Merchant
                     SET merch_amount = merch_amount + %s,
                     date_updated_on = NOW(),
                     cust_email = %s,
@@ -97,8 +97,10 @@ class Consumer():
                 """
                 cursor.execute(sql_query, (merch_amount, cust_email, merch_email))
                 connection.commit()
+                print(1)
                 return True, "Payment processed"
         except pymysql.MySQLError as e:
+            print(f"Error processing payment: {e}")
             return False, f"Error processing payment: {e}"
 
     def getConsumerByEmail(self, cust_email):
