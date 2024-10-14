@@ -5,7 +5,7 @@ import merchantController from '../controller/merchantController';
 const Register = () => {
   const [formData, setFormData] = useState({
     merch_email: '',
-    password: '',
+    merch_pass: '',
     merch_name: '',
     merch_phone: '',
     merch_address: '',
@@ -46,9 +46,9 @@ const Register = () => {
         />
         <input
           type="password"
-          name="password"
+          name="merch_pass"
           placeholder="Password"
-          value={formData.password}
+          value={formData.merch_pass}
           onChange={handleChange}
           required
         />

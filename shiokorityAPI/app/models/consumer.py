@@ -33,9 +33,7 @@ class Consumer():
         except Exception as e:
             print(f"Unexpected error during payment processing: {str(e)}")
             return False, "An unexpected error occurred"
-
-class Consumer:
-
+        
     def getDBConnection(self):
         if 'db' not in g:
             g.db = pymysql.connect(
@@ -47,7 +45,7 @@ class Consumer:
             )
         return g.db
 
-    def registerConsumer(self, cust_fname, cust_lname, cust_email, cust_pass, cust_address, cust_phone):
+    def registerConsumer(self, cust_email, cust_pass, cust_fname, cust_lname, cust_phone, cust_address):
 
         hash_pass = bcrypt.hashpw(cust_pass.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -60,10 +58,10 @@ class Consumer:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
                 sql_query = """
-                    INSERT INTO Customer (cust_fname, cust_lname, cust_email, cust_pass, cust_address, cust_phone, date_created, date_updated_on, cust_status)
-                    VALUES (%s, %s, %s, %s, %s, %s NOW(), NOW(), 1)
+                    INSERT INTO Customer (cust_email, cust_pass, cust_fname, cust_lname, cust_phone, cust_address, date_created, date_updated_on, cust_status)
+                    VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW(), 1)
                 """
-                cursor.execute(sql_query, (cust_fname, cust_lname, cust_email, hash_pass, cust_address, cust_phone))
+                cursor.execute(sql_query, (cust_email, hash_pass, cust_fname, cust_lname, cust_phone, cust_address))
                 connection.commit()
                 return True, "Consumer created successfully"
             
@@ -85,15 +83,22 @@ class Consumer:
         except pymysql.MySQLError as e:
             return False, "Error logging in"
 
-    def processPayment(self, cust_email, merch_id, amount):
+    def sendPayment(self, cust_email, merch_email, merch_amount):
         connection = self.getDBConnection()
+
+        print(f'cust_email: {cust_email}, merch_email: {merch_email}, merch_amount: {merch_amount}')
         try:
             with connection.cursor() as cursor:
                 sql_query = """
-                    INSERT INTO Payment (consumer_email, merch_id, amount, payment_date, payment_status, date_created, date_updated_on)
-                    VALUES (%s, %s, %s, NOW(), 'pending', NOW(), NOW())
+                    UPDATE shiokority_pay.Merchant
+                    SET merch_amount = merch_amount + %s,
+                    date_updated_on = NOW(),
+                    cust_email = %s,
+                    payment_date = NOW(),
+                    payment_status = 1
+                    WHERE merch_email = %s;
                 """
-                cursor.execute(sql_query, (cust_email, merch_id, amount))
+                cursor.execute(sql_query, (merch_amount, cust_email, merch_email))
                 connection.commit()
                 return True, "Payment processed"
         except pymysql.MySQLError as e:
