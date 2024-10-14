@@ -1,24 +1,19 @@
 import pymysql
 from flask import current_app, g
+from ..auth.databaseConnection import getDBConnection
 
-class Transaction:
+class Transaction():
 
     def insertPaymentTransaction(self, transaction_data):
-        connection = pymysql.connect(
-            host=current_app.config['MYSQL_HOST'],
-            user=current_app.config['MYSQL_USER'],
-            password=current_app.config['MYSQL_PASSWORD'],
-            database=current_app.config['BANK_SCHEMA'],  # Adjust schema name as per your structure
-            cursorclass=pymysql.cursors.DictCursor
-        )
+        connection = getDBConnection(current_app.config['API_SCHEMA'])
         try:
             with connection.cursor() as cursor:
                 # Insert the transaction record
                 query = """
-                    INSERT INTO Transaction_Record (transaction_record_id, transaction_record_amount, trasaction_record_date, transaction_record_status, customer_id)
-                    VALUES (%s, %s, NOW(), %s, %s)
+                    INSERT INTO Transaction (transaction_amount, transaction_date, transaction_status, cust_id, merch_id)
+                    VALUES (%s, NOW(), 'completed',%s, %s)
                 """
-                cursor.execute(query, (transaction_data['transaction_record_id'], transaction_data['amount'], 'completed', transaction_data['customer_id']))
+                cursor.execute(query, (transaction_data['amount'], transaction_data['cust_id'], transaction_data['merch_id']))
                 connection.commit()
                 return True, "Transaction added successfully"
         except pymysql.MySQLError as e:
