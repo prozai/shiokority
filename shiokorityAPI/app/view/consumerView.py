@@ -99,6 +99,6 @@ def sendPayment():
     success, message = consumer_instance.processPayment(cust_email, merch_email, merch_amount)
 
     if success:
-        return jsonify({'success': True}), 200
+        return jsonify({'success': True, 'message':message}), 200
     else:
-        return jsonify({'success': False}), 400
+        return jsonify({'success': False, 'message':message}), 400

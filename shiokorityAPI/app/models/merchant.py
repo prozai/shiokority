@@ -312,7 +312,7 @@ class Merchant:
             print(f"Error fetching merchant: {e}")
             return None
         
-    def updateMerchantBalance(self, merch_id, amount):
+    def updateMerchantBalance(self, merch_email, amount):
         try:
             connection = self.getDBConnection()
             with connection.cursor() as cursor:
@@ -320,9 +320,9 @@ class Merchant:
                 update_query = """
                     UPDATE Merchant 
                     SET merch_amount = merch_amount + %s 
-                    WHERE merch_id = %s
+                    WHERE merch_amount = %s
                 """
-                cursor.execute(update_query, (amount, merch_id))
+                cursor.execute(update_query, (amount, merch_email))
                 connection.commit()
                 return True, "Merchant balance updated successfully"
         except pymysql.MySQLError as e:
