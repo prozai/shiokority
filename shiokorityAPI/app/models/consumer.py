@@ -1,6 +1,5 @@
 import pymysql
-from flask import current_app, g
-from pymysql.err import MySQLError
+from flask import current_app
 import bcrypt
 from .merchant import Merchant
 from .transaction import Transaction
@@ -192,65 +191,31 @@ class Consumer():
         
     def customerValidateCardProcedure(self, card_number, cvv, expiry_date):
 
-        # Check if the card exists in the Card schema
-        isCardValidInCardSchema = self.isCardInCardSchema(card_number, cvv, expiry_date)
+        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
-        if not isCardValidInCardSchema:
-            return False, "Card not found In Card Schema"
-        
-        # Check if the card exists in the Bank schema
-        isCardValidInBankSchema = self.isCardInBankSchema(card_number, cvv, expiry_date) 
-
-        if not isCardValidInBankSchema:
-            return False, "Card not found In Bank Schema"
-
-        # if both valid return true
-        return True, "Card found"
-
-    def isCardInCardSchema(self, card_number, cvv, expiryDate):
         try:
-            connection = getDBConnection(current_app.config['CARD_SCHEMA'])
+            # Create a cursor to interact with the database
             with connection.cursor() as cursor:
-                sql_query = """
-                    SELECT COUNT(tokenised_pan) as card_count
-                    FROM Card
-                    WHERE tokenised_pan = %s
-                    AND cvv = %s
-                """
-                cursor.execute(sql_query, (card_number, cvv))
-                card = cursor.fetchone()
 
-                if card['card_count'] < 0:
-                    print("Card not found in Card schema")
-                    return False
+                # Prepare the output parameters as queryable variables
+                cursor.callproc('CheckCardInBothSchemas', [card_number, card_number, cvv, cvv, 0, ''])
+
+                # Retrieve output parameters (status_code and status_message)
+                cursor.execute("SELECT @_CheckCardInBothSchemas_4, @_CheckCardInBothSchemas_5")
+                result = cursor.fetchone()
+
+                statusCode = result['@_CheckCardInBothSchemas_4']
+                statusMessage = result['@_CheckCardInBothSchemas_5']
+
+                if statusCode == 403 or statusCode == 404:
+                    return False, statusMessage
                 
-                print("Card found in Card schema")
-                return True
+                return True, statusMessage
 
         except pymysql.MySQLError as e:
-            print(f"Error checking card in Card schema: {e}")
-            return False
-        
-    def isCardInBankSchema(self, card_number, cvv, expiryDate):
-        try:
-            connection = getDBConnection(current_app.config['BANK_SCHEMA'])
-            with connection.cursor() as cursor:
-                sql_query = """
-                    SELECT COUNT(pan) as card_count
-                    FROM Card
-                    WHERE pan = %s
-                    AND cvv = %s
-                """
-                cursor.execute(sql_query, (card_number, cvv))
-                card = cursor.fetchone()
+            print(f"Error: {e}")
+            return False, "An error occurred"
 
-                if card['card_count'] < 0:
-                    print("Card not found in Bank schema")
-                    return False
-                
-                print("Card found in Bank schema")
-                return True
-
-        except pymysql.MySQLError as e:
-            print(f"Error checking card in Bank schema: {e}")
-            return False
+        finally:
+            # Close the database connection
+            connection.close()
