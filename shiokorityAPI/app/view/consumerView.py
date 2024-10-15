@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from werkzeug.exceptions import BadRequest
 from ..controller.consumerController import ConsumerController
-from ..controller.bankController import BankController
 import bcrypt
 
 consumerBlueprint = Blueprint('consumerBlueprint', __name__)
