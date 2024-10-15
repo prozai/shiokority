@@ -6,7 +6,7 @@ from pymysql.err import MySQLError
 class Administrator():
     # 227
     def validateLogin(email, password):
-        
+
         try:
             with pymysql.connect(
                 host=current_app.config['MYSQL_HOST'],

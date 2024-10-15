@@ -3,10 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import consumerController from '../controller/consumerController';
 import CardValidation from './CardValidation';
 
-
 const ProfileConsumer = () => {
   const [profileData, setProfileData] = useState(null);
-  const [paymentData, setPaymentData] = useState({ merch_email: '', amount: 0 });
+  const [paymentData, setPaymentData] = useState({ 
+    merch_email: '', 
+    amount: 0,
+    cardNumber: '',
+    expiryDate: '',
+    cvv: ''
+  });
+  const [cardValidation, setCardValidation] = useState({
+    cardNumber: false,
+    expiryDate: false,
+    cvv: false
+  });
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
@@ -23,14 +33,31 @@ const ProfileConsumer = () => {
     }
   };
   
-  const handleChange = (e) => {
+  const handlePaymentChange = (e) => {
     setPaymentData({ ...paymentData, [e.target.name]: e.target.value });
+  };
+
+  const handleCardValidationChange = (cardData, isValid) => {
+    setPaymentData(prev => ({ ...prev, ...cardData }));
+    setCardValidation(prev => ({ ...prev, [Object.keys(cardData)[0]]: isValid }));
   };
 
   const handleSendPayment = async (e) => {
     e.preventDefault();
     try {
-      const response = await consumerController.sendPayment(profileData.cust_email, paymentData.merch_email, paymentData.merch_amount);
+      if (!Object.values(cardValidation).every(Boolean)) {
+        setMessage('Please correct the card information');
+        return;
+      }
+      
+      const response = await consumerController.sendPayment(
+        profileData.cust_email, 
+        paymentData.merch_email, 
+        paymentData.amount,
+        paymentData.cardNumber,
+        paymentData.expiryDate,
+        paymentData.cvv
+      );
       setMessage(response.message);
     } catch (error) {
       setMessage(error.message);
@@ -79,26 +106,35 @@ const ProfileConsumer = () => {
                     name="merch_email"
                     placeholder="Merchant Email"
                     value={paymentData.merch_email}
-                    onChange={handleChange}
+                    onChange={handlePaymentChange}
                     required
                     className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
                   />
                   <input
                     type="number"
-                    name="merch_amount"
+                    name="amount"
                     placeholder="Payment Amount"
-                    value={paymentData.merch_amount}
-                    onChange={handleChange}
+                    value={paymentData.amount}
+                    onChange={handlePaymentChange}
                     required
                     className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
                   />
-                  {/* <CardValidation /> */}
+                  <CardValidation onChange={handleCardValidationChange} />
 
-                  <button type="submit" className="w-full px-3 py-4 text-white bg-indigo-500 rounded-md focus:bg-indigo-600 focus:outline-none">Send Payment</button>
+                  <button 
+                    type="submit" 
+                    className={`w-full px-3 py-4 text-white rounded-md focus:outline-none ${
+                      Object.values(cardValidation).every(Boolean)
+                        ? 'bg-indigo-500 hover:bg-indigo-600'
+                        : 'bg-gray-400 cursor-not-allowed'
+                    }`}
+                    disabled={!Object.values(cardValidation).every(Boolean)}
+                  >
+                    Send Payment
+                  </button>
                 </form>
               </div>
 
-              
               <button onClick={handleLogout} className="mt-6 w-full px-3 py-4 text-white bg-red-500 rounded-md focus:bg-red-600 focus:outline-none">Logout</button>
               {message && <p className="mt-4 text-3xl text-center text-gray-600 ">{message}</p>}
             </div>
