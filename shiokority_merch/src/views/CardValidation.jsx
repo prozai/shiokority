@@ -1,81 +1,92 @@
 import React, { useState } from 'react';
-import { CreditCard, Calendar, Lock } from 'lucide-react';
 
-const CardValidation = () => {
-  const [cardData, setCardData] = useState({
-    cardNumber: '',
-    expirationDate: '',
-    cvv: '',
-  });
+const CardValidation = ({ onChange }) => {
+  const [errors, setErrors] = useState({});
+
+  const validateCardNumber = (number) => {
+    const regex = /^[0-9]{16}$/;
+    return regex.test(number) ? "" : "Card number must be 16 digits";
+  };
+
+  const validateExpiryDate = (date) => {
+    const regex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
+    if (!regex.test(date)) {
+      return "Invalid format (MM/YY)";
+    }
+    const [month, year] = date.split('/');
+    const expiryDate = new Date(2000 + parseInt(year), month - 1);
+    const today = new Date();
+    return expiryDate > today ? "" : "Card has expired";
+  };
+
+  const validateCVV = (cvv) => {
+    const regex = /^[0-9]{3}$/;
+    return regex.test(cvv) ? "" : "CVV must be 3 digits";
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCardData({ ...cardData, [name]: value });
-  };
+    let error = '';
+    let updatedValue = value;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Here you would typically send the card data to a server for validation
-    console.log('Card data submitted:', cardData);
-    // You can add your validation logic here
+    switch (name) {
+      case 'cardNumber':
+        updatedValue = value.slice(0, 16);
+        error = validateCardNumber(updatedValue);
+        break;
+      case 'expiryDate':
+        error = validateExpiryDate(value);
+        break;
+      case 'cvv':
+        updatedValue = value.slice(0, 3);
+        error = validateCVV(updatedValue);
+        break;
+      default:
+        break;
+    }
+
+    setErrors(prev => ({ ...prev, [name]: error }));
+    onChange({ [name]: updatedValue }, error === '');
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-light-blue-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-          <div className="max-w-md mx-auto">
-            <div>
-              <h1 className="text-2xl font-semibold">Card Details</h1>
-            </div>
-            <div className="divide-y divide-gray-200">
-              <form onSubmit={handleSubmit} className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                <div className="relative">
-                  <input
-                    id="cardNumber"
-                    name="cardNumber"
-                    type="text"
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-rose-600"
-                    placeholder="Card Number"
-                    value={cardData.cardNumber}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="cardNumber" className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm">Card Number</label>
-                  <CreditCard className="absolute right-0 top-2 h-6 w-6 text-gray-400" />
-                </div>
-                <div className="relative">
-                  <input
-                    id="expirationDate"
-                    name="expirationDate"
-                    type="text"
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-rose-600"
-                    placeholder="MM/YY"
-                    value={cardData.expirationDate}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="expirationDate" className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm">Expiration Date (MM/YY)</label>
-                  <Calendar className="absolute right-0 top-2 h-6 w-6 text-gray-400" />
-                </div>
-                <div className="relative">
-                  <input
-                    id="cvv"
-                    name="cvv"
-                    type="text"
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-rose-600"
-                    placeholder="CVV"
-                    value={cardData.cvv}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="cvv" className="absolute left-0 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:text-sm">CVV</label>
-                  <Lock className="absolute right-0 top-2 h-6 w-6 text-gray-400" />
-                </div>
-                <div className="relative">
-                  <button className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">Validate Card</button>
-                </div>
-              </form>
-            </div>
-          </div>
+    <div className="space-y-4">
+      <div>
+        <input
+          type="text"
+          name="cardNumber"
+          placeholder="Card Number (16 digits)"
+          onChange={handleChange}
+          maxLength={16}
+          required
+          className={`w-full px-3 py-2 placeholder-gray-300 border rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 ${errors.cardNumber ? 'border-red-500' : 'border-gray-300'}`}
+        />
+        {errors.cardNumber && <p className="mt-1 text-xs text-red-500">{errors.cardNumber}</p>}
+      </div>
+      <div className="flex space-x-4">
+        <div className="w-1/2">
+          <input
+            type="text"
+            name="expiryDate"
+            placeholder="MM/YY"
+            onChange={handleChange}
+            maxLength={5}
+            required
+            className={`w-full px-3 py-2 placeholder-gray-300 border rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 ${errors.expiryDate ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.expiryDate && <p className="mt-1 text-xs text-red-500">{errors.expiryDate}</p>}
+        </div>
+        <div className="w-1/2">
+          <input
+            type="text"
+            name="cvv"
+            placeholder="CVV"
+            onChange={handleChange}
+            maxLength={3}
+            required
+            className={`w-full px-3 py-2 placeholder-gray-300 border rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 ${errors.cvv ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.cvv && <p className="mt-1 text-xs text-red-500">{errors.cvv}</p>}
         </div>
       </div>
     </div>

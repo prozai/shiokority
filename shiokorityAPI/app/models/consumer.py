@@ -76,7 +76,7 @@ class Consumer():
         except pymysql.MySQLError as e:
             return False, "Error logging in"
 
-    def processPayment(self, cust_email, merch_email, amount):
+    def processPayment(self, data):
         #0. need to check if the shiokority_pay.Consumer exists
         #1. need to check if the shiokority_pay.Consumer has enough money
         #2. need to check if the shiokority_pay.Merchant exists
@@ -86,18 +86,18 @@ class Consumer():
         #6. need to insert the transaction into the shiokority._api.Payment table
        
         # Check if the consumer has enough money and Check if the consumer exists
-        consumer = self.getConsumerByEmail(cust_email)
+        consumer = self.getConsumerByEmail(data['cust_email'])
 
         if not consumer:
             print("Consumer not found")
             return False, "Consumer not found"
 
-        if consumer['cust_amount'] < Decimal(amount):
+        if consumer['cust_amount'] < Decimal(data['amount']):
             print("Insufficient funds")
             return False, "Insufficient funds"
         
         # Check if the merchant exists
-        merchant = Merchant().getMerchantByEmail(merch_email)
+        merchant = Merchant().getMerchantByEmail(data['merch_email'])
 
         if not merchant:
             print("Merchant not found")
@@ -108,21 +108,21 @@ class Consumer():
             return False, "Merchant is inactive"
         
         # Deduct the amount from the consumer
-        success, message = self.customerDeductAmount(cust_email, amount)
+        success, message = self.customerDeductAmount(data['cust_email'], data['amount'])
 
         if not success:
             print("Error deducting amount")
             return False, message
         
         # Update the amount to the merchant
-        success, message = Merchant().updateMerchantBalance(merch_email, amount)
+        success, message = Merchant().updateMerchantBalance(data['merch_email'], data['amount'])
         
         if not success:
             print("Error updating merchant balance")
             return False, message
         
         transactionData = {
-            'amount': amount,
+            'amount': data['amount'],
             'cust_id': consumer['cust_id'],
             'merch_id': merchant['merch_id']
         }
@@ -189,3 +189,68 @@ class Consumer():
         except pymysql.MySQLError as e:
             print(f"Error deducting amount: {e}")
             return False, f"Error deducting amount: {e}"
+        
+    def customerValidateCardProcedure(self, card_number, cvv, expiry_date):
+
+        # Check if the card exists in the Card schema
+        isCardValidInCardSchema = self.isCardInCardSchema(card_number, cvv, expiry_date)
+
+        if not isCardValidInCardSchema:
+            return False, "Card not found In Card Schema"
+        
+        # Check if the card exists in the Bank schema
+        isCardValidInBankSchema = self.isCardInBankSchema(card_number, cvv, expiry_date) 
+
+        if not isCardValidInBankSchema:
+            return False, "Card not found In Bank Schema"
+
+        # if both valid return true
+        return True, "Card found"
+
+    def isCardInCardSchema(self, card_number, cvv, expiryDate):
+        try:
+            connection = getDBConnection(current_app.config['CARD_SCHEMA'])
+            with connection.cursor() as cursor:
+                sql_query = """
+                    SELECT COUNT(tokenised_pan) as card_count
+                    FROM Card
+                    WHERE tokenised_pan = %s
+                    AND cvv = %s
+                """
+                cursor.execute(sql_query, (card_number, cvv))
+                card = cursor.fetchone()
+
+                if card['card_count'] < 0:
+                    print("Card not found in Card schema")
+                    return False
+                
+                print("Card found in Card schema")
+                return True
+
+        except pymysql.MySQLError as e:
+            print(f"Error checking card in Card schema: {e}")
+            return False
+        
+    def isCardInBankSchema(self, card_number, cvv, expiryDate):
+        try:
+            connection = getDBConnection(current_app.config['BANK_SCHEMA'])
+            with connection.cursor() as cursor:
+                sql_query = """
+                    SELECT COUNT(pan) as card_count
+                    FROM Card
+                    WHERE pan = %s
+                    AND cvv = %s
+                """
+                cursor.execute(sql_query, (card_number, cvv))
+                card = cursor.fetchone()
+
+                if card['card_count'] < 0:
+                    print("Card not found in Bank schema")
+                    return False
+                
+                print("Card found in Bank schema")
+                return True
+
+        except pymysql.MySQLError as e:
+            print(f"Error checking card in Bank schema: {e}")
+            return False

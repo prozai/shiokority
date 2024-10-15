@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from werkzeug.exceptions import BadRequest
 from ..controller.consumerController import ConsumerController
+from ..controller.bankController import BankController
 import bcrypt
 
 consumerBlueprint = Blueprint('consumerBlueprint', __name__)
@@ -90,13 +91,23 @@ def sendPayment():
     data = request.get_json()
 
     if not data:
-        return jsonify({'success': False, 'message': 'Consumer email, merchant email, and amount are required'}), 400
+        return jsonify({'success': False, 'message': 'Missing Value'}), 400
+    
+    # data consists of the following keys: cust_email, merch_email, amount, cardNumber, expiryDate, cvv
 
-    cust_email = data.get('cust_email')
-    merch_email = data.get('merch_email')
-    amount = data.get('merch_amount')
+    # 0. Need to tokenize the card number and pass it to the bank in the model not here
+    # 1. Validate the card (need to tokenize the card number and pass it to the bank)
+    # 2. if the card is valid, process the payment
 
-    success, message = consumer_instance.processPayment(cust_email, merch_email, amount)
+    # validate the card
+    success, message = ConsumerController().customerValidateCardProcedure(data['cardNumber'], data['cvv'], data['expiryDate'])
+
+    # if the card is invalid, return the error message
+    if not success:
+        return jsonify({'success': False, 'message': message}), 400
+    
+    # if the card is valid, process the payment
+    success, message = consumer_instance.processPayment(data)
 
     if success:
         return jsonify({'success': True, 'message':message}), 200

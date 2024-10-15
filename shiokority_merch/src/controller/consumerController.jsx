@@ -30,9 +30,9 @@ class consumerController {
   }
 
   // Send payment to merchant
-  static async sendPayment(cust_email, merch_email, merch_amount) {
+  static async sendPayment(cust_email, merch_email, amount, cardNumber, expiryDate, cvv) {
     try {
-      return await Consumer.sendPayment(cust_email, merch_email, merch_amount);
+      return await Consumer.sendPayment(cust_email, merch_email, amount, cardNumber, expiryDate, cvv);  
     } catch (error) {
       throw new Error(error.message);
     }
