@@ -1,5 +1,6 @@
 from ..models.administrator import Administrator
 from ..models.merchant import Merchant
+from ..models.consumer import Consumer
 
 class AdminController:
     def validate_admin_login(self, email, password):
@@ -19,23 +20,25 @@ class AdminController:
 
     def update_merchant_status(self, merch_id, status):
         return Merchant().updateMerchantStatus(merch_id, status)
-
-    def addUser(self,user):
-        return Administrator().addUser(user)
-
-    def get_all_users(self):
-        return Administrator.get_all_users(self)
-
-    def get_user_by_id(self, cust_id):
-        return Administrator().getUserById(cust_id)
-
-    def submit_user_update(self, user_id, email=None, first_name=None, last_name=None, address=None, phone=None, status=None):
-        return Administrator().update_user(user_id, email, first_name, last_name, address, phone, status)
     
     def getAdminTokenByEmail(self, email):
         return Administrator().getAdminTokenByEmail(email)
-    
+
     def update2FAbyEmail(self, email):
         return Administrator().update2FAbyEmail(email)
+
+    def addUser(self,user):
+        return Consumer().addUser(user)
+
+    def get_all_users(self):
+        return Consumer().get_all_users()
+
+    def get_user_by_id(self, cust_id):
+        return Consumer().getUserById(cust_id)
+
+    def submit_user_update(self, user_id, email=None, first_name=None, last_name=None, address=None, phone=None, status=None):
+        return Consumer().update_user(user_id, email, first_name, last_name, address, phone, status)
+    
+
 
     
