@@ -1,5 +1,6 @@
 import Administrator from '../model/administrator';
 import Merchant from '../model/merchant';  
+import Consumer from '../model/consumer';
 
 class AdministratorController {
   static async login(data) {
@@ -55,7 +56,7 @@ class AdministratorController {
   // My work of art
   static async addUser(data) {
     try {
-      const result = await Administrator.addUser(data);  // Calls the model method to add user
+      const result = await Consumer.addUser(data);  // Calls the model method to add user
       return result;
     } catch (error) {
       console.error('Error in createUser:', error);
@@ -65,7 +66,7 @@ class AdministratorController {
 
   static async getAllUsers() {
     try {
-      const users = await Administrator.getAllUsers();  // Fetches all users from the model
+      const users = await Consumer.getAllUsers();  // Fetches all users from the model
       return users;
     } catch (error) {
       console.error('Error in getUsers:', error);
@@ -76,7 +77,7 @@ class AdministratorController {
   // Fetch user by ID
   static async getUserById(cust_id) {
     try {
-      const user = await Administrator.getUserById(cust_id);  // Fetch user details from the model
+      const user = await Consumer.getUserById(cust_id);  // Fetch user details from the model
       return user;
     } catch (error) {
       console.error('Error in getUserById:', error);
@@ -86,7 +87,7 @@ class AdministratorController {
 
   static async updateUser(userId, userData) {
     try {
-      const result = await Administrator.updateUser(userId, userData);  // Calls the model method to update the user
+      const result = await Consumer.updateUser(userId, userData);  // Calls the model method to update the user
       return result;
     } catch (error) {
       console.error('Error in updateUser:', error);
@@ -105,7 +106,6 @@ class AdministratorController {
   static async getSecretKey() {
     return await Administrator.getSecretKey();
   }
-
 
 }
 
