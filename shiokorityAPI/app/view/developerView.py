@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify, session, send_file
 from werkzeug.exceptions import BadRequest
 from app.controller.developersController import DevelopersController
 from ..models.developers import Developers
-from api_key_manager import generate_encrypted_api_key
+from shiokorityAPI.app.auth.api_key_manager import generate_encrypted_api_key
 from cryptography.hazmat.primitives import serialization
 from ..auth.TOTP import generate_totp_uri, create_qr_code, generate_secret, encrypt_secret, decrypt_secret, get_totp_token
 
