@@ -345,3 +345,16 @@ class Merchant:
         except pymysql.MySQLError as e:
             print(f"Error fetching merchant balance: {e}")
             return None
+        
+    def getMerchantIdByEmail(self, merch_email):
+        try:
+            connection = self.getDBConnection()
+            with connection.cursor() as cursor:
+                sql_query = "SELECT merch_id FROM Merchant WHERE merch_email = %s"
+                cursor.execute(sql_query, (merch_email,))
+                merchant = cursor.fetchone()  
+                return merchant  # Merchant data fetched successfully
+
+        except pymysql.MySQLError as e:
+            print(f"Error fetching merchant by email: {e}")
+            return False

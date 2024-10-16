@@ -31,3 +31,4 @@ instance/
 config.py
 testDatabase.py
 holdingArea/
+shiokorityAPI/test.py

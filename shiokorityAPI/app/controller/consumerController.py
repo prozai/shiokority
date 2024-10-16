@@ -1,5 +1,6 @@
 from ..models.consumer import Consumer
 from ..models.merchant import Merchant
+from ..models.apiProcess import ApiProcess
 
 class ConsumerController():
 
@@ -32,3 +33,6 @@ class ConsumerController():
     
     def customerValidateCardProcedure(self, card_number, cvv, expiry_date):
         return Consumer().customerValidateCardProcedure(card_number, cvv, expiry_date)    
+    
+    def processPaymentProcedure(self, data):
+        return ApiProcess().paymentProcessProcedure(data)
