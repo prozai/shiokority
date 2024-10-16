@@ -15,3 +15,9 @@ class DevelopersController():
     
     def update2FAbyEmail(self, email):
         return self.developers.update2FAbyEmail(email)
+
+    def generate_api_key(self, dev_id):
+        return Developers().generateApiKey(dev_id)
+    
+    def get_developer_by_email(self, dev_email):
+        return Developers().getDeveloperByEmail(dev_email)

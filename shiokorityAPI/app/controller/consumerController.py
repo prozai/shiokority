@@ -14,6 +14,12 @@ class ConsumerController():
     
     def login(self, cust_email, password):
         return Consumer().login(cust_email, password)
+
+    def logoutConsumer(self, session):
+        if 'cust_id' in session:
+            session.pop('cust_id')
+            return True, "Consumer logged out successfully"
+        return False, "No Consumer session found"
     
     def processPayment(self, data):
         return Consumer().processPayment(data) 
