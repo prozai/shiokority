@@ -66,11 +66,6 @@ def loginConsumer():
         return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
 
 @consumerBlueprint.route('/logout-consumer', methods=['POST'])
-def logout():
-    session.pop('cust_id', None)
-    return jsonify({'success': True, 'message': 'Logged out successfully'}), 200
-
-@consumerBlueprint.route('/logout-consumer', methods=['POST'])
 def logoutConsumer():
     session.clear()
     return jsonify({'success': True, 'message': 'Logout successful'}), 200
