@@ -146,11 +146,11 @@ class Merchant:
         return g.db
 
     # 130
-    def registerMerchant(self, merch_name, merch_email, merch_phone, merch_address, merch_pass, merch_uen):
+    def registerMerchant(self, merchant):
 
-        hash_pass = bcrypt.hashpw(merch_pass.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        hash_pass = bcrypt.hashpw(merchant['merch_pass'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
-        existing_merchant = self.getMerchantByEmail(merch_email)
+        existing_merchant = self.getMerchantByEmail(merchant['merch_email'])
 
         if existing_merchant:
             return False, "Email already in use"
@@ -163,7 +163,7 @@ class Merchant:
                     VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), 1, %s)
                 """
 
-                cursor.execute(sql_query, (merch_name, merch_email, merch_phone, merch_address, hash_pass, merch_uen))
+                cursor.execute(sql_query, (merchant['merch_name'], merchant['merch_email'], merchant['merch_phone'], merchant['merch_address'], hash_pass, merchant['uen']))
 
                 connection.commit()
                 return True, "Merchant created successfully"

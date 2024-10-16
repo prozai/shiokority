@@ -5,7 +5,7 @@ class Merchant {
   // # 130
   static async registerMerchant(merch_data) {
     try {
-      const response = await axios.post('merchant/register', merch_data);  // Updated path
+      const response = await axios.post('merchant/register-merchant', merch_data);  // Updated path
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Registration failed');
