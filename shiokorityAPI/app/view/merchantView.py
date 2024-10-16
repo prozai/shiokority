@@ -13,20 +13,13 @@ merchantBlueprint = Blueprint('merchant', __name__)
 @merchantBlueprint.route('/register-merchant', methods=['POST'])
 def registerMerchant():
     data = request.get_json()
-    # Extract data from request
-    merch_email = data.get('merch_email')
-    merch_pass = data.get('merch_pass') # Plain-text password entered by the user
-    merch_name = data.get('merch_name')
-    merch_phone = data.get('merch_phone')
-    merch_address = data.get('merch_address')
-    date_created = data.get('date_created')
-    date_updated_on = data.get('date_updated_on')
-    merch_status = data.get('merch_status')
-    merch_uen = data.get('merch_uen')
+
+    if not data:
+        return jsonify({'success': False, 'message': 'Merchant email, password, first name, last name, phone number, and address are required'}), 400
     
     # Call the Merchant model to create the new merchant
 
-    success, message = merchant_instance.registerMerchant(merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
+    success, message = merchant_instance.registerMerchant(data)
     
     if success:
         return jsonify({'success': True, 'message': message}), 201  # 201 = Created
