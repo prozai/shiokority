@@ -1,6 +1,6 @@
 import os
-from encryption_utils import aes_encrypt, aes_decrypt
-from rsa_utils import generate_rsa_keys, sign_data, verify_signature
+from .encryption_utils import aes_encrypt, aes_decrypt
+from .rsa_utils import generate_rsa_keys, sign_data, verify_signature
 
 # Encrypt data, sign AES key, verify and decrypt workflow
 def generate_encrypted_api_key():
