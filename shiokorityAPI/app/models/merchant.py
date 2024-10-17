@@ -12,14 +12,15 @@ class Merchant:
 
         try:
             connection = getDBConnection(current_app.config['PAY_SCHEMA'])
-            with connection.cursor() as connect:
+
+            with connection.cursor() as cursor:
                 sqlQuery = """
                     INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
                     VALUES (%s, %s, %s, %s, '$2y$10$IvuJ8FziVxYNbLIOMllv.Oou3GLwBe5RAlElZgZTY7cZH.xvLokPm', NOW(), NOW(), 1, %s)
                 """
-                with connect.cursor() as cursor:
+                with connection.cursor() as cursor:
                     cursor.execute(sqlQuery, values)
-                    connect.commit()
+                    connection.commit()
                 return True  # Merchant created successfully
 
         except pymysql.MySQLError as e:
