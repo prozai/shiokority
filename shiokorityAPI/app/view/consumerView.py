@@ -87,7 +87,7 @@ def profile():
 @consumerBlueprint.route('/send-payment', methods=['POST'])
 def sendPayment():
     data = request.get_json()
-
+    
     if not data:
         return jsonify({'success': False, 'message': 'Missing Value'}), 400
     
@@ -105,7 +105,7 @@ def sendPayment():
         return jsonify({'success': False, 'message': message}), 400
     
     # if the card is valid, process the payment
-    success, message = consumer_instance.processPayment(data)
+    success, message = ConsumerController().processPaymentProcedure(data)
 
     if success:
         return jsonify({'success': True, 'message':message}), 200

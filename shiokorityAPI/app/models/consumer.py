@@ -1,42 +1,10 @@
 import pymysql
 from flask import current_app
 import bcrypt
-from .merchant import Merchant
-from .transaction import Transaction
 from ..auth.databaseConnection import getDBConnection
-from decimal import Decimal
 from pymysql.err import MySQLError
 
 class Consumer():
-
-
-    # def process_payment(self, merchant_id, amount):
-    #     try:
-    #         with pymysql.connect(
-    #             host=current_app.config['MYSQL_HOST'],
-    #             user=current_app.config['MYSQL_USER'],
-    #             password=current_app.config['MYSQL_PASSWORD'],
-    #             database=current_app.config['MERCHANT_SCHEMA'],
-    #             cursorclass=pymysql.cursors.DictCursor
-    #         ) as connection:
-    #             with connection.cursor() as cursor:
-    #                 # Process the payment
-    #                 sql_query = """
-    #                 UPDATE Merchant
-    #                 SET merch_amount = merch_amount + %s 
-    #                 WHERE merch_id = %s
-    #                 """
-    #                 cursor.execute(sql_query, (amount, merchant_id))
-    #                 connection.commit()
-    #                 return True
-
-    #     except MySQLError as e:
-    #         print(f"Database error during payment processing: {str(e)}")
-    #         return False, "Database error occurred"
-
-    #     except Exception as e:
-    #         print(f"Unexpected error during payment processing: {str(e)}")
-    #         return False, "An unexpected error occurred"
 
     def registerConsumer(self, customer):
 
@@ -75,67 +43,7 @@ class Consumer():
                     return False, "Invalid email or password"
         except pymysql.MySQLError as e:
             return False, "Error logging in"
-
-    def processPayment(self, data):
-        #0. need to check if the shiokority_pay.Consumer exists
-        #1. need to check if the shiokority_pay.Consumer has enough money
-        #2. need to check if the shiokority_pay.Merchant exists
-        #3. need to check if the shiokority_pay.Merchant is active
-        #4. need to deduct the amount from the shiokority_pay.Consumer
-        #5. need to update the amount to the shiokority_pay.Merchant
-        #6. need to insert the transaction into the shiokority._api.Payment table
-       
-        # Check if the consumer has enough money and Check if the consumer exists
-        consumer = self.getConsumerByEmail(data['cust_email'])
-
-        if not consumer:
-            print("Consumer not found")
-            return False, "Consumer not found"
-
-        if consumer['cust_amount'] < Decimal(data['amount']):
-            print("Insufficient funds")
-            return False, "Insufficient funds"
-        
-        # Check if the merchant exists
-        merchant = Merchant().getMerchantByEmail(data['merch_email'])
-
-        if not merchant:
-            print("Merchant not found")
-            return False, "Merchant not found"
-        
-        if merchant['merch_status'] != 1:
-            print("Merchant is inactive")
-            return False, "Merchant is inactive"
-        
-        # Deduct the amount from the consumer
-        success, message = self.customerDeductAmount(data['cust_email'], data['amount'])
-
-        if not success:
-            print("Error deducting amount")
-            return False, message
-        
-        # Update the amount to the merchant
-        success, message = Merchant().updateMerchantBalance(data['merch_email'], data['amount'])
-        
-        if not success:
-            print("Error updating merchant balance")
-            return False, message
-        
-        transactionData = {
-            'amount': data['amount'],
-            'cust_id': consumer['cust_id'],
-            'merch_id': merchant['merch_id']
-        }
-
-        # Insert the transaction into the Payment table
-        success, message = Transaction().insertPaymentTransaction(transactionData)
-
-        if not success:
-            return False, message
-        
-        return True, "Payment processed successfully"
     
-
     def getConsumerByEmail(self, cust_email):
         # Fetch consumer by email - used in login and create
         try:
@@ -148,7 +56,7 @@ class Consumer():
 
         except pymysql.MySQLError as e:
             print(f"Error fetching consumer by email: {e}")
-            return None
+            return False  
         
     def getConsumerByID(self, cust_id):
         # Fetch consumer by ID from the database
