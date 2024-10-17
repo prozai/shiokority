@@ -1,30 +1,18 @@
 import pymysql
 from flask import current_app, g
 import bcrypt
+from ..auth.databaseConnection import getDBConnection
 
 class Merchant:
 
-    def getDBConnection(self):
-        if 'db' not in g:
-            g.db = pymysql.connect(
-                host=current_app.config['MYSQL_HOST'],
-                user=current_app.config['MYSQL_USER'],
-                password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['PAY_SCHEMA'],
-                cursorclass=pymysql.cursors.DictCursor
-            )
-        return g.db
-
     # 143
     def createMerchant(self, merchant):
-        print(merchant)
+        
         values = (merchant['name'], merchant['email'], merchant['phone'], merchant['address'], merchant['uen'])   
 
         try:
-            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'],
-                                 cursorclass=pymysql.cursors.DictCursor) as connect:
-              
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
+            with connection.cursor() as connect:
                 sqlQuery = """
                     INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
                     VALUES (%s, %s, %s, %s, '$2y$10$IvuJ8FziVxYNbLIOMllv.Oou3GLwBe5RAlElZgZTY7cZH.xvLokPm', NOW(), NOW(), 1, %s)
@@ -41,15 +29,11 @@ class Merchant:
     # 144
     def getMerchantData(self):
         try:
-
-            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'], 
-                                 cursorclass=pymysql.cursors.DictCursor) as connect:
-
-                with connect.cursor() as cursor:
-                    sqlQuery = "SELECT * FROM Merchant"
-                    cursor.execute(sqlQuery)
-                    merchant = cursor.fetchall()
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
+            with connection.cursor() as cursor:
+                sqlQuery = "SELECT * FROM Merchant"
+                cursor.execute(sqlQuery)
+                merchant = cursor.fetchall()
 
                 if not merchant:
                     return False  # No merchant data found
@@ -63,14 +47,12 @@ class Merchant:
     def getOneMerchant(self, id):
         try:
 
-            with pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                 password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'], 
-                                 cursorclass=pymysql.cursors.DictCursor) as connect:
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
 
-                with connect.cursor() as cursor:
-                    sqlQuery = "SELECT * FROM Merchant WHERE merch_id = %s"
-                    cursor.execute(sqlQuery, (id,))
-                    merchant = cursor.fetchone()
+            with connection.cursor() as cursor:
+                sqlQuery = "SELECT * FROM Merchant WHERE merch_id = %s"
+                cursor.execute(sqlQuery, (id,))
+                merchant = cursor.fetchone()
 
                 if merchant is None:
                     return False
@@ -84,19 +66,17 @@ class Merchant:
     # 146
     def updateMerchantDetails(self, merchID,merchData):
         
-        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'], 
-                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'],
-                                  cursorclass=pymysql.cursors.DictCursor)
+        connection = getDBConnection(current_app.config['PAY_SCHEMA'])
         try:
             
             query = """UPDATE Merchant 
                     SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW(), merch_uen = %s
                     WHERE merch_id = %s"""
             
-            with connect.cursor() as cursor:
+            with connection.cursor() as cursor:
                 affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_email'], merchData['merch_phone'],merchData['merch_uen'], merchID))
 
-                connect.commit()
+                connection.commit()
 
             if affected_rows == 0:
                 return False  # No rows were affected
@@ -104,15 +84,13 @@ class Merchant:
             return True
 
         except pymysql.MySQLError as e:
-            connect.rollback()
+            connection.rollback()
             print(f"Error updating merchant details: {e}")
             return False
 
     def updateMerchantStatus(self, merch_id, status):
 
-        connect = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'],    
-                                  cursorclass=pymysql.cursors.DictCursor)
+        connect = getDBConnection(current_app.config['PAY_SCHEMA'])
         try:
             with connect.cursor() as cursor:
                 new_status = bool(int(status))  # Convert status to boolean
@@ -134,17 +112,6 @@ class Merchant:
         finally:
             connect.close()
 
-    def getDBConnection(self):
-        if 'db' not in g:
-            g.db = pymysql.connect(
-                host=current_app.config['MYSQL_HOST'],
-                user=current_app.config['MYSQL_USER'],
-                password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['PAY_SCHEMA'],
-                cursorclass=pymysql.cursors.DictCursor
-            )
-        return g.db
-
     # 130
     def registerMerchant(self, merchant):
 
@@ -156,7 +123,7 @@ class Merchant:
             return False, "Email already in use"
 
         try:
-            connection = self.getDBConnection()
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
             with connection.cursor() as cursor:
                 sql_query = """
                     INSERT INTO Merchant (merch_name, merch_email, merch_phone, merch_address, merch_pass, date_created, date_updated_on, merch_status, merch_uen)
@@ -192,7 +159,7 @@ class Merchant:
     def getMerchantByEmail(self, merch_email):
         # Fetch merchant by email - used in login and create
         try:
-            connection = self.getDBConnection()
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
             with connection.cursor() as cursor:
                 sql_query = "SELECT * FROM Merchant WHERE merch_email = %s"
                 cursor.execute(sql_query, (merch_email,))
@@ -206,7 +173,7 @@ class Merchant:
     def getMerchantByID(self, merch_id):
         # Fetch merchant by ID from the database
         try:
-            connection = self.getDBConnection()
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
             with connection.cursor() as cursor:
                 sql_query = """
                     SELECT merch_id, merch_name, merch_email, merch_phone, merch_address, merch_uen 
@@ -224,131 +191,10 @@ class Merchant:
         except pymysql.MySQLError as e:
             print(f"Error fetching merchant: {e}")
             return None
-    
-    # 133
-    def addPayment(self, merch_email, amount):
-        # Fetch the merchant by email
-        merchant = self.getMerchantByEmail(merch_email)
-        if not merchant:
-            return False, "Merchant not found"
-
-        merch_id = merchant['merch_id']
-        connection = self.getDBConnection()
-
-        try:
-            with connection.cursor() as cursor:
-                # Add the payment to the transaction record
-                query = """
-                    INSERT INTO transaction_management.Transaction (merch_id, amount, payment_date, status, date_created, date_updated_on)
-                    VALUES (%s, %s, NOW(), 'completed', NOW(), NOW())
-                """
-                cursor.execute(query, (merch_id, amount))
-
-                # Update the merchant's total balance
-                update_query = """
-                    UPDATE merchant_management.Merchant 
-                    SET merch_amount = merch_amount + %s 
-                    WHERE merch_id = %s
-                """
-                cursor.execute(update_query, (amount, merch_id))
-
-                connection.commit()
-
-            return True, "Payment added successfully"
-        
-        except pymysql.MySQLError as e:
-            print(f"Error adding payment: {e}")
-            return False, "Error adding payment"
-
-    def getTransactionHistory(self, merch_id):
-        try:
-            connection = self.getDBConnection()
-            with connection.cursor() as cursor:
-                # Fetch all transactions for the merchant
-                query = """
-                    SELECT payment_id, amount, payment_date, status
-                    FROM transaction_management.Transaction
-                    WHERE merch_id = %s
-                """
-                cursor.execute(query, (merch_id,))
-                transactions = cursor.fetchall()
-
-                # Calculate the total balance
-                balance_query = """
-                    SELECT SUM(amount) as total_balance
-                    FROM transaction_management.Transaction
-                    WHERE merch_id = %s AND status = 'completed'
-                """
-                cursor.execute(balance_query, (merch_id,))
-                balance = cursor.fetchone()['total_balance'] or 0.0
-
-            return transactions, balance
-
-        except pymysql.MySQLError as e:
-            print(f"Error fetching transactions: {e}")
-            return None, 0.0  # Return None for transactions and 0.0 for balance in case of an error
-        
-    def validateMerchantIsValid(self, merch_id):
-        # Fetch merchant by ID from the database
-        try:
-            connection = pymysql.connect(host=current_app.config['MYSQL_HOST'], user=current_app.config['MYSQL_USER'],
-                                  password=current_app.config['MYSQL_PASSWORD'], database=current_app.config['PAY_SCHEMA'],    
-                                  cursorclass=pymysql.cursors.DictCursor)
-            
-            with connection.cursor() as cursor:
-                sql_query = "SELECT status FROM Merchant WHERE merch_id = %s"
-                cursor.execute(sql_query, (merch_id,))
-                merchant = cursor.fetchone()
-
-                if not merchant:
-                    return None  # No merchant found
-                
-                if merchant['status'] != 1:
-                    return False # Merchant is inactive
-
-                return True  # Merchant data fetched successfully
-
-        except pymysql.MySQLError as e:
-            print(f"Error fetching merchant: {e}")
-            return None
-        
-    def updateMerchantBalance(self, merch_email, amount):
-        try:
-            connection = self.getDBConnection()
-            with connection.cursor() as cursor:
-                # Update the merchant's balance
-                update_query = """
-                    UPDATE Merchant 
-                    SET merch_amount = merch_amount + %s 
-                    WHERE merch_email = %s
-                """
-                cursor.execute(update_query, (amount, merch_email))
-                connection.commit()
-                return True, "Merchant balance updated successfully"
-        except pymysql.MySQLError as e:
-            print(f"Error updating merchant balance: {e}")
-            return False, "Error updating merchant balance"
-
-    def getMerchantBalance(self, merch_id):
-        try:
-            connection = self.getDBConnection()
-            with connection.cursor() as cursor:
-                # Retrieve the merchant's balance
-                sql_query = "SELECT merch_amount FROM Merchant WHERE merch_id = %s"
-                cursor.execute(sql_query, (merch_id,))
-                result = cursor.fetchone()
-
-                if result is None:
-                    return None
-
-                return result['merch_amount']
-        except pymysql.MySQLError as e:
-            print(f"Error fetching merchant balance: {e}")
-            return None
         
     def getMerchantIdByEmail(self, merch_email):
         try:
-            connection = self.getDBConnection()
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
             with connection.cursor() as cursor:
                 sql_query = "SELECT merch_id FROM Merchant WHERE merch_email = %s"
                 cursor.execute(sql_query, (merch_email,))
