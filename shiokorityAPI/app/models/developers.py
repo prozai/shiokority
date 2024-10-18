@@ -4,6 +4,7 @@ import secrets
 from flask import current_app, g
 import bcrypt
 from pymysql.err import MySQLError
+import base64
 
 class Developers():
     
@@ -14,34 +15,27 @@ class Developers():
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
 
                 with connect.cursor() as cursor:
-
-                    # Check if the email already exists
-                    cursor.execute("SELECT COUNT(*) as count FROM Developer WHERE dev_email = %s", (developer['email'],))
-                    result = cursor.fetchone()
                     
-                    if result['count'] > 0:
-                        print("Error creating developers: Email already exists")
-                        return False  # Email already exists
+                    sql_query = '''
+                        INSERT INTO Developer (dev_fname, dev_lname, dev_email, dev_pass, dev_address, 
+                        dev_phone, dev_status, dev_secret_key, dev_mfa_enabled, date_created, date_updated_on)
+                        VALUES (%s, %s, %s, %s, %s, %s, 1, %s, 0, NOW(), NOW())
+                    '''
 
+                    # Hash the password before storing it in the database
                     hashed_password = bcrypt.hashpw(developer['password'].encode('utf-8'), bcrypt.gensalt())
 
-                    cursor.callproc('CreateDeveloper', (
-                    developer['firstName'],
-                    developer['lastName'],
-                    developer['email'],
-                    hashed_password,
-                    developer['address'],
-                    developer['phoneNumber'],
-                    True,
-                    secret_key
-                ))
+                    cursor.execute(sql_query, (developer['firstName'], developer['lastName'], developer['email'], hashed_password,
+                                               developer['address'], developer['phoneNumber'], secret_key))   
+
                     connect.commit()
 
                 return True  # developers created successfully
 
         except pymysql.MySQLError as e:
             print(f"Error creating developers: {e}")
-            return False  # Return False in case of an error
+            return False  # Return False in case of an error'
+
         
         
     def loginDeveloper(self, developer):
@@ -74,7 +68,7 @@ class Developers():
                     
                     # Check if the provided password matches the hashed password
                     if bcrypt.checkpw(developer['password'].encode('utf-8'), hashed_password):
-                        return {"success" : True, "two_factor_enabled" : user['dev_mfa_enabled']}
+                        return {"success" : True, "dev_id": user["dev_id"], "two_factor_enabled" : user['dev_mfa_enabled']}
                     
                     else:
                         print(f"Login attempt failed: Incorrect password for email {developer['email']}")
@@ -220,4 +214,57 @@ class Developers():
 
         except pymysql.MySQLError as e:
             print(f"Database error during API key storage: {e}")
+            return False
+
+    def get_api_keys(self, dev_id):
+        try:
+            with pymysql.connect(
+                host=current_app.config['MYSQL_HOST'],
+                user=current_app.config['MYSQL_USER'],
+                password=current_app.config['MYSQL_PASSWORD'],
+                database=current_app.config['DEV_SCHEMA'],
+                cursorclass=pymysql.cursors.DictCursor
+            ) as connection:
+                with connection.cursor() as cursor:
+                    # Fetch API keys, public key, created date, and status for the given developer
+                    sql_query = """
+                    SELECT api_id, api_key, api_status, date_created, public_key
+                    FROM Developer_API
+                    WHERE dev_id = %s
+                    """
+                    cursor.execute(sql_query, (dev_id,))
+                    api_keys = cursor.fetchall()
+                    
+                    return api_keys
+
+        except MySQLError as e:
+            print(f"Database error fetching API keys: {e}")
+            return None
+    
+    def delete_api_key(self, api_id):
+        try:
+            with pymysql.connect(
+                host=current_app.config['MYSQL_HOST'],
+                user=current_app.config['MYSQL_USER'],
+                password=current_app.config['MYSQL_PASSWORD'],
+                database=current_app.config['DEV_SCHEMA'],
+                cursorclass=pymysql.cursors.DictCursor
+            ) as connection:
+
+                with connection.cursor() as cursor:
+                    # SQL query to delete the API key by api_id
+                    sql_query = """
+                    DELETE FROM Developer_API
+                    WHERE api_id = %s
+                    """
+                    cursor.execute(sql_query, (api_id,))
+                    connection.commit()
+
+                    if cursor.rowcount > 0:
+                        return True  # Return True if a row was deleted
+                    else:
+                        return False  # Return False if no row was deleted
+
+        except pymysql.MySQLError as e:
+            print(f"Database error during API key deletion: {e}")
             return False
