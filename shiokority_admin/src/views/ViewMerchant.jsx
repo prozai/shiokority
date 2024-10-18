@@ -7,6 +7,7 @@ import AdministratorController from '../controller/administratorController';
 
 
 const ViewMerchants = () => {
+  
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -35,14 +36,7 @@ const ViewMerchants = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h3 className="text-2xl font-bold mb-4">User Management</h3>
-
-{/* Links for toggling between Merchant and User Lists */}
-      <div className="mb-4">
-        <Link to="/user-management" className=" text-blue-600 hover:underline">Merchant List</Link>
-                <span className="mx-2">/</span>
-        <Link to="/user-management/users" className="text-blue-600 hover:underline">User List</Link>
-      </div>
+      <h3 className="text-2xl font-bold mb-4">Merchant Management</h3>
 
 {/* Search and Add Merchant Button */}
       <div className="bg-white p-6 rounded-lg shadow-md">

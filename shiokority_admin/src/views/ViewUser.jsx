@@ -1,7 +1,7 @@
 // src/views/ViewUser.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FiEdit, FiTrash2 } from 'react-icons/fi';
+import { FiEdit } from 'react-icons/fi';
 import AdministratorController from '../controller/administratorController';
 
 
@@ -38,12 +38,6 @@ const UserList = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h3 className="text-2xl font-bold mb-4">User Management</h3>
-
-      <div className="mb-4">
-        <Link to="/user-management" className="text-blue-600 hover:underline">Merchant List</Link>
-        <span className="mx-2">/</span>
-        <Link to="/user-management/users" className="text-blue-600 hover:underline">User List</Link>
-      </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
