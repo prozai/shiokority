@@ -14,27 +14,19 @@ class Developers():
                                  cursorclass=pymysql.cursors.DictCursor) as connect:
 
                 with connect.cursor() as cursor:
-
-                    # Check if the email already exists
-                    cursor.execute("SELECT COUNT(*) as count FROM Developer WHERE dev_email = %s", (developer['email'],))
-                    result = cursor.fetchone()
                     
-                    if result['count'] > 0:
-                        print("Error creating developers: Email already exists")
-                        return False  # Email already exists
+                    sql_query = '''
+                        INSERT INTO Developer (dev_fname, dev_lname, dev_email, dev_pass, dev_address, 
+                        dev_phone, dev_status, dev_secret_key, dev_mfa_enabled, date_created, date_updated_on)
+                        VALUES (%s, %s, %s, %s, %s, %s, 1, %s, 0, NOW(), NOW())
+                    '''
 
+                    # Hash the password before storing it in the database
                     hashed_password = bcrypt.hashpw(developer['password'].encode('utf-8'), bcrypt.gensalt())
 
-                    cursor.callproc('CreateDeveloper', (
-                    developer['firstName'],
-                    developer['lastName'],
-                    developer['email'],
-                    hashed_password,
-                    developer['address'],
-                    developer['phoneNumber'],
-                    True,
-                    secret_key
-                ))
+                    cursor.execute(sql_query, (developer['firstName'], developer['lastName'], developer['email'], hashed_password,
+                                               developer['address'], developer['phoneNumber'], secret_key))   
+
                     connect.commit()
 
                 return True  # developers created successfully
