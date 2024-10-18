@@ -97,37 +97,6 @@ class Consumer():
         except pymysql.MySQLError as e:
             print(f"Error deducting amount: {e}")
             return False, f"Error deducting amount: {e}"
-        
-    def customerValidateCardProcedure(self, card_number, cvv, expiry_date):
-
-        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
-
-        try:
-            # Create a cursor to interact with the database
-            with connection.cursor() as cursor:
-
-                # Prepare the output parameters as queryable variables
-                cursor.callproc('CheckCardInBothSchemas', [card_number, card_number, cvv, cvv, 0, ''])
-
-                # Retrieve output parameters (status_code and status_message)
-                cursor.execute("SELECT @_CheckCardInBothSchemas_4, @_CheckCardInBothSchemas_5")
-                result = cursor.fetchone()
-
-                statusCode = result['@_CheckCardInBothSchemas_4']
-                statusMessage = result['@_CheckCardInBothSchemas_5']
-
-                if statusCode == 403 or statusCode == 404:
-                    return False, statusMessage
-                
-                return True, statusMessage
-
-        except pymysql.MySQLError as e:
-            print(f"Error: {e}")
-            return False, "An error occurred"
-
-        finally:
-            # Close the database connection
-            connection.close()
 
     # My work of art
     #136

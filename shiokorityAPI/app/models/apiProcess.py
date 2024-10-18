@@ -1,178 +1,141 @@
 from ..auth.databaseConnection import getDBConnection
 from flask import current_app
 from .bank import Bank
-from .merchant import Merchant
+import pymysql
 
-class ApiProcess():
+class ApiProcess(): 
+
+    def validateCardProcedure(self, card_number, cvv, expiry_date):
+
+        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
+
+        try:
+            # Create a cursor to interact with the database
+            with connection.cursor() as cursor:
+
+                # Prepare the output parameters as queryable variables
+                cursor.callproc('CheckCardInBank', [card_number, cvv, expiry_date, 0, ''])
+
+                # Retrieve output parameters (status_code and status_message)
+                cursor.execute("SELECT @_CheckCardInBank_3, @_CheckCardInBank_4")
+                result = cursor.fetchone()
+                connection.commit()
+
+                statusCode = result['@_CheckCardInBank_3']
+                statusMessage = result['@_CheckCardInBank_4']
+
+
+                if statusCode == 403 or statusCode == 404:
+                    return False, statusMessage
+                
+                return True, statusMessage
+
+        except pymysql.MySQLError as e:
+            connection.rollback()
+            print(f"Error: {e}")
+            return False, "An error occurred"
+
+        finally:
+            # Close the database connection
+            connection.close()
     
     def paymentProcessProcedure(self, data):
 
         #data include cust_email, merch_email, amount, cardNumber, expiryDate, cvv
-
-        # get the merchant id by the merchant email
-        merchId = Merchant().getMerchantIdByEmail(data['merch_email'])['merch_id']
-
         
-        #after validate card need to store the card info into the shiokority_api.Staging_card
-        isInserted = self.insertCardIntoStaging(data['cardNumber'], data['cvv'], data['expiryDate'])
+        # before process to bank, need to insert the payment record
+        isInserted, response = self.beforeProcessToBank(data['merch_email'], data['cust_email'], data['cardNumber'], data['cvv'], data['expiryDate'], data['amount'])
 
         if not isInserted:
-            return False, "Error inserting card into staging"
+            # if the payment record is not inserted, return the error message from response
+            return False, response
         
-        #after insert card into staging, need to insert the payment record into the shiokority_api.Payment_record
-        isInserted, paymentRecordId = self.insertPaymentRecord(data['amount'], data['cardNumber'], merchId)
+        paymentRecordId = response['paymentRecordId']
+        uen = response['companyUEN']
+        transactionId = response['transactionId']
+        paymentId = response['paymentId']
+        merchId = response['merchId']
 
-        if not isInserted:
-            # if isInserted is False, paymentRecordId will be the error message
-            return False, paymentRecordId
-        
-        #after insert payment record, need to process the payment
-        isProcessed, paymentId = self.insertPayment(data['amount'], data['cardNumber'], merchId, paymentRecordId)
-
-        if not isProcessed:
-            # if isProcessed is False, paymentId will be the error message
-            return False, paymentId
 
         # if all the above steps are successful, now we need to call the bank to process the payment
-        bankProcessPayment, message = Bank().bankProcessPayment(data['cardNumber'], data['amount'])
+        bankProcessPayment, message = Bank().bankProcessPayment(data['cardNumber'], data['amount'], uen)
 
-        # Need insert the payment_success_history table or payment_fail_history table
-        # this lulin need to help I also need to help lulin
+        # bank will also return the transaction record id failed or successful
+        bank_transactionRecordId = message['transactionRecordId']
 
         if not bankProcessPayment:
 
-            # bankProcessPayment is False, need to update the payment status (fail) in the shiokority_api.Payment table
-            isUpdated, message = self.updatePaymentStatus(paymentRecordId)
+            # if the bank process payment is not successful, insert the payment history and update the payment status
+            isUpdated, message = self.afterProcessToBank(paymentRecordId, 'failed', data['cardNumber'], merchId, bank_transactionRecordId, transactionId, paymentId)
 
-            if not isUpdated:
-                return False, message
-
-            # bank process payment failed, need to insert the shiokority_api.Payment_result table after update the payment status
-            isInserted, message = self.insertPaymentResult(paymentId)
-            
-            if not isInserted:
-                return False, message
-
-            return False, message
+            return isUpdated, message
         
-        # after verify completed with the bank, need to update the payment status in the shiokority_api.Payment table
-        isUpdated, message = self.updatePaymentStatus(paymentRecordId)
 
-        if not isUpdated:
-            return False, message
-        
-        # if the Payment status is updated successfully, insert the record payment_result table
-        isInserted, message = self.insertPaymentResult(paymentId)
+        # if the bank process payment is successful, insert the payment history and update the payment status
+        isUpdated, message = self.afterProcessToBank(paymentRecordId, 'completed', data['cardNumber'], merchId, bank_transactionRecordId, transactionId, paymentId)
 
-        if not isInserted:
-            return False, message
-        
-        return True, "Payment processed successfully"
-
-    def insertPaymentResult(self, payment_id):
-        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
-        try:
-            with connection.cursor() as cursor:
-                sql_query = '''
-                    INSERT INTO Payment_result (payment_id, payment_result_status, payment_result_date_created, payment_result_date_updated_on)
-                    VALUES (%s, 'completed', NOW(), NOW())
-                '''
-                result = cursor.execute(sql_query, (payment_id))
-                connection.commit()
-
-                if result == 0:
-                    return False, "Error inserting payment result"
-                
-                return True, "Payment result inserted successfully"
-        except Exception as e:
-            print(f"Error inserting payment result function: {str(e)}")
-            return False, "Error inserting payment result"
+        return isUpdated, message
 
 
-    def updatePaymentStatus(self, payment_record_id):
-        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
-        try:
-            with connection.cursor() as cursor:
-                sql_query = '''
-                    UPDATE Payment
-                    SET payment_status = 'completed', payment_updated_on = NOW()
-                    WHERE payment_record_id = %s
-                '''
-                result = cursor.execute(sql_query, (payment_record_id))
-                connection.commit()
+    def afterProcessToBank(self, paymentRecordId, paymentStatus, cardNumber, merchId, transactionRecordId, transactionId, paymentId):
 
-                if result == 0:
-                    return False, "Error updating payment status"
-                
-                return True, "Payment status updated successfully"
-        except Exception as e:
-            print(f"Error updating payment status function: {str(e)}")
-            return False, "Error updating payment status"
-    
-    def insertPayment(self, amount, cardNumber, merch_id, payment_record_id):
-        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
-        try:
-            with connection.cursor() as cursor:
-                sql_query = '''
-                    INSERT INTO Payment (payment_amount, payment_type, payment_status, payment_date_created, 
-                    payment_updated_on, tokenised_pan, merch_id, payment_record_id)
-                    VALUES (%s, 'payment', 'pending', NOW(), NOW(), %s, %s, %s)
-                '''
-                result = cursor.execute(sql_query, (amount, cardNumber, merch_id, payment_record_id))
-                paymentId = cursor.lastrowid
-                connection.commit()
-
-                if result == 0:
-                    return False, "Error inserting payment "
-                
-                return True, paymentId
-        except Exception as e:
-            print(f"Error inserting payment function: {str(e)}")
-            return False, "Error inserting payment record"
-
-    def insertPaymentRecord(self, amount, cardNumber, merch_id):
-        connection = getDBConnection('shiokority_api')
-
-        try:
-            with connection.cursor() as cursor:
-                sql_query = '''
-                    INSERT INTO Payment_record (payment_record_amount, payment_record_type, payment_record_status,
-                    payment_record_date_created, payment_record_updated_on, tokenised_pan, merch_id)
-                    VALUES (%s, 'payment', 'pending', NOW(), NOW(), %s, %s);
-                '''
-                result = cursor.execute(sql_query, (amount, cardNumber, merch_id))
-                # Get the primary key of the newly inserted record
-                payment_record_pk = cursor.lastrowid
-                connection.commit()
-                
-                if result == 0:
-                    return False, "Error inserting payment record"
-
-
-                return True, payment_record_pk
-        except Exception as e:
-            print(f"Error inserting payment record function: {str(e)}")
-            return False, "Error inserting payment record"
-        
-        finally:
-            connection.close()
-
-    def insertCardIntoStaging(self, card_number, cvv, expiry_date):
-        
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             with connection.cursor() as cursor:
-
+                cursor.callproc('AfterProceedToBank', [paymentRecordId, paymentStatus, cardNumber, merchId, transactionRecordId, transactionId, paymentId, '',''])
+                
                 sql_query = '''
-                    INSERT INTO Staging_card (tokenised_pan, cvv, date_expired)
-                    VALUES (%s, %s, %s)
+                    SELECT @_AfterProceedToBank_7, @_AfterProceedToBank_8
                 '''
-                cursor.execute(sql_query, (card_number, cvv, expiry_date))
+                cursor.execute(sql_query)
+                result = cursor.fetchone()
                 connection.commit()
-                return True
-            
+                
+                response = {
+                    'statusCode': result['@_AfterProceedToBank_7'],
+                    'statusMessage': result['@_AfterProceedToBank_8']
+                }
+
+                
+                return True, response['statusMessage']
+
+
         except Exception as e:
-            print(f"Error inserting card into staging function: {str(e)}")
-            return False
+            print(f"Error after process to bank function: {str(e)}")
+            return False, "Error after process to bank"
         
+    def beforeProcessToBank(self, merchEmail, custEmail, cardNumber, cvv, expirtyDate, amount):
+
+        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.callproc('BeforeProceedToBank', [merchEmail, custEmail,cardNumber, cvv, expirtyDate, amount,
+                                                        '', '', '', '', '', '', ''])
+                
+                sql_query = '''
+                    SELECT @_BeforeProceedToBank_6, @_BeforeProceedToBank_7, @_BeforeProceedToBank_8, 
+                    @_BeforeProceedToBank_9, @_BeforeProceedToBank_10,
+                    @_BeforeProceedToBank_11, @_BeforeProceedToBank_12;
+                '''
+                cursor.execute(sql_query)
+                result = cursor.fetchone()
+                connection.commit()
+
+                if result['@_BeforeProceedToBank_6'] == 403 or result['@_BeforeProceedToBank_6'] == 404: 
+                    return False, result['@_BeforeProceedToBank_7']
+                
+                response = {
+                    'paymentRecordId': result['@_BeforeProceedToBank_8'],
+                    'transactionId': result['@_BeforeProceedToBank_9'],
+                    'companyUEN': result['@_BeforeProceedToBank_10'],
+                    'paymentId' : result['@_BeforeProceedToBank_11'],
+                    'merchId' : result['@_BeforeProceedToBank_12']
+                }
+                
+                return True, response
+
+        except Exception as e:
+            print(f"Error before process to bank function: {str(e)}")
+            return False, "Error before process to bank"

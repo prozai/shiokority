@@ -17,7 +17,7 @@ class ConsumerController():
         return Consumer().getConsumerByID(cust_id)
     
     def customerValidateCardProcedure(self, card_number, cvv, expiry_date):
-        return Consumer().customerValidateCardProcedure(card_number, cvv, expiry_date)    
+        return ApiProcess().validateCardProcedure(card_number, cvv, expiry_date) 
     
     def processPaymentProcedure(self, data):
         return ApiProcess().paymentProcessProcedure(data)
