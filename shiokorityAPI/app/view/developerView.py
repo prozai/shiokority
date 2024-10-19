@@ -31,10 +31,12 @@ def login():
     
     ifLogin = DevelopersController().loginDeveloper(data)
 
-    if not ifLogin:
+    if not ifLogin.get('success'):
         return jsonify(ifLogin)
         
+    
     session['email'] = data.get('email')
+    session['dev_id'] = ifLogin.get('dev_id')  # Store dev_id for API key functions
 
     return jsonify(ifLogin)
 
@@ -81,11 +83,11 @@ def verify2FA():
     
 @developerBlueprint.route('/generate-api-key', methods=['POST'])
 def generate_api_key():
-    dev_id = 'dev_6' # Change to 'dev_id' when adjusting for login
+    dev_id = session.get('dev_id') # Change to 'dev_id' when adjusting for login
 
     # Check if dev_id exists
-    #if not dev_id:
-        #return jsonify({'success': False, 'message': 'Developer ID is required'}), 400
+    if not dev_id:
+        return jsonify({'success': False, 'message': 'Developer ID is required'}), 400
 
     # Generate encrypted API key
     api_data = generate_encrypted_api_key()
@@ -110,3 +112,28 @@ def generate_api_key():
         return jsonify({'success': True, 'message': 'API key generated', 'api_key': encoded_ciphertext, 'iv': encoded_iv, 'signature':encoded_signature}), 200
     else:
         return jsonify({'success': False, 'message': 'Failed to generate API key'}), 500
+
+@developerBlueprint.route('/api-keys', methods=['GET'])
+def get_api_keys():
+    dev_id = session.get('dev_id')
+
+    if not dev_id:
+        return jsonify({'success': False, 'message': 'Developer ID is required'}), 400
+
+    # Fetch API keys for the given developer
+    developer = Developers()
+    api_keys = developer.get_api_keys(dev_id)
+
+    if api_keys:
+        return jsonify({'success': True, 'api_keys': api_keys}), 200
+    else:
+        return jsonify({'success': True, 'api_keys': []}), 200
+
+@developerBlueprint.route('/api-keys/<api_id>', methods=['DELETE'])
+def delete_api_key(api_id):
+    success = Developers().delete_api_key(api_id)
+
+    if success:
+        return jsonify({'success': True, 'message': 'API key deleted successfully'}), 200
+    else:
+        return jsonify({'success': False, 'message': 'Failed to delete API key'}), 500
