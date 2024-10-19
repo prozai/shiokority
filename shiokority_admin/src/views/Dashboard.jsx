@@ -41,45 +41,12 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen bg-gray-200">
-<<<<<<< HEAD
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#153247] p-4 text-white flex flex-col items-center">
-        <img
-          src={ShiokorityAdminLogo}
-          alt="Shiokority Admin"
-          className="h-24 mb-6 cursor-pointer"
-          onClick={handleLogoClick}
-        />
-        <h2 className="text-xl font-bold mb-4">Administrator</h2>
-        
-        <nav className="flex flex-col w-full space-y-4">
-          <button
-            onClick={handleUserManagement}
-            className="w-full p-2 text-left hover:bg-[#0c1821] rounded-lg"
-          >
-            User Management
-          </button>
-          <SidebarLink text="Feature Management" />
-          <SidebarLink text="System Management" />
-          <SidebarLink text="Predictive Analytics Tools" />
-        </nav>
-
-        <button onClick={handleSetup2FA} className="mt-auto bg-[#0f1e28] hover:bg-[#0c1821] text-white font-bold py-2 px-4 rounded-full w-full">
-          Setup 2FA
-        </button>
-        
-        <button onClick={handleLogout} className="mt-2 bg-[#0f1e28] hover:bg-[#0c1821] text-white font-bold py-2 px-4 rounded-full w-full">
-          Logout
-        </button>
-      </aside>
-=======
       {/* Use Sidebar Component */}
       <Sidebar 
         handleLogout={handleLogout} 
         handleSetup2FA={handleSetup2FA} 
         handleUserManagement={handleUserManagement} 
       />
->>>>>>> bfe1984 (converted side bar into component and top notification into a component)
 
       {/* Main Content */}
       <main className="flex-1 p-6">
