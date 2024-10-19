@@ -6,31 +6,34 @@ import pymysql
 class ApiProcess(): 
 
     def validateCardProcedure(self, card_number, cvv, expiry_date):
-
+        # Establish a connection to the database
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             # Create a cursor to interact with the database
             with connection.cursor() as cursor:
+                # Call the stored procedure with OUT parameters as placeholders
+                cursor.callproc('CheckCardInBank', (card_number, cvv, expiry_date, 0, ''))
 
-                # Prepare the output parameters as queryable variables
-                cursor.callproc('CheckCardInBank', [card_number, cvv, expiry_date, 0, ''])
-
-                # Retrieve output parameters (status_code and status_message)
-                cursor.execute("SELECT @_CheckCardInBank_3, @_CheckCardInBank_4")
+                # Retrieve the OUT parameter values using the positional names
+                cursor.execute("SELECT @_CheckCardInBank_3 AS statusCode, @_CheckCardInBank_4 AS statusMessage")
                 result = cursor.fetchone()
+
+                # Commit the transaction
                 connection.commit()
 
-                statusCode = result['@_CheckCardInBank_3']
-                statusMessage = result['@_CheckCardInBank_4']
+                # Extract the output values
+                statusCode = result['statusCode']
+                statusMessage = result['statusMessage']
 
-
-                if statusCode == 403 or statusCode == 404:
+                # Determine the return based on the status code
+                if statusCode in (403, 404):
                     return False, statusMessage
-                
+
                 return True, statusMessage
 
         except pymysql.MySQLError as e:
+            # Rollback in case of error
             connection.rollback()
             print(f"Error: {e}")
             return False, "An error occurred"
@@ -38,6 +41,7 @@ class ApiProcess():
         finally:
             # Close the database connection
             connection.close()
+
     
     def paymentProcessProcedure(self, data):
 
@@ -76,66 +80,94 @@ class ApiProcess():
 
         return isUpdated, message
 
-
     def afterProcessToBank(self, paymentRecordId, paymentStatus, cardNumber, merchId, transactionRecordId, transactionId, paymentId):
-
+        # Establish a connection to the database
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             with connection.cursor() as cursor:
-                cursor.callproc('AfterProceedToBank', [paymentRecordId, paymentStatus, cardNumber, merchId, transactionRecordId, transactionId, paymentId, '',''])
-                
+                # Call the stored procedure with the provided parameters
+                cursor.callproc('AfterProceedToBank', [
+                    paymentRecordId, paymentStatus, cardNumber, merchId, 
+                    transactionRecordId, transactionId, paymentId, '', ''
+                ])
+
+                # Query to retrieve the OUT parameter values
                 sql_query = '''
-                    SELECT @_AfterProceedToBank_7, @_AfterProceedToBank_8
+                    SELECT @_AfterProceedToBank_7 AS statusCode, @_AfterProceedToBank_8 AS statusMessage;
                 '''
                 cursor.execute(sql_query)
                 result = cursor.fetchone()
+
+                # Commit the transaction
                 connection.commit()
-                
+
+                # Prepare the response with the retrieved status code and message
                 response = {
-                    'statusCode': result['@_AfterProceedToBank_7'],
-                    'statusMessage': result['@_AfterProceedToBank_8']
+                    'statusCode': result['statusCode'],
+                    'statusMessage': result['statusMessage']
                 }
 
-                
+                # Return the status message along with a success indicator
                 return True, response['statusMessage']
 
+        except pymysql.MySQLError as e:
+            # Handle any MySQL-related errors
+            print(f"Error in after process to bank function: {str(e)}")
+            return False, "An error occurred during post-bank processing"
 
-        except Exception as e:
-            print(f"Error after process to bank function: {str(e)}")
-            return False, "Error after process to bank"
+        finally:
+            # Ensure the connection is closed properly
+            connection.close()
+
         
-    def beforeProcessToBank(self, merchEmail, custEmail, cardNumber, cvv, expirtyDate, amount):
-
+    def beforeProcessToBank(self, merchEmail, custEmail, cardNumber, cvv, expiryDate, amount):
+        # Establish a connection to the database
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
-            with connection.cursor() as cursor:
-                cursor.callproc('BeforeProceedToBank', [merchEmail, custEmail,cardNumber, cvv, expirtyDate, amount,
-                                                        '', '', '', '', '', '', ''])
-                
+            with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+                # Call the stored procedure with placeholder parameters
+                cursor.callproc('BeforeProceedToBank', [
+                    merchEmail, custEmail, cardNumber, cvv, expiryDate, amount,
+                    '', '', '', '', '', '', ''
+                ])
+
+                # Query to retrieve the OUT parameter values
                 sql_query = '''
-                    SELECT @_BeforeProceedToBank_6, @_BeforeProceedToBank_7, @_BeforeProceedToBank_8, 
-                    @_BeforeProceedToBank_9, @_BeforeProceedToBank_10,
-                    @_BeforeProceedToBank_11, @_BeforeProceedToBank_12;
+                    SELECT @_BeforeProceedToBank_6 AS statusCode, @_BeforeProceedToBank_7 AS statusMessage, 
+                        @_BeforeProceedToBank_8 AS paymentRecordId, @_BeforeProceedToBank_9 AS transactionId, 
+                        @_BeforeProceedToBank_10 AS companyUEN, @_BeforeProceedToBank_11 AS paymentId, 
+                        @_BeforeProceedToBank_12 AS merchId;
                 '''
                 cursor.execute(sql_query)
                 result = cursor.fetchone()
+
+                # Commit the transaction
                 connection.commit()
 
-                if result['@_BeforeProceedToBank_6'] == 403 or result['@_BeforeProceedToBank_6'] == 404: 
-                    return False, result['@_BeforeProceedToBank_7']
-                
+                # Check the status code for error conditions
+                statusCode = result['statusCode']
+                statusMessage = result['statusMessage']
+                if statusCode in (403, 404):
+                    return False, statusMessage
+
+                # Prepare the response with the retrieved values
                 response = {
-                    'paymentRecordId': result['@_BeforeProceedToBank_8'],
-                    'transactionId': result['@_BeforeProceedToBank_9'],
-                    'companyUEN': result['@_BeforeProceedToBank_10'],
-                    'paymentId' : result['@_BeforeProceedToBank_11'],
-                    'merchId' : result['@_BeforeProceedToBank_12']
+                    'paymentRecordId': result['paymentRecordId'],
+                    'transactionId': result['transactionId'],
+                    'companyUEN': result['companyUEN'],
+                    'paymentId': result['paymentId'],
+                    'merchId': result['merchId']
                 }
-                
+
                 return True, response
 
-        except Exception as e:
+        except pymysql.MySQLError as e:
+            # Handle any MySQL-related errors
             print(f"Error before process to bank function: {str(e)}")
-            return False, "Error before process to bank"
+            return False, "An error occurred during the bank processing"
+
+        finally:
+            # Ensure the connection is closed properly
+            connection.close()
