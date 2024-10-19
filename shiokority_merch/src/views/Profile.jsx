@@ -47,10 +47,6 @@ const Profile = () => {
     return () => clearInterval(interval);
   }, [profileData?.merch_id]);
 
-  const handleLogout = async () => {
-    await merchantController.logout();
-    navigate('/login');
-  };
 
   const handleViewTransactionHistory = () => {
     navigate('/transactions');
@@ -92,12 +88,7 @@ const Profile = () => {
             )}
 
             <div className="flex space-x-4">
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 w-full font-semibold"
-              >
-                Logout
-              </button>
+      
               <button
                 onClick={handleViewTransactionHistory}
                 className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 w-full font-semibold"
