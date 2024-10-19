@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import merchantController from '../controller/merchantController';
+import Sidebar from '../components/sidebar';
+
 
 const Profile = () => {
   const [profileData, setProfileData] = useState(null);
@@ -43,50 +45,72 @@ const Profile = () => {
     
     // Clean up the interval when the component unmounts
     return () => clearInterval(interval);
-  }, [profileData?.merch_id]); // Remove profileData from the dependency array
+  }, [profileData?.merch_id]);
 
   const handleLogout = async () => {
     await merchantController.logout();
-    navigate('/login'); // Redirect to login after logout
+    navigate('/login');
   };
 
   const handleViewTransactionHistory = () => {
-    navigate('/transactions'); // Navigate to transaction history page
+    navigate('/transactions');
   };
-  
+
   return (
-    <div>
-      <h2>Merchant Profile</h2>
-      {profileData ? (
-        <div>
-          <p>Name: {profileData.merch_name}</p>
-          <p>Email: {profileData.merch_email}</p>
-          <p>Phone: {profileData.merch_phone}</p>
-          <p>Address: {profileData.merch_address}</p>
-          <p>UEN: {profileData.merch_uen}</p>   
+    <div className="flex h-screen bg-gray-200">
+      {/* Sidebar */}
+      <Sidebar />
 
+{/* Main Content */}
+<div className="flex-1 p-6">
+        <div className="bg-white w-full max-w-3xl p-8 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-[#153247] mb-6">Merchant Profile</h2>
 
+        {profileData ? (
+          <div>
+            <div className="mb-6 space-y-4">
+              <p className="text-gray-700"><span className="font-semibold">Name:</span> {profileData.merch_name}</p>
+              <p className="text-gray-700"><span className="font-semibold">Email:</span> {profileData.merch_email}</p>
+              <p className="text-gray-700"><span className="font-semibold">Phone:</span> {profileData.merch_phone}</p>
+              <p className="text-gray-700"><span className="font-semibold">Address:</span> {profileData.merch_address}</p>
+              <p className="text-gray-700"><span className="font-semibold">UEN:</span> {profileData.merch_uen}</p>
+            </div>
 
-          <h3>Recent Transactions</h3>
-          {transactions.length > 0 ? (
-            <ul>
-              {transactions.map((transaction) => (
-                <li key={transaction.payment_id}>
-                  Transaction ID: {transaction.payment_id},
-                  Amount: ${transaction.amount},
-                  Date: {new Date(transaction.payment_date).toLocaleString()}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No transactions found.</p>
-          )}
-          <button onClick={handleLogout}>Logout</button>
-          <button onClick={handleViewTransactionHistory}>View Transaction History</button>
-        </div>
-      ) : (
-        <p>{message || 'Loading profile...'}</p>
-      )}
+            <h3 className="text-xl font-semibold mb-4">Recent Transactions</h3>
+            {transactions.length > 0 ? (
+              <ul className="space-y-2 mb-6">
+                {transactions.map((transaction) => (
+                  <li key={transaction.payment_id} className="bg-gray-100 p-4 rounded-lg shadow-sm">
+                    <p><span className="font-semibold">Transaction ID:</span> {transaction.payment_id}</p>
+                    <p><span className="font-semibold">Amount:</span> ${transaction.amount}</p>
+                    <p><span className="font-semibold">Date:</span> {new Date(transaction.payment_date).toLocaleString()}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 mb-6">No transactions found.</p>
+            )}
+
+            <div className="flex space-x-4">
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 w-full font-semibold"
+              >
+                Logout
+              </button>
+              <button
+                onClick={handleViewTransactionHistory}
+                className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 w-full font-semibold"
+              >
+                View Transaction History
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-600">{message || 'Loading profile...'}</p>
+        )}
+      </div>
+    </div>
     </div>
   );
 };
