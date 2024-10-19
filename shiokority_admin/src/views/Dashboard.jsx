@@ -53,7 +53,6 @@ function Dashboard() {
             User Management
           </button>
           <SidebarLink text="Feature Management" />
-          <SidebarLink text="Customer Support" />
           <SidebarLink text="System Management" />
           <SidebarLink text="Predictive Analytics Tools" />
         </nav>

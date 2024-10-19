@@ -90,7 +90,7 @@ const EditUser = () => {
         <button type="submit" className="bg-[#153247] text-white py-2 px-4 rounded w-full hover:bg-green-600 font-semibold">
           Update 
         </button>
-        <button type="button" onClick={() => navigate('/dashboard')} className="bg-gray-400 text-white py-2 px-4 rounded w-full mt-2 hover:bg-gray-500 font-semibold">
+        <button type="button" onClick={() => navigate('/user-management')} className="bg-gray-400 text-white py-2 px-4 rounded w-full mt-2 hover:bg-gray-500 font-semibold">
           Cancel
         </button>
         {statusMessage && <p className="mt-4 text-center text-gray-600">{statusMessage}</p>}

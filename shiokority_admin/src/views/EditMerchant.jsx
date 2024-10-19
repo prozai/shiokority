@@ -1,10 +1,11 @@
 // src/views/EditMerchant.jsx
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
 
 const MerchantEdit = () => {
     const { merchId } = useParams();
+    const navigate = useNavigate(); 
     const [merchant, setMerchant] = useState({
         merch_name: '',
         merch_email: '',
@@ -52,6 +53,10 @@ const MerchantEdit = () => {
         }
     };
 
+    const handleCancel = () => {
+        navigate('/user-management');  // Navigate back to user-management
+    };
+
     return (
         <div className="min-h-screen flex justify-center items-center bg-[#153247] p-6">
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
@@ -71,6 +76,9 @@ const MerchantEdit = () => {
                 ))}
                 <button type="submit" disabled={isLoading} className="bg-[#153247] text-white py-2 px-4 rounded w-full hover:bg-green-600 font-semibold">
                     {isLoading ? 'Updating...' : 'Update'}
+                </button>
+                <button type="button" onClick={handleCancel} className="bg-gray-400 text-white py-2 px-4 rounded w-full mt-2 hover:bg-gray-500 font-semibold">
+                    Cancel
                 </button>
                 {statusMessage && <p className="mt-4 text-center text-gray-600">{statusMessage}</p>}
             </form>
