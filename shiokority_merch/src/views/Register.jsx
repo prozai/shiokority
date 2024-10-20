@@ -38,7 +38,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-[#153247] p-6">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
         {/* Logo at the top left */}
         <img
@@ -123,11 +123,16 @@ const Register = () => {
           />
         </div>
 
-        <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full font-semibold">
+        <button type="submit" className="w-full bg-[#153247] text-white font-semibold py-2 rounded-lg hover:bg-[#1e4b64] focus:outline-none focus:ring-2 focus:ring-[#153247] focus:ring-offset-2">
           Submit
         </button>
 
         {message && <p className="mt-4 text-center text-gray-600">{message}</p>}
+          <div className="text-center">
+          <a href="/" className="text-sm text-[#153247] hover:text-[#1e4b64] hover:underline">
+            Back
+          </a>
+          </div>
       </form>
     </div>
   
