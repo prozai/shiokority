@@ -88,6 +88,7 @@ const ProfileConsumer = () => {
                 <p className="text-gray-700"><span className="font-semibold">Address:</span> {profileData.cust_address}</p>
               </div>
 
+<<<<<<< HEAD
               <div className="mt-8">
                 <h3 className="text-2xl font-bold mb-4 text-gray-800">Send Payment</h3>
                 <form onSubmit={handleSendPayment} className="space-y-4">
@@ -110,6 +111,29 @@ const ProfileConsumer = () => {
                     className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
                   />
                   <CardValidation onChange={handleCardValidationChange} />
+=======
+              <h3 className="text-xl font-semibold mb-4">Send Payment</h3>
+              <form onSubmit={handleSendPayment} className="space-y-4">
+                <input
+                  type="email"
+                  name="merch_email"
+                  placeholder="Merchant Email"
+                  value={paymentData.merch_email}
+                  onChange={handlePaymentChange}
+                  required
+                  className="border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#153247]"
+                />
+                <input
+                  type="number"
+                  name="amount"
+                  placeholder="Payment Amount"
+                  value={paymentData.amount}
+                  onChange={handlePaymentChange}
+                  required
+                  className="border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#153247]"
+                />
+                <CardValidation onChange={handleCardValidationChange} />
+>>>>>>> 23a101f (ShiokorityPay-Consumer CSS)
 
                 <button
                   type="submit"
