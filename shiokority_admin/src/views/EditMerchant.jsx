@@ -58,8 +58,8 @@ const MerchantEdit = () => {
     };
 
     return (
-        <div className="min-h-screen flex justify-center items-center bg-[#153247] p-6">
-            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <div className="p-6 bg-gray-100 min-h-screen flex justify-center items-center">
+            <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg">
                 <h3 className="text-2xl font-bold mb-6 text-[#153247]">Edit Merchant</h3>
                 {['merch_name', 'merch_email', 'merch_phone', 'merch_address', 'merch_uen'].map((field) => (
                     <div className="mb-4" key={field}>
