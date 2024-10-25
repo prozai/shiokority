@@ -28,22 +28,22 @@ class Administrator():
                     
                     if not user:
                         print(f"Login attempt failed: User not found for email {email}")
-                        return False
+                        return False, None
                     
                     if user['admin_account_status'] != 1:
                         print(f"Login attempt failed: Inactive account for email {email}")
-                        return False
+                        return False, None
                     
                     # Retrieve the hashed password from the database
                     hashed_password = user['admin_pass'].encode('utf-8')
                     
                     # Check if the provided password matches the hashed password
                     if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
-                        return True
+                        return True, user['admin_email']
                     
                     else:
                         print(f"Login attempt failed: Incorrect password for email {email}")
-                        return False
+                        return False, None
                         
 
         except MySQLError as e:
@@ -109,3 +109,4 @@ class Administrator():
         except Exception as e:
             print(f"Unexpected error during login validation: {str(e)}")
             return False
+        

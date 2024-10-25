@@ -171,3 +171,36 @@ class ApiProcess():
         finally:
             # Ensure the connection is closed properly
             connection.close()
+
+    def validateUEN(self, uen):
+        # Establish a connection to the database
+        connection = getDBConnection(current_app.config['GOVERNMENT_SCHEMA'])
+
+        try:
+            with connection.cursor() as cursor:
+                # Call the stored procedure with placeholder parameters
+                cursor.callproc('validateUEN', [uen, ''])
+
+                # Query to retrieve the OUT parameter values
+                sql_query = '''
+                    SELECT @_validateUEN_1 AS statusCode;
+                '''
+                cursor.execute(sql_query)
+                result = cursor.fetchone()
+                connection.commit()
+
+                # Check the status code for error conditions
+                statusCode = result['statusCode']
+                if statusCode == 404:
+                    return False
+
+                return True
+
+        except pymysql.MySQLError as e:
+            # Handle any MySQL-related errors
+            print(f"Error in validate UEN function: {str(e)}")
+            return False, "An error occurred during UEN validation"
+
+        finally:
+            # Ensure the connection is closed properly
+            connection.close()
