@@ -1,4 +1,3 @@
-// src/views/ViewUser.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FiEdit } from 'react-icons/fi';
@@ -9,6 +8,8 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
   const [statusMessage, setStatusMessage] = useState('');
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);  // Pagination state
+  const [usersPerPage] = useState(5);  // Set number of users per page
   const navigate = useNavigate();
 
   useEffect(() => {

@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
-import { FiHome, FiSettings, FiBell, FiUser } from 'react-icons/fi';
 
 import Sidebar from '../components/SideBar'; // Import Sidebar component
 import TopNotificationBar from '../components/TopNotificationBar'; // Import TopNotificationBar component
+import TopNavbar from '../components/TopNavBar';
 
 function Dashboard() {
   const [status, setStatus] = useState('');
@@ -31,7 +31,7 @@ function Dashboard() {
 
   // Define alerts to pass to TopNotificationBar
   const initialAlerts = [
-    { color: 'bg-pink-500', message: 'Pink Alert' },
+    { color: 'bg-red-500', message: 'Red Alert' },
     { color: 'bg-gray-500', message: 'Gray Alert' },
     { color: 'bg-green-500', message: 'Green Alert' },
     { color: 'bg-orange-500', message: 'Orange Alert' },
@@ -84,15 +84,7 @@ function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 p-6">
         {/* Top Navbar */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <div className="flex space-x-4">
-            <FiHome size={24} />
-            <FiSettings size={24} />
-            <FiBell size={24} />
-            <FiUser size={24} />
-          </div>
-        </div>
+        <TopNavbar title="Dashboard" />
 
         {/* Top Notification Bar */}
         <TopNotificationBar initialAlerts={initialAlerts} />

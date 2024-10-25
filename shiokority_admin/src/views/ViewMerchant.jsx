@@ -1,5 +1,4 @@
-// src/views/ViewMerchant.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
@@ -7,9 +6,10 @@ import AdministratorController from '../controller/administratorController';
 import ShiokorityAdminLogo from '../asset/image/ShiokorityAdmin.png';
 
 const ViewMerchants = () => {
-  
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const itemsPerPage = 10; // Define items per page
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['merchant'],
@@ -17,7 +17,8 @@ const ViewMerchants = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ merchantId, status }) => AdministratorController.updateMerchantStatus(merchantId, status),
+    mutationFn: ({ merchantId, status }) =>
+      AdministratorController.updateMerchantStatus(merchantId, status),
     onSuccess: () => {
       queryClient.invalidateQueries('merchant');
     },
@@ -58,8 +59,15 @@ const ViewMerchants = () => {
       {/* Search and Add Merchant Button */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <input type="text" placeholder="Search ID" className="border rounded-lg p-2 w-1/4" />
-          <button onClick={handleAddMerchant} className="bg-[#153247] text-white py-2 px-4 rounded-lg hover:bg-green-600">
+          <input
+            type="text"
+            placeholder="Search ID"
+            className="border rounded-lg p-2 w-1/4"
+          />
+          <button
+            onClick={handleAddMerchant}
+            className="bg-[#153247] text-white py-2 px-4 rounded-lg hover:bg-green-600"
+          >
             + Add Merchant
           </button>
         </div>
