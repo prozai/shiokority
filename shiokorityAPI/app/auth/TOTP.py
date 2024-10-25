@@ -24,7 +24,7 @@ def get_totp_token(secret):
     h = struct.unpack('>I', h[o:o+4])[0] & 0x7fffffff
     return '{:06d}'.format(h % 1000000)
 
-def generate_totp_uri(username, secret, issuer="YourApp"):
+def generate_totp_uri(username, secret, issuer="Shiokority"):
     return f"otpauth://totp/{issuer}:{username}?secret={secret}&issuer={issuer}"
 
 def create_qr_code(uri):
