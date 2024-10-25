@@ -11,13 +11,14 @@ merchantBlueprint = Blueprint('merchant', __name__)
 # Route for creating a new merchant (registration)
 @merchantBlueprint.route('/register-merchant', methods=['POST'])
 def registerMerchant():
+    # data include merch_name, merch_email, merch_pass, merch_phone, merch_address, uen
     data = request.get_json()
 
     if not data:
         return jsonify({'success': False, 'message': 'Merchant email, password, first name, last name, phone number, and address are required'}), 400
     
     # validate uen before register merchant
-    isUENValid = merchant_instance.validateUEN(data['companyUEN'])
+    isUENValid = merchant_instance.validateUEN(data['uen'])
 
     if not isUENValid:
         return jsonify({'success': False, 'message': 'Invalid UEN'}), 400
