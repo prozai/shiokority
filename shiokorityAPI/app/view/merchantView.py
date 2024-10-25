@@ -16,8 +16,13 @@ def registerMerchant():
     if not data:
         return jsonify({'success': False, 'message': 'Merchant email, password, first name, last name, phone number, and address are required'}), 400
     
-    # Call the Merchant model to create the new merchant
+    # validate uen before register merchant
+    isUENValid = merchant_instance.validateUEN(data['companyUEN'])
 
+    if not isUENValid:
+        return jsonify({'success': False, 'message': 'Invalid UEN'}), 400
+    
+    # Call the Merchant model to create the new merchant
     success, message = merchant_instance.registerMerchant(data)
     
     if success:
