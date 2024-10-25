@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import consumerController from '../controller/consumerController';
-
+import ShiokorityPayLogo from '../asset/image/ShiokorityPay.png'; // Assuming there's a logo for consumer as well
 
 const RegisterConsumer = () => {
   const [formData, setFormData] = useState({
@@ -13,7 +13,6 @@ const RegisterConsumer = () => {
     cust_address: ''
   });
   const [message, setMessage] = useState('');
-
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -31,6 +30,10 @@ const RegisterConsumer = () => {
     } catch (error) {
       setMessage(error.message);
     }
+  };
+
+  const handleLogoClick = () => {
+    navigate('/login-consumer'); // Redirect to login for consumer
   };
 
   return (
@@ -85,7 +88,6 @@ const RegisterConsumer = () => {
         />
         <button type="submit">Register</button>
       </form>
-      {message && <p>{message}</p>}
     </div>
   );
 };

@@ -52,8 +52,18 @@ const UserList = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h3 className="text-2xl font-bold mb-4">User Management</h3>
-
+      {/* Logo at the top left */}
+      <div className="flex items-center mb-4">
+        <img
+          src={ShiokorityAdminLogo}
+          alt="Shiokority Admin"
+          className="h-20 mr-4 cursor-pointer"
+          onClick={handleLogoClick}
+        />
+        <h1 className="text-3xl font-bold">User Management</h1>
+      </div>
+      
+      {/* Search and Add User Button */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
           <input type="text" placeholder="Search ID" className="border rounded-lg p-2 w-1/4" />

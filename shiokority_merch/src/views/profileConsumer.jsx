@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import consumerController from '../controller/consumerController';
 import CardValidation from './CardValidation';
+import ShiokorityPayLogo from '../asset/image/ShiokorityPay.png';
+
 
 const ProfileConsumer = () => {
   const [profileData, setProfileData] = useState(null);
@@ -33,7 +35,7 @@ const ProfileConsumer = () => {
       setMessage(error.message);
     }
   };
-  
+
   const handlePaymentChange = (e) => {
     setPaymentData({ ...paymentData, [e.target.name]: e.target.value });
   };
@@ -71,34 +73,23 @@ const ProfileConsumer = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-light-blue-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-          <h2 className="text-3xl font-bold mb-5 text-gray-800">Consumer Profile</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div className="flex justify-center mb-8">
+          <img src={ShiokorityPayLogo} alt="Shiokority Pay" className="h-40" />
+        </div>
+          <h2 className="text-2xl font-bold text-[#153247] mb-6">Consumer Profile</h2>
+
           {profileData ? (
-            <div className="space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4 shadow">
-                <p className="text-sm text-gray-600">Name</p>
-                <p className="font-semibold">{profileData.cust_fname} {profileData.cust_lname}</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 shadow">
-                <p className="text-sm text-gray-600">Email</p>
-                <p className="font-semibold">{profileData.cust_email}</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 shadow">
-                <p className="text-sm text-gray-600">Phone</p>
-                <p className="font-semibold">{profileData.cust_phone}</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 shadow">
-                <p className="text-sm text-gray-600">Address</p>
-                <p className="font-semibold">{profileData.cust_address}</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 shadow">
-                <p className="text-sm text-gray-600">Balance</p>
-                <p className="font-semibold">{profileData.cust_amount}</p>
+            <div>
+              <div className="mb-6 space-y-4">
+                <p className="text-gray-700"><span className="font-semibold">Name:</span> {profileData.cust_fname} {profileData.cust_lname}</p>
+                <p className="text-gray-700"><span className="font-semibold">Email:</span> {profileData.cust_email}</p>
+                <p className="text-gray-700"><span className="font-semibold">Phone:</span> {profileData.cust_phone}</p>
+                <p className="text-gray-700"><span className="font-semibold">Address:</span> {profileData.cust_address}</p>
               </div>
 
+<<<<<<< HEAD
               <div className="mt-8">
                 <h3 className="text-2xl font-bold mb-4 text-gray-800">Send Payment</h3>
                 <form onSubmit={handleSendPayment} className="space-y-4">
@@ -121,30 +112,57 @@ const ProfileConsumer = () => {
                     className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
                   />
                   <CardValidation onChange={handleCardValidationChange} />
+=======
+              <h3 className="text-xl font-semibold mb-4">Send Payment</h3>
+              <form onSubmit={handleSendPayment} className="space-y-4">
+                <input
+                  type="email"
+                  name="merch_email"
+                  placeholder="Merchant Email"
+                  value={paymentData.merch_email}
+                  onChange={handlePaymentChange}
+                  required
+                  className="border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#153247]"
+                />
+                <input
+                  type="number"
+                  name="amount"
+                  placeholder="Payment Amount"
+                  value={paymentData.amount}
+                  onChange={handlePaymentChange}
+                  required
+                  className="border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#153247]"
+                />
+                <CardValidation onChange={handleCardValidationChange} />
+>>>>>>> 23a101f (ShiokorityPay-Consumer CSS)
 
-                  <button 
-                    type="submit" 
-                    className={`w-full px-3 py-4 text-white rounded-md focus:outline-none ${
-                      Object.values(cardValidation).every(Boolean)
-                        ? 'bg-indigo-500 hover:bg-indigo-600'
-                        : 'bg-gray-400 cursor-not-allowed'
-                    }`}
-                    disabled={!Object.values(cardValidation).every(Boolean)}
-                  >
-                    Send Payment
-                  </button>
-                </form>
-              </div>
+                <button
+                  type="submit"
+                  className={`w-full px-3 py-4 text-white rounded-md focus:outline-none ${
+                    Object.values(cardValidation).every(Boolean)
+                      ? 'bg-[#153247] hover:bg-green-600'
+                      : 'bg-gray-400 cursor-not-allowed'
+                  }`}
+                  disabled={!Object.values(cardValidation).every(Boolean)}
+                >
+                  Send Payment
+                </button>
+              </form>
 
-              <button onClick={handleLogout} className="mt-6 w-full px-3 py-4 text-white bg-red-500 rounded-md focus:bg-red-600 focus:outline-none">Logout</button>
-              {message && <p className="mt-4 text-3xl text-center text-gray-600 ">{message}</p>}
+              <button
+                onClick={handleLogout}
+                className="mt-6 w-full px-3 py-4 text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none"
+              >
+                Logout
+              </button>
+
+              {message && <p className="mt-4 text-center text-gray-600">{message}</p>}
             </div>
           ) : (
             <p className="text-center text-gray-600">{message || 'Loading profile...'}</p>
           )}
         </div>
       </div>
-    </div>
   );
 };
 
