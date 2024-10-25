@@ -45,10 +45,10 @@ class ApiProcess():
     
     def paymentProcessProcedure(self, data):
 
-        #data include cust_email, merch_email, amount, cardNumber, expiryDate, cvv
+        #data include cust_email, amount, cardNumber, expiryDate, cvv
         
         # before process to bank, need to insert the payment record
-        isInserted, response = self.beforeProcessToBank(data['merch_email'], data['cust_email'], data['cardNumber'], data['cvv'], data['expiryDate'], data['amount'])
+        isInserted, response = self.beforeProcessToBank(data['uen'], data['cust_email'], data['cardNumber'], data['cvv'], data['expiryDate'], data['amount'])
 
         if not isInserted:
             # if the payment record is not inserted, return the error message from response
@@ -63,6 +63,7 @@ class ApiProcess():
 
         # if all the above steps are successful, now we need to call the bank to process the payment
         bankProcessPayment, message = Bank().bankProcessPayment(data['cardNumber'], data['amount'], uen)
+
 
         # bank will also return the transaction record id failed or successful
         bank_transactionRecordId = message['transactionRecordId']
@@ -121,7 +122,7 @@ class ApiProcess():
             connection.close()
 
         
-    def beforeProcessToBank(self, merchEmail, custEmail, cardNumber, cvv, expiryDate, amount):
+    def beforeProcessToBank(self, uen, custEmail, cardNumber, cvv, expiryDate, amount):
         # Establish a connection to the database
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
@@ -129,7 +130,7 @@ class ApiProcess():
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:
                 # Call the stored procedure with placeholder parameters
                 cursor.callproc('BeforeProceedToBank', [
-                    merchEmail, custEmail, cardNumber, cvv, expiryDate, amount,
+                    uen, custEmail, cardNumber, cvv, expiryDate, amount,
                     '', '', '', '', '', '', ''
                 ])
 

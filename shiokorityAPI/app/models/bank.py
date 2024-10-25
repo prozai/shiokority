@@ -36,7 +36,7 @@ class Bank():
         except pymysql.MySQLError as e:
             connection.rollback()
             print(f"Error: {e}")
-            return False, "An error occurred", None
+            return False, "An error occurred"
 
         finally:
             # Close the database connection
