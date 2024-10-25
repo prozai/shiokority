@@ -1,9 +1,11 @@
+// src/views/Dashboard.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
 import { FiHome, FiSettings, FiBell, FiUser } from 'react-icons/fi';
 
-import ShiokorityAdminLogo from '../asset/image/ShiokorityAdmin.png';
+import Sidebar from '../components/SideBar'; // Import Sidebar component
+import TopNotificationBar from '../components/TopNotificationBar'; // Import TopNotificationBar component
 
 function Dashboard() {
   const [status, setStatus] = useState('');
@@ -23,18 +25,23 @@ function Dashboard() {
     navigate('/setup2FA');
   };
 
-  // Function to navigate to User Management
   const handleUserManagement = () => {
     navigate('/user-management');
   };
 
-  // Function to navigate back to the Dashboard
-  const handleLogoClick = () => {
-    navigate('/dashboard');
-  };
+  // Define alerts to pass to TopNotificationBar
+  const initialAlerts = [
+    { color: 'bg-pink-500', message: 'Pink Alert' },
+    { color: 'bg-gray-500', message: 'Gray Alert' },
+    { color: 'bg-green-500', message: 'Green Alert' },
+    { color: 'bg-orange-500', message: 'Orange Alert' },
+    { color: 'bg-blue-500', message: 'Blue Alert' },
+    { color: 'bg-black', message: 'Black Alert' },
+  ];
 
   return (
     <div className="flex h-screen bg-gray-200">
+<<<<<<< HEAD
       {/* Sidebar */}
       <aside className="w-64 bg-[#153247] p-4 text-white flex flex-col items-center">
         <img
@@ -65,6 +72,14 @@ function Dashboard() {
           Logout
         </button>
       </aside>
+=======
+      {/* Use Sidebar Component */}
+      <Sidebar 
+        handleLogout={handleLogout} 
+        handleSetup2FA={handleSetup2FA} 
+        handleUserManagement={handleUserManagement} 
+      />
+>>>>>>> bfe1984 (converted side bar into component and top notification into a component)
 
       {/* Main Content */}
       <main className="flex-1 p-6">
@@ -79,15 +94,8 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Alert Section */}
-        <section className="space-y-4 mb-8">
-          <Alert color="bg-pink-500" />
-          <Alert color="bg-gray-500" />
-          <Alert color="bg-green-500" />
-          <Alert color="bg-orange-500" />
-          <Alert color="bg-blue-500" />
-          <Alert color="bg-black" />
-        </section>
+        {/* Top Notification Bar */}
+        <TopNotificationBar initialAlerts={initialAlerts} />
 
         {/* Notifications */}
         <section className="bg-white p-4 rounded-lg shadow-lg">
@@ -107,19 +115,6 @@ function Dashboard() {
     </div>
   );
 }
-
-const SidebarLink = ({ text }) => (
-  <div className="p-2 rounded-lg hover:bg-[#0c1821] w-full text-center cursor-pointer">
-    {text}
-  </div>
-);
-
-const Alert = ({ color }) => (
-  <div className={`${color} text-white p-4 rounded-lg flex justify-between items-center`}>
-    <span>Alert Message</span>
-    <button className="text-white font-bold">×</button>
-  </div>
-);
 
 const NotificationButton = ({ text, color }) => (
   <button className={`${color} text-white py-2 px-4 rounded-full w-1/4 font-bold hover:opacity-90`}>
