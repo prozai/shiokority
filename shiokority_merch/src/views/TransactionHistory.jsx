@@ -9,16 +9,11 @@ const TransactionHistory = () => {
   
   const fetchTransactionHistory = async () => {
     try {
-        const merch_id = localStorage.getItem('merch_id');
-
-        if (merch_id) {
-            const data = await merchantController.getTransactionHistory(merch_id);
-            setTransactions(data.transactions);
-        } else {
-            setMessage('Merchant ID not found.');
-        }
+        const data = await merchantController.getTransactionHistory();
+        setTransactions(data);
+        
     } catch (error) {
-        setMessage('Unable to fetch transaction history');
+        setMessage(error.message);
     }
   };
 
@@ -36,28 +31,27 @@ const TransactionHistory = () => {
         <div className="bg-white w-full max-w-3xl p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-[#153247] mb-6">Transaction History</h2>
 
-        {transactions.length > 0 ? (
           <ul className="space-y-4">
             {transactions.map((transaction) => (
               <li key={transaction.payment_id} className="bg-gray-100 p-4 rounded-lg shadow-sm">
                 <p className="text-gray-700">
-                  <span className="font-semibold">Transaction ID:</span> {transaction.payment_id}
+                  <span className="font-semibold">Transaction ID:</span> {transaction.payment_record_id}
                 </p>
                 <p className="text-gray-700">
-                  <span className="font-semibold">Amount:</span> ${transaction.amount}
+                  <span className="font-semibold">Amount:</span> ${transaction.payment_record_amount}
                 </p>
                 <p className="text-gray-700">
-                  <span className="font-semibold">Date:</span> {new Date(transaction.payment_date).toLocaleString()}
+                  <span className="font-semibold">Date:</span> {transaction.payment_record_date_created}
                 </p>
-                <p className={`font-semibold ${transaction.status === 'Success' ? 'text-green-500' : 'text-red-500'}`}>
-                  Status: {transaction.status}
+                <p className="text-gray-700">
+                  <span className="font-semibold">Type:</span> {transaction.payment_record_type}
+                </p>
+                <p className={`font-semibold ${transaction.payment_record_status === 'completed' ? 'text-green-500' : 'text-red-500'}`}>
+                  Status: {transaction.payment_record_status}
                 </p>
               </li>
             ))}
           </ul>
-        ) : (
-          <p className="text-gray-600">{message || 'No transactions available.'}</p>
-        )}
       </div>
     </div>
     </div>

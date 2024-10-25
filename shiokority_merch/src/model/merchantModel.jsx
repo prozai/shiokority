@@ -73,10 +73,10 @@ class Merchant {
   // Fetch the merchant's transaction history
   static async getTransactionHistory() {
     try {
-      const response = await axios.get("merchant/transactions");
+      const response = await axios.get("merchant/viewTransactionHistory");
       return response.data;
     } catch (error) {
-      throw new Error('Failed to fetch transaction history and balance');
+      throw new Error(error.response.data.message);
     }
   }
 }

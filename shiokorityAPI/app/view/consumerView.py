@@ -102,11 +102,11 @@ def testf():
 
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    success, message = FraudDetection()._check_amount(data['amount'])
-    success, message = FraudDetection()._check_daily_total(data['custId'], data['amount'])
-    success, message = FraudDetection()._check_transaction_frequency(data['custId'])
-    success, message = FraudDetection()._check_sudden_pattern_change(data['custId'], data['amount'])
-    success, message = FraudDetection()._check_rapid_transactions(data['custId'], timestamp)
+    # success, message = FraudDetection()._check_amount(data['amount'])
+    # success, message = FraudDetection()._check_daily_total(data['custId'], data['amount'])
+    # success, message = FraudDetection()._check_transaction_frequency(data['custId'])
+    # success, message = FraudDetection()._check_sudden_pattern_change(data['custId'], data['amount'])
+    # success, message = FraudDetection()._check_rapid_transactions(data['custId'], timestamp)
     
     # success, message = FraudDetection().detect_transaction_fraud(data['custId'], data['amount'])
 
