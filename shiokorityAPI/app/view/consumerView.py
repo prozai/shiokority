@@ -64,9 +64,15 @@ def sendPayment():
     if not data:
         return jsonify({'success': False, 'message': 'Missing Value'}), 400
     
-    # data consists of the following keys: cust_email, merch_email, amount, cardNumber, expiryDate, cvv
+    # data consists of the following keys: cust_email, merch_email, amount, cardNumber, expiryDate, cvv, uen
 
-    # 0. Need to tokenize the card number and pass it to the bank in the model not here
+    # validate UEN
+    success = ConsumerController().validateUEN(data['uen'])
+
+    if not success:
+        return jsonify({'success': False, 'message': 'Invalid UEN'}), 400
+
+    # 0. Need to tokenize the card number and pass it to the bank in the model 
     # 1. Validate the card (need to tokenize the card number and pass it to the bank)
     # 2. if the card is valid, process the payment
 

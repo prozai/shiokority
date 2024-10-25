@@ -49,9 +49,9 @@ class Consumer {
   }
 
   // Send payment to merchant (API call)
-  static async sendPayment(cust_email, merch_email, amount, cardNumber, expiryDate, cvv) {
+  static async sendPayment(cust_email, amount, cardNumber, expiryDate, cvv, uen) {
     try {
-      const response = await axios.post('consumer/send-payment', { cust_email, merch_email, amount, cardNumber, expiryDate, cvv });
+      const response = await axios.post('consumer/send-payment', { cust_email, amount, cardNumber, expiryDate, cvv, uen});
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to send payment');
