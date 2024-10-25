@@ -193,14 +193,37 @@ class ApiProcess():
                 # Check the status code for error conditions
                 statusCode = result['statusCode']
                 if statusCode == 404:
+                    # if the UEN is not valid, insert the payment authorise record
+                    self.insertPaymentAuthorise(self, uen, 0)
                     return False
 
+                # if the UEN is valid, insert the payment authorise record
+                self.insertPaymentAuthorise(self, uen, 1)
                 return True
 
         except pymysql.MySQLError as e:
             # Handle any MySQL-related errors
             print(f"Error in validate UEN function: {str(e)}")
             return False, "An error occurred during UEN validation"
+
+        finally:
+            # Ensure the connection is closed properly
+            connection.close()
+    
+    def insertPaymentAuthorise(self, uen, status):
+        # Establish a connection to the database
+        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
+
+        try:
+            with connection.cursor() as cursor:
+                # Call the stored procedure with placeholder parameters
+                cursor.callproc('InsertPaymentAuthorisation', [uen, status, ''])
+                connection.commit()
+
+        except pymysql.MySQLError as e:
+            # Handle any MySQL-related errors
+            print(f"Error in insert payment authorise function: {str(e)}")
+            connection.rollback()
 
         finally:
             # Ensure the connection is closed properly
