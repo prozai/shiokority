@@ -65,7 +65,7 @@ class ApiProcess():
         merchId = response['merchId']
         custId = response['custId']
 
-        # fraud detection check
+        # # # fraud detection check
         # success, message = FraudDetection().detect_transaction_fraud(custId, data['amount'], timestamp)
 
         # if not success:

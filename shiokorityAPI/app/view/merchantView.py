@@ -56,7 +56,7 @@ def profile():
     # Fetch the merchant profile
     merchant = merchant_instance.getMerchantByID(session['merch_id'])
 
-    if merchant:
+    if merchant:    
         return jsonify(merchant), 200
     else:
         return jsonify({'success': False, 'message': 'Merchant not found'}), 404
@@ -66,3 +66,17 @@ def profile():
 def logout():
     session.clear()
     return jsonify({'success': True, 'message': 'Logged out successfully'}), 200
+
+@merchantBlueprint.route('/viewTransactionHistory', methods=['GET'])
+def viewTransactionHistory():
+
+    if 'merch_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+
+    
+    transactionHistory = merchant_instance.viewPaymentRecordByMerchId(session['merch_id'])
+
+    if not transactionHistory:
+        return jsonify({'success': False, 'message': 'No transaction history found'}), 404
+
+    return jsonify(transactionHistory), 200

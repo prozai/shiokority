@@ -25,26 +25,18 @@ const Profile = () => {
       }
     };
 
-    const fetchTransactionHistory = async (merch_id) => {
+    const fetchTransactionHistory = async () => {
       try {
-        const data = await merchantController.getTransactionHistory(merch_id);
-        setTransactions(data.transactions);
+        const data = await merchantController.getTransactionHistory();
+        setTransactions(data);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
     };
 
     fetchProfile();
+    fetchTransactionHistory()
 
-    // Poll for new transactions every 10 seconds
-    const interval = setInterval(async () => {
-      if (profileData?.merch_id) {
-        fetchTransactionHistory(profileData.merch_id);
-      }
-    }, 10000); // Poll every 10 seconds
-    
-    // Clean up the interval when the component unmounts
-    return () => clearInterval(interval);
   }, [profileData?.merch_id]);
 
 
@@ -73,19 +65,16 @@ const Profile = () => {
             </div>
 
             <h3 className="text-xl font-semibold mb-4">Recent Transactions</h3>
-            {transactions.length > 0 ? (
+
               <ul className="space-y-2 mb-6">
                 {transactions.map((transaction) => (
                   <li key={transaction.payment_id} className="bg-gray-100 p-4 rounded-lg shadow-sm">
-                    <p><span className="font-semibold">Transaction ID:</span> {transaction.payment_id}</p>
-                    <p><span className="font-semibold">Amount:</span> ${transaction.amount}</p>
-                    <p><span className="font-semibold">Date:</span> {new Date(transaction.payment_date).toLocaleString()}</p>
+                    <p><span className="font-semibold">Transaction ID:</span> {transaction.payment_record_id}</p>
+                    <p><span className="font-semibold">Amount:</span> ${transaction.payment_record_amount}</p>
+                    <p><span className="font-semibold">Date:</span> {new Date(transaction.payment_record_date_created).toLocaleString()}</p>
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p className="text-gray-500 mb-6">No transactions found.</p>
-            )}
 
             <div className="flex space-x-4">
       
