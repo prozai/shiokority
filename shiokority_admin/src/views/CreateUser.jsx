@@ -1,8 +1,10 @@
 // src/views/CreateUser.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
 
 const AdminAddUser = () => {
+  const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -33,6 +35,10 @@ const AdminAddUser = () => {
       setStatusMessage('Failed to add user: ' + error.message);
     }
   };
+
+  const handleCancel = () => {
+    navigate('/user-management');  // Navigate back to user-management
+};
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen flex justify-center items-center">
@@ -139,6 +145,10 @@ const AdminAddUser = () => {
         >
           + Add User
         </button>
+
+        <button type="button" onClick={handleCancel} className="bg-gray-400 text-white py-2 px-4 rounded w-full mt-2 hover:bg-gray-500 font-semibold">
+                    Cancel
+                </button>
 
         {statusMessage && <p className="mt-4 text-center text-gray-600">{statusMessage}</p>}
       </form>

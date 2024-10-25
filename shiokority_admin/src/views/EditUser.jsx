@@ -59,8 +59,8 @@ const EditUser = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-[#153247] p-6">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+    <div className="p-6 bg-gray-100 min-h-screen flex justify-center items-center">
+      <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg">
         <h3 className="text-2xl font-bold mb-6 text-[#153247]">Edit User</h3>
         {['email', 'first_name', 'last_name', 'address', 'phone'].map((field) => (
           <div className="mb-4" key={field}>
@@ -90,7 +90,7 @@ const EditUser = () => {
         <button type="submit" className="bg-[#153247] text-white py-2 px-4 rounded w-full hover:bg-green-600 font-semibold">
           Update 
         </button>
-        <button type="button" onClick={() => navigate('/dashboard')} className="bg-gray-400 text-white py-2 px-4 rounded w-full mt-2 hover:bg-gray-500 font-semibold">
+        <button type="button" onClick={() => navigate('/user-management')} className="bg-gray-400 text-white py-2 px-4 rounded w-full mt-2 hover:bg-gray-500 font-semibold">
           Cancel
         </button>
         {statusMessage && <p className="mt-4 text-center text-gray-600">{statusMessage}</p>}
