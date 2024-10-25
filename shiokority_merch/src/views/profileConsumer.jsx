@@ -8,11 +8,12 @@ import ShiokorityPayLogo from '../asset/image/ShiokorityPay.png';
 const ProfileConsumer = () => {
   const [profileData, setProfileData] = useState(null);
   const [paymentData, setPaymentData] = useState({ 
-    merch_email: '', 
+    cust_email: '', 
     amount: 0,
     cardNumber: '',
     expiryDate: '',
-    cvv: ''
+    cvv: '',
+    uen: ''
   });
   const [cardValidation, setCardValidation] = useState({
     cardNumber: false,
@@ -53,7 +54,7 @@ const ProfileConsumer = () => {
       }
       
       const response = await consumerController.sendPayment(
-        paymentData.merch_email, 
+        profileData.cust_email, 
         paymentData.amount,
         paymentData.cardNumber,
         paymentData.expiryDate,

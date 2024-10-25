@@ -2,6 +2,8 @@ from ..auth.databaseConnection import getDBConnection
 from flask import current_app
 from .bank import Bank
 import pymysql
+from .fraudDetection import FraudDetection
+from datetime import datetime, timedelta
 
 class ApiProcess(): 
 
@@ -45,6 +47,8 @@ class ApiProcess():
     
     def paymentProcessProcedure(self, data):
 
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
         #data include cust_email, amount, cardNumber, expiryDate, cvv
         
         # before process to bank, need to insert the payment record
@@ -59,6 +63,14 @@ class ApiProcess():
         transactionId = response['transactionId']
         paymentId = response['paymentId']
         merchId = response['merchId']
+        custId = response['custId']
+
+        # fraud detection check
+        # success, message = FraudDetection().detect_transaction_fraud(custId, data['amount'], timestamp)
+
+        # if not success:
+        #     # if the transaction is fraud, need to update the payment status to failed
+        #     return success, message
 
 
         # if all the above steps are successful, now we need to call the bank to process the payment
@@ -126,12 +138,13 @@ class ApiProcess():
         # Establish a connection to the database
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
+
         try:
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:
                 # Call the stored procedure with placeholder parameters
                 cursor.callproc('BeforeProceedToBank', [
                     uen, custEmail, cardNumber, cvv, expiryDate, amount,
-                    '', '', '', '', '', '', ''
+                    '', '', '', '', '', '', '', ''
                 ])
 
                 # Query to retrieve the OUT parameter values
@@ -139,7 +152,7 @@ class ApiProcess():
                     SELECT @_BeforeProceedToBank_6 AS statusCode, @_BeforeProceedToBank_7 AS statusMessage, 
                         @_BeforeProceedToBank_8 AS paymentRecordId, @_BeforeProceedToBank_9 AS transactionId, 
                         @_BeforeProceedToBank_10 AS companyUEN, @_BeforeProceedToBank_11 AS paymentId, 
-                        @_BeforeProceedToBank_12 AS merchId;
+                        @_BeforeProceedToBank_12 AS merchId, @_BeforeProceedToBank_13 AS custId;
                 '''
                 cursor.execute(sql_query)
                 result = cursor.fetchone()
@@ -159,7 +172,8 @@ class ApiProcess():
                     'transactionId': result['transactionId'],
                     'companyUEN': result['companyUEN'],
                     'paymentId': result['paymentId'],
-                    'merchId': result['merchId']
+                    'merchId': result['merchId'],
+                    'custId': result['custId']
                 }
 
                 return True, response
@@ -194,11 +208,11 @@ class ApiProcess():
                 statusCode = result['statusCode']
                 if statusCode == 404:
                     # if the UEN is not valid, insert the payment authorise record
-                    self.insertPaymentAuthorise(self, uen, 0)
+                    self.insertPaymentAuthorise(uen, 0)
                     return False
 
                 # if the UEN is valid, insert the payment authorise record
-                self.insertPaymentAuthorise(self, uen, 1)
+                self.insertPaymentAuthorise(uen, 1)
                 return True
 
         except pymysql.MySQLError as e:
