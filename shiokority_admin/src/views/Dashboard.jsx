@@ -2,10 +2,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
-
-import Sidebar from '../components/SideBar'; // Import Sidebar component
 import TopNotificationBar from '../components/TopNotificationBar'; // Import TopNotificationBar component
 import TopNavbar from '../components/TopNavBar';
+import Sidebar from '../components/Sidebar'; // Import Sidebar component
 
 function Dashboard() {
   const [status, setStatus] = useState('');
