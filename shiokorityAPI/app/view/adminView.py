@@ -21,10 +21,11 @@ def adminLogin():
         if not email or not password:
             raise BadRequest("Email and password are required")
 
-        admin = admin_controller.validate_admin_login(email, password)
+        admin, adminEmail = admin_controller.validate_admin_login(email, password)
         
         if admin:
             session['loggedIn'] = True
+            session['email'] = adminEmail
             return jsonify(success=True), 200
         else:
             return jsonify(success=False), 401
@@ -166,7 +167,7 @@ def getAllUser():
         print(f"An error occurred: {e}")  # Log the error
         return jsonify({"error": "An unexpected error occurred"}), 500
 
-@adminBlueprint.route('/get-user/<string:cust_id>', methods=['GET'])
+@adminBlueprint.route('/get-user/<int:cust_id>', methods=['GET'])
 def getUserById(cust_id):
     try:
         user = admin_controller.get_user_by_id(cust_id)  # Assuming you have this method in your controller
@@ -181,7 +182,7 @@ def getUserById(cust_id):
         return jsonify(success=False, message="An unexpected error occurred"), 500
 
 
-@adminBlueprint.route('/users/<string:user_id>/update', methods=['PUT'])
+@adminBlueprint.route('/users/<int:user_id>/update', methods=['PUT'])
 def submitUserUpdate(user_id):
     try:
         data = request.get_json()
@@ -235,3 +236,8 @@ def verify2FA():
         return jsonify(success=update2FA), 200
     else:
         return jsonify({"error": "Failed to update user details"}), 400
+    
+@adminBlueprint.route('/getKeyToInsert', methods=['GET'])
+def hey():
+    secret_key = encrypt_secret(generate_secret())
+    return jsonify(secret_key=secret_key)
