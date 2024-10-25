@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AdministratorController from '../controller/administratorController';
 import ViewMerchant from './ViewMerchant'; // Existing component for viewing merchants
 import ViewUser from './ViewUser'; // Existing component for viewing users
-import Sidebar from '../components/Sidebar'; // Import Sidebar component
+import Sidebar from '../components/SideBar'; // Import Sidebar component
 import TopNotificationBar from '../components/TopNotificationBar'; // Import TopNotificationBar component
 import TopNavbar from '../components/TopNavBar';
 
