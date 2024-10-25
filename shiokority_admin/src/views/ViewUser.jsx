@@ -115,10 +115,21 @@ const UserList = () => {
         {/* Pagination controls */}
         <div className="flex justify-between items-center mt-4">
           <button
-            onClick={handleBackClick}
-            className="bg-gray-300 text-black py-2 px-4 rounded-lg hover:bg-gray-400"
+            onClick={handlePreviousPage}
+            className="bg-gray-300 text-gray-800 py-1 px-3 rounded-lg hover:bg-gray-400"
+            disabled={currentPage === 1}
           >
-            Back
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNextPage}
+            className="bg-gray-300 text-gray-800 py-1 px-3 rounded-lg hover:bg-gray-400"
+            disabled={currentPage === totalPages}
+          >
+            Next
           </button>
         </div>
       </div>

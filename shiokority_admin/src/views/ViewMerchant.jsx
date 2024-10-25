@@ -142,10 +142,21 @@ const ViewMerchants = () => {
         {/* Pagination Controls */}
         <div className="flex justify-between mt-4">
           <button
-            onClick={handleBackClick}
-            className="bg-gray-300 text-black py-2 px-4 rounded-lg hover:bg-gray-400"
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
+            className="bg-gray-200 py-2 px-4 rounded-lg disabled:bg-gray-400"
           >
-            Back
+            Previous
+          </button>
+          <span className="text-gray-600">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+            className="bg-gray-200 py-2 px-4 rounded-lg disabled:bg-gray-400"
+          >
+            Next
           </button>
         </div>
       </div>

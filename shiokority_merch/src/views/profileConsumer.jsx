@@ -93,10 +93,10 @@ const ProfileConsumer = () => {
                 <h3 className="text-2xl font-bold mb-4 text-gray-800">Send Payment</h3>
                 <form onSubmit={handleSendPayment} className="space-y-4">
                   <input
-                    type="email"
-                    name="merch_email"
-                    placeholder="Merchant Email"
-                    value={paymentData.merch_email}
+                    type="text"
+                    name="uen"
+                    placeholder="UEN"
+                    value={paymentData.uen}
                     onChange={handlePaymentChange}
                     required
                     className="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300"
