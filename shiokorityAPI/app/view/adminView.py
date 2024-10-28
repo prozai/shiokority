@@ -28,7 +28,8 @@ def adminLogin():
             session['email'] = adminEmail
             return jsonify(success=True), 200
         else:
-            return jsonify(success=False), 401
+            # if fail, adminEmail will be the error message
+            return jsonify(success=False, message=adminEmail), 401
 
     except BadRequest as e:
         return jsonify(success=False, message=str(e)), 400
@@ -44,8 +45,9 @@ def logout():
 
 @adminBlueprint.route("/auth/isLoggedIn", methods=['GET'])
 def isLoggedIn():
-    if session.get('loggedIn'):
+    if 'loggedIn' in session:
         return jsonify({"valid": True}), 200
+    
     return jsonify({"valid": False}), 401
 
 @adminBlueprint.route("/create-merchant", methods=['POST'])

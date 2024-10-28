@@ -10,7 +10,7 @@ class Administrator {
       localStorage.setItem('token', response.data.token);
       return response.data;
     } catch (error) {
-      throw new Error('Wrong email or password');
+      throw new Error(error.response.data.message);
     }
   }
 

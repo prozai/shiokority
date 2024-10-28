@@ -13,7 +13,8 @@ class FraudDetection():
             'daily_total': 3000,               # Daily total amount
             'hourly_transactions': 5,          # Transactions per hour
             'daily_transactions': 10,          # Transactions per day
-            'rapid_transaction': 3             # Rapid transactions in 5 minutes
+            'rapid_transaction': 3,            # Rapid transactions in 5 minutes
+            'max_attempts': 5
         }
 
     def _check_amount(self, amount):
@@ -190,3 +191,85 @@ class FraudDetection():
                 return False, f"Fraud Alert: {message}"
 
         return True, "Transaction appears legitimate"
+    
+    def check_login_attempts(self, adminEmail):
+
+        connection = getDBConnection(current_app.config['ADMIN_SCHEMA'])
+
+        try:
+            with connection.cursor() as cursor:
+                # Fetch the number of login attempts by the admin
+
+                sqlQuery = """
+                SELECT admin_login_flag_counter
+                FROM admin 
+                WHERE admin_email = %s
+                """
+                cursor.execute(sqlQuery, (adminEmail))
+                login_attempts = cursor.fetchone()['admin_login_flag_counter']
+
+                if login_attempts >= self.thresholds['max_attempts']:
+                    # Update counter and lock account
+                    sqlQuery = """
+                    UPDATE Admin
+                    SET admin_login_flag_counter = 0,
+                    admin_account_status = 0
+                    WHERE admin_email = %s
+                    """
+                    cursor.execute(sqlQuery, (adminEmail))
+                    connection.commit()
+                    return False, f"Maximum login attempts exceeded"
+        
+                return True, ""
+            
+        except pymysql.MySQLError as e:
+            connection.rollback()
+            print(f"Error check_login_attempts: {e}")
+            return False, "An error occurred"
+        
+    def update_login_attempts(self, adminEmail, status):
+        connection = getDBConnection(current_app.config['ADMIN_SCHEMA'])
+
+        try:
+            with connection.cursor() as cursor:
+                if status:
+                    sqlQuery = """
+                    UPDATE Admin
+                    SET admin_login_flag_counter = 0
+                    WHERE admin_email = %s
+                    """
+                else:
+                    sqlQuery = """
+                    UPDATE Admin
+                    SET admin_login_flag_counter = admin_login_flag_counter + 1
+                    WHERE admin_email = %s
+                    """
+
+                cursor.execute(sqlQuery, (adminEmail))
+                connection.commit()
+
+                return True, ""
+            
+        except pymysql.MySQLError as e:
+            connection.rollback()
+            print(f"Error update_login_attempts: {e}")
+            return False, "An error occurred"
+        finally:
+            connection.close()
+
+    def adminFraudDetection(self, adminEmail, status):
+        """
+        Main fraud detection method that runs all checks
+        Returns: (is_safe, message)
+        """
+
+        checks = [
+            self.check_login_attempts(adminEmail),
+            self.update_login_attempts(adminEmail, status)
+        ]
+
+        for is_safe, message in checks:
+            if not is_safe:
+                return False, f"Fraud Alert: {message}"
+
+        return True, "Admin appears legitimate"
