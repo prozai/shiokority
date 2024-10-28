@@ -71,7 +71,7 @@ const Profile = () => {
                   <li key={transaction.payment_id} className="bg-gray-100 p-4 rounded-lg shadow-sm">
                     <p><span className="font-semibold">Transaction ID:</span> {transaction.payment_record_id}</p>
                     <p><span className="font-semibold">Amount:</span> ${transaction.payment_record_amount}</p>
-                    <p><span className="font-semibold">Date:</span> {new Date(transaction.payment_record_date_created).toLocaleString()}</p>
+                    <p><span className="font-semibold">Date:</span> {transaction.payment_record_date_created}</p>
                   </li>
                 ))}
               </ul>
