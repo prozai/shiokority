@@ -42,6 +42,12 @@ def logout():
     session.clear()
     return jsonify({'message': 'Logout successful'}), 200
 
+@adminBlueprint.route("/auth/isLoggedIn", methods=['GET'])
+def isLoggedIn():
+    if session.get('loggedIn'):
+        return jsonify({"valid": True}), 200
+    return jsonify({"valid": False}), 401
+
 @adminBlueprint.route("/create-merchant", methods=['POST'])
 def createMerchant():
     try:
@@ -167,7 +173,7 @@ def getAllUser():
         print(f"An error occurred: {e}")  # Log the error
         return jsonify({"error": "An unexpected error occurred"}), 500
 
-@adminBlueprint.route('/get-user/<int:cust_id>', methods=['GET'])
+@adminBlueprint.route('/get-user/<cust_id>', methods=['GET'])
 def getUserById(cust_id):
     try:
         user = admin_controller.get_user_by_id(cust_id)  # Assuming you have this method in your controller
