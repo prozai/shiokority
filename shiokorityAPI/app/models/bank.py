@@ -4,6 +4,61 @@ from ..auth.databaseConnection import getDBConnection
 
 class Bank():
 
+    def viewAllTransactionRecord(self):
+
+        connection = getDBConnection(current_app.config['BANK_SCHEMA'])
+
+        try:
+            with connection.cursor() as cursor:
+
+                sql = """SELECT * FROM Transaction_record;"""
+                cursor.execute(sql)
+                result = cursor.fetchall()
+                connection.commit()
+                return result
+            
+        except pymysql.MySQLError as e:
+            connection.rollback()
+            print(f"Error viewAllTransactionRecord: {e}")
+            return "An error occurred"
+    
+    def viewAllTransactionHistory(self):
+
+        connection = getDBConnection(current_app.config['BANK_SCHEMA'])
+
+        try:
+            with connection.cursor() as cursor:
+
+                sql = """SELECT * FROM Transaction_history;"""
+                cursor.execute(sql)
+                result = cursor.fetchall()
+                connection.commit()
+                return result
+            
+        except pymysql.MySQLError as e:
+            connection.rollback()
+            print(f"Error viewAllTransactionHistory: {e}")
+            return "An error occurred"
+
+    def viewAllTransaction(self):
+
+        connection = getDBConnection(current_app.config['BANK_SCHEMA'])
+
+        try:
+            with connection.cursor() as cursor:
+
+                sql = """SELECT * FROM Transaction;"""
+                cursor.execute(sql)
+                result = cursor.fetchall()
+                connection.commit()
+                return result
+            
+        except pymysql.MySQLError as e:
+            connection.rollback()
+            print(f"Error viewAllTransaction: {e}")
+            return "An error occurred"
+
+
     def bankProcessPayment(self, cardNumber, amount, uen):
         
         # This function will be called by the API to process the payment

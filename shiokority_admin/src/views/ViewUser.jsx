@@ -79,6 +79,7 @@ const UserList = () => {
             </thead>
             <tbody>
               {currentUsers.map(user => (
+                
                 <tr key={user.cust_id} className="hover:bg-gray-100">
                   <td className="py-2 px-4 border-b">{user.cust_id}</td>
                   <td className="py-2 px-4 border-b">{user.cust_email}</td>

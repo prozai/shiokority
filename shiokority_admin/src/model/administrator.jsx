@@ -24,8 +24,12 @@ class Administrator {
     }
   }
 
-  static isLoggedIn() {
-    return !!localStorage.getItem('token');
+  static async isLoggedIn() {
+    try {
+      return await axios.get(`${ADMIN_PREFIX}/auth/isLoggedIn`);
+    } catch (error) {
+      return false;
+    }
   }
 
   static async verify2FA(code) {

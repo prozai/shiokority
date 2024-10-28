@@ -9,7 +9,7 @@ const ProfileConsumer = () => {
   const [profileData, setProfileData] = useState(null);
   const [paymentData, setPaymentData] = useState({ 
     cust_email: '', 
-    amount: 0,
+    amount: '',
     cardNumber: '',
     expiryDate: '',
     cvv: '',

@@ -4,7 +4,7 @@ import AdministratorController from '../controller/administratorController';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const EditUser = () => {
-  const { cust_id } = useParams();
+  const { userId } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -21,7 +21,8 @@ const EditUser = () => {
     const fetchUserDetails = async () => {
       setStatusMessage('Loading user details...');
       try {
-        const user = await AdministratorController.getUserById(cust_id);
+
+        const user = await AdministratorController.getUserById(userId);
         if (user) {
           setFormData({
             email: user.cust_email,
@@ -39,7 +40,7 @@ const EditUser = () => {
     };
 
     fetchUserDetails();
-  }, [cust_id]);
+  }, [userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +51,7 @@ const EditUser = () => {
     e.preventDefault();
     setStatusMessage('Updating user...');
     try {
-      const response = await AdministratorController.updateUser(cust_id, formData);
+      const response = await AdministratorController.updateUser(userId, formData);
       setStatusMessage(response.success ? 'User updated successfully.' : 'Failed to update user.');
       if (response.success) navigate('/dashboard');
     } catch {

@@ -3,7 +3,6 @@ from werkzeug.exceptions import BadRequest
 from ..controller.consumerController import ConsumerController
 import bcrypt
 from ..models.fraudDetection import FraudDetection
-from datetime import datetime, timedelta
 
 
 consumerBlueprint = Blueprint('consumerBlueprint', __name__)
@@ -94,26 +93,6 @@ def sendPayment():
     else:
         return jsonify({'success': False, 'message':message}), 400
     
-
-@consumerBlueprint.route('/testFraudDetection', methods=['POST'])
-def testf():
-
-    data = request.get_json()
-
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    # success, message = FraudDetection()._check_amount(data['amount'])
-    # success, message = FraudDetection()._check_daily_total(data['custId'], data['amount'])
-    # success, message = FraudDetection()._check_transaction_frequency(data['custId'])
-    # success, message = FraudDetection()._check_sudden_pattern_change(data['custId'], data['amount'])
-    # success, message = FraudDetection()._check_rapid_transactions(data['custId'], timestamp)
-    
-    # success, message = FraudDetection().detect_transaction_fraud(data['custId'], data['amount'])
-
-    if not success:
-        return jsonify({'success': success, 'message': message}), 400
-
-    return jsonify({'success': success, 'message' : message}), 200
 
 
 
