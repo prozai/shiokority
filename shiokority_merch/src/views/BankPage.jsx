@@ -98,8 +98,8 @@ function TransactionDashboard() {
         <div className="flex bg-[#1a1f24]">
           {[
             { id: 'transactions', label: 'Transactions' },
-            { id: 'history', label: 'History' },
-            { id: 'record', label: 'Record' }
+            { id: 'history', label: 'Transaction History' },
+            { id: 'record', label: 'Transaction Record' }
           ].map((tab) => (
             <button
               key={tab.id}
