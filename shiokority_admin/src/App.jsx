@@ -11,7 +11,9 @@ import CreateUser from './views/CreateUser';
 import EditUser from './views/EditUser';
 
 const ProtectedRoute = () => {
-  if (!AdministratorController.isLoggedIn()) {
+
+  const isLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
+  if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
   return <Outlet />;
@@ -30,7 +32,6 @@ function App() {
         <Route path="/create-user" element={<CreateUser />} />
         <Route path="/setup2FA" element={<Setup2FA />} />
         <Route path="/verify2FA" element={<Verify2FA />} />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

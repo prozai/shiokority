@@ -6,9 +6,16 @@ class Administrator {
     
   static async login(data) {
     try {
-      const response = await axios.post(`${ADMIN_PREFIX}/auth/login`, data);      
-      localStorage.setItem('token', response.data.token);
-      return response.data;
+      const response = await axios.post(`${ADMIN_PREFIX}/auth/login`, data);   
+      
+      if (response.data.success) {
+        localStorage.setItem('isAdminLoggedIn', 'true');
+        return response.data;
+      }
+      else {
+        localStorage.setItem('isAdminLoggedIn', 'false');
+        return response.data;
+      }
     } catch (error) {
       throw new Error(error.response.data.message);
     }
@@ -20,7 +27,7 @@ class Administrator {
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
-      localStorage.removeItem('token');
+      localStorage.removeItem('isAdminLoggedIn');
     }
   }
 
