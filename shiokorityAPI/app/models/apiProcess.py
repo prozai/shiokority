@@ -65,12 +65,12 @@ class ApiProcess():
         merchId = response['merchId']
         custId = response['custId']
 
-        # # # fraud detection check
-        # success, message = FraudDetection().detect_transaction_fraud(custId, data['amount'], timestamp)
+        # fraud detection check
+        success, message = FraudDetection().detect_transaction_fraud(custId, data['amount'], timestamp)
 
-        # if not success:
-        #     # if the transaction is fraud, need to update the payment status to failed
-        #     return success, message
+        if not success:
+            # if the transaction is fraud, need to update the payment status to failed
+            return success, message
 
 
         # if all the above steps are successful, now we need to call the bank to process the payment
