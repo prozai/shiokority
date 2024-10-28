@@ -25,9 +25,9 @@ const Login = () => {
     e.preventDefault();
     setStatus('Logging in...');
     try {
-      console.log(formData);
-      await AdministratorController.login(formData);
-      setStatus('Login successful');
+      
+      const response = await AdministratorController.login(formData);
+      setStatus(response.message);
       navigate('/dashboard');
     } catch (error) {
       setStatus('Login failed: ' + error.message);

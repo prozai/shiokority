@@ -31,7 +31,8 @@ def adminLogin():
             return jsonify(success=True), 200
         else:
             audit_trail_controller.log_action('POST', '/admin/auth/login', f"Failed login attempt for {email}")
-            return jsonify(success=False), 401
+            return jsonify(success=False, message=adminEmail), 401
+
 
     except BadRequest as e:
         audit_trail_controller.log_action('POST', '/admin/auth/login', f"Error: {str(e)}")

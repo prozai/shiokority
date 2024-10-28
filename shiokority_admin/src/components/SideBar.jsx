@@ -30,10 +30,10 @@ const Sidebar = ({ handleLogout, handleSetup2FA, handleUserManagement }) => {
         >
           User Management
         </button>
-        <SidebarLink text="Feature Management" />
+        {/* <SidebarLink text="Feature Management" />
         <SidebarLink text="Customer Support" />
         <SidebarLink text="System Management" />
-        <SidebarLink text="Predictive Analytics Tools" />
+        <SidebarLink text="Predictive Analytics Tools" /> */}
       </nav>
 
       {/* Bottom buttons, aligned at the bottom */}

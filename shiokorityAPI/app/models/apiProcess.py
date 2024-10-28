@@ -4,6 +4,7 @@ from .bank import Bank
 import pymysql
 from .fraudDetection import FraudDetection
 from datetime import datetime, timedelta
+from ..models.consumer import Consumer
 
 class ApiProcess(): 
 
@@ -46,10 +47,17 @@ class ApiProcess():
 
     
     def paymentProcessProcedure(self, data):
-
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
         #data include cust_email, amount, cardNumber, expiryDate, cvv
+        
+
+        # fraud detection check
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        custId = Consumer().getConsumerByEmail(data['cust_email'])['cust_id']
+        isFraud, message = FraudDetection().detect_transaction_fraud(custId, data['amount'], timestamp)
+
+        if not isFraud:
+            return isFraud, message
+
         
         # before process to bank, need to insert the payment record
         isInserted, response = self.beforeProcessToBank(data['uen'], data['cust_email'], data['cardNumber'], data['cvv'], data['expiryDate'], data['amount'])
@@ -64,13 +72,6 @@ class ApiProcess():
         paymentId = response['paymentId']
         merchId = response['merchId']
         custId = response['custId']
-
-        # fraud detection check
-        success, message = FraudDetection().detect_transaction_fraud(custId, data['amount'], timestamp)
-
-        if not success:
-            # if the transaction is fraud, need to update the payment status to failed
-            return success, message
 
 
         # if all the above steps are successful, now we need to call the bank to process the payment
@@ -152,7 +153,7 @@ class ApiProcess():
                     SELECT @_BeforeProceedToBank_6 AS statusCode, @_BeforeProceedToBank_7 AS statusMessage, 
                         @_BeforeProceedToBank_8 AS paymentRecordId, @_BeforeProceedToBank_9 AS transactionId, 
                         @_BeforeProceedToBank_10 AS companyUEN, @_BeforeProceedToBank_11 AS paymentId, 
-                        @_BeforeProceedToBank_12 AS merchId, @_BeforeProceedToBank_13 AS custId;
+                        @_BeforeProceedToBank_12 AS merchId;
                 '''
                 cursor.execute(sql_query)
                 result = cursor.fetchone()
@@ -173,7 +174,6 @@ class ApiProcess():
                     'companyUEN': result['companyUEN'],
                     'paymentId': result['paymentId'],
                     'merchId': result['merchId'],
-                    'custId': result['custId']
                 }
 
                 return True, response
