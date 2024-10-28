@@ -7,7 +7,7 @@ from ..auth.databaseConnection import getDBConnection
 class Administrator():
     # 227
     def validateLogin(email, password):
-
+        
         connection = getDBConnection(current_app.config['ADMIN_SCHEMA'])
 
         try:
@@ -40,10 +40,6 @@ class Administrator():
                 else:
                     print(f"Login attempt failed: Incorrect password for email {email}")
                     return False, None
-                        
-        except MySQLError as e:
-            print(f"Database error during login validation: {str(e)}")
-            raise
 
         except Exception as e:
             print(f"Unexpected error during login validation: {str(e)}")
@@ -64,13 +60,8 @@ class Administrator():
                 '''
                 cursor.execute(sql_query, (email,))
                 user = cursor.fetchone()
-                
                 return user
-
-        except MySQLError as e:
-            print(f"Database error during login validation: {str(e)}")
-            return False
-
+            
         except Exception as e:
             print(f"Unexpected error during login validation: {str(e)}")
             return False
@@ -87,10 +78,6 @@ class Administrator():
                 cursor.execute(sql_query, (email))
                 connection.commit()
                 return True
-        except MySQLError as e:
-            print(f"Database error during login validation: {str(e)}")
-            return False
-
         except Exception as e:
             print(f"Unexpected error during login validation: {str(e)}")
             return False
