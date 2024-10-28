@@ -80,23 +80,6 @@ class Consumer():
         except pymysql.MySQLError as e:
             print(f"Error fetching consumer: {e}")
             return None
-        
-    def customerDeductAmount(self, cust_email, amount):
-        # Deduct the amount from the consumer
-        try:
-            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
-            with connection.cursor() as cursor:
-                sql_query = """
-                    UPDATE Customer
-                    SET cust_amount = cust_amount - %s
-                    WHERE cust_email = %s
-                """
-                cursor.execute(sql_query, (amount, cust_email))
-                connection.commit()
-                return True, "Amount deducted successfully"
-        except pymysql.MySQLError as e:
-            print(f"Error deducting amount: {e}")
-            return False, f"Error deducting amount: {e}"
 
     # My work of art
     #136
