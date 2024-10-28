@@ -20,3 +20,6 @@ class Transaction():
         except pymysql.MySQLError as e:
             print(f'Error Occur: {e}')
             return False
+        
+        finally:
+            connection.close()
