@@ -52,10 +52,14 @@ const EditUser = () => {
     setStatusMessage('Updating user...');
     try {
       const response = await AdministratorController.updateUser(userId, formData);
-      setStatusMessage(response.success ? 'User updated successfully.' : 'Failed to update user.');
-      if (response.success) navigate('/dashboard');
-    } catch {
-      setError('Error occurred while updating the user.');
+      setStatusMessage(response.message);
+      if (response.success)
+      {
+        navigate('/user-management');
+      }
+
+    } catch (error){
+      setError(error.message);
     }
   };
 

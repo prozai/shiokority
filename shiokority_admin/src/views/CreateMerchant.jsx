@@ -26,11 +26,11 @@ const MerchantForm = () => {
     e.preventDefault();
     setStatus('Submitting...');
     try {
-      await AdministratorController.createMerchant(formData);
-      setStatus('Merchant created successfully!');
+      const response = await AdministratorController.createMerchant(formData);
+      setStatus(response.message);
       setFormData({ name: '', email: '', phone: '', address: '', uen: '' });
     } catch (error) {
-      setStatus(`Error: ${error.message}`);
+      setStatus(`${error.message}`);
     }
   };
 

@@ -6,11 +6,12 @@ class Consumer {
 
   //My work of art
   static async addUser(data) {
-    const response = await axios.post(`${ADMIN_PREFIX}/add-user`, data); 
-    if (response.status !== 200){
-      throw new Error(response.data.message || "Adding of user failed!");
+    try {
+      const response = await axios.post(`${ADMIN_PREFIX}/add-user`, data);  // Updated endpoint
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
     }
-    return response.data;
   }
 
   // Fetch all users from the backend
@@ -43,7 +44,7 @@ class Consumer {
       const response = await axios.put(`${ADMIN_PREFIX}/users/${userId}/update`, userData);  // Updated endpoint for editing user
       return response.data;
     } catch (error) {
-      throw new Error('Error updating user details');
+      throw new Error(error.response.data.message);
     }
   }
 
