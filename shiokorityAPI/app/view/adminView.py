@@ -272,11 +272,8 @@ def verify2FA():
         return jsonify(success=update2FA), 200
     else:
         return jsonify({"error": "Failed to update user details"}), 400
+    
+@adminBlueprint.route('/get-key', methods=['GET'])
 def getKeyToInsert():
-    try:
-        secret_key = encrypt_secret(generate_secret())
-        audit_trail_controller.log_action('GET', '/admin/getKeyToInsert', "Generated and encrypted new secret key")
-        return jsonify(secret_key=secret_key)
-    except Exception as e:
-        audit_trail_controller.log_action('GET', '/admin/getKeyToInsert', f"Unexpected error: {e}")
-        return jsonify({"error": "An unexpected error occurred"}), 500
+    secret_key = encrypt_secret(generate_secret())
+    return jsonify(secret_key=secret_key)
