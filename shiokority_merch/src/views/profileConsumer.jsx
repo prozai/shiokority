@@ -37,7 +37,13 @@ const ProfileConsumer = () => {
   };
 
   const handlePaymentChange = (e) => {
-    setPaymentData({ ...paymentData, [e.target.name]: e.target.value });
+    if (e.target.name === 'amount') {
+      // Prevent negative values and remove leading zeros
+      const value = Math.max(0, Number(e.target.value));
+      setPaymentData({ ...paymentData, amount: value ? value.toString() : '' });
+    } else {
+      setPaymentData({ ...paymentData, [e.target.name]: e.target.value });
+    }
   };
 
   const handleCardValidationChange = (cardData, isValid) => {
@@ -106,6 +112,14 @@ const ProfileConsumer = () => {
                   placeholder="Payment Amount"
                   value={paymentData.amount}
                   onChange={handlePaymentChange}
+                  min="0"
+                  step="0.01" // Allow decimal values if needed
+                  onKeyDown={(e) => {
+                    // Prevent minus sign
+                    if (e.key === '-' || e.key === 'e') {
+                      e.preventDefault();
+                    }
+                  }}
                   required
                   className="border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#153247]"
                 />
