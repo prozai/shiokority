@@ -15,11 +15,12 @@ class Merchant {
   }
 
   static async createMerchant(merchantData) {
-    const response = await axios.post('/admin/create-merchant', merchantData);
-    if (response.status !== 200) {
-      throw new Error(response.data.message || 'Merchant creation failed!');
+    try {
+      const response = await axios.post('/admin/create-merchant', merchantData);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
     }
-    return response.data;
   }
 
 

@@ -1,5 +1,5 @@
 import pymysql
-from flask import current_app, g
+from flask import current_app
 import bcrypt
 from ..auth.databaseConnection import getDBConnection
 
