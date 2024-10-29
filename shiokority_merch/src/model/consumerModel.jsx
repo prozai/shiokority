@@ -1,10 +1,18 @@
 import axios from 'axios';
 
+// Create an axios instance with default config
+const api = axios.create({
+  baseURL: '', 
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
 class Consumer {
   // Register a new consumer
   static async registerConsumer(cust_data) {
     try {
-      const response = await axios.post('consumer/register-consumer', cust_data);  // Assuming the backend API endpoint
+      const response = await api.post('/consumer/register-consumer', cust_data);  // Assuming the backend API endpoint
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Registration failed');
@@ -14,7 +22,7 @@ class Consumer {
   // Login consumer
   static async loginConsumer(data) {
     try {
-      const response = await axios.post('consumer/login-consumer', data, { withCredentials: true });
+      const response = await api.post('/consumer/login-consumer', data, { withCredentials: true });
       localStorage.setItem('cust_token', response.data.token); // Save token or session management
       localStorage.setItem('cust_id', response.data.customer.cust_id);
       return response.data;
@@ -25,7 +33,7 @@ class Consumer {
 
   static async logoutConsumer() {
     try {
-      await axios.post('consumer/logout-consumer', {}, { withCredentials: true });
+      await api.post('/consumer/logout-consumer', {}, { withCredentials: true });
       localStorage.removeItem('cust_token');
       localStorage.setItem('cust_id');
     } catch (error) {
@@ -41,7 +49,7 @@ class Consumer {
   // Fetch consumer profile details
   static async getProfileConsumer() {
     try {
-      const response = await axios.get('consumer/profile-consumer', { withCredentials: true });
+      const response = await api.get('/consumer/profile-consumer');
       return response.data;
     } catch (error) {
       throw new Error('Unable to fetch profile');
@@ -51,7 +59,7 @@ class Consumer {
   // Send payment to merchant (API call)
   static async sendPayment(cust_email, amount, cardNumber, expiryDate, cvv, uen) {
     try {
-      const response = await axios.post('consumer/send-payment', { cust_email, amount, cardNumber, expiryDate, cvv, uen});
+      const response = await api.post(`/consumer/send-payment`, { cust_email, amount, cardNumber, expiryDate, cvv, uen});
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to send payment');

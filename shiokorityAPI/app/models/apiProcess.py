@@ -71,8 +71,6 @@ class ApiProcess():
         transactionId = response['transactionId']
         paymentId = response['paymentId']
         merchId = response['merchId']
-        custId = response['custId']
-
 
         # if all the above steps are successful, now we need to call the bank to process the payment
         bankProcessPayment, message = Bank().bankProcessPayment(data['cardNumber'], data['amount'], uen)
@@ -145,7 +143,7 @@ class ApiProcess():
                 # Call the stored procedure with placeholder parameters
                 cursor.callproc('BeforeProceedToBank', [
                     uen, custEmail, cardNumber, cvv, expiryDate, amount,
-                    '', '', '', '', '', '', '', ''
+                    '', '', '', '', '', '', ''
                 ])
 
                 # Query to retrieve the OUT parameter values

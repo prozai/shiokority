@@ -10,7 +10,6 @@ import LoginConsumer from './views/loginConsumer';
 import ProfileConsumer from './views/profileConsumer';
 import RegisterConsumer from './views/registerConsumer';
 import PayMerchant from './views/payMerch';
-//import './index.css';
 
 
 function App() {
@@ -24,7 +23,7 @@ function App() {
         <Route path="/bankpage" element={<BankPage />} />
         <Route path="/transactions" element={<TransactionHistory />} />
         <Route path="/login-consumer" element={<LoginConsumer />} />
-        <Route path="/profile-consumer" element={<ProfileConsumer />} />
+        <Route path="/profile-consumer/:pay_uen" element={<ProfileConsumer />} />
         <Route path="/register-consumer" element={<RegisterConsumer />} />
         <Route path="/pay-merchant" element={<PayMerchant />} />
         {/* Default route */}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
 import consumerController from '../controller/consumerController';
 
-const MerchantsGrid = () => {
+const PayMerchant = () => {
   const [merchants, setMerchants] = useState([]);
   const navigate = useNavigate(); // Initialize navigate
 
@@ -24,7 +24,7 @@ const MerchantsGrid = () => {
   // Function to handle click on the merchant card
   const handleMerchantClick = (uen) => {
     // Navigate to the payment page with UEN as a URL parameter
-    navigate(`/payment/${uen}`);
+    navigate(`/profile-consumer/${uen}`);
   };
 
   // Styles for the grid layout
@@ -72,4 +72,4 @@ const MerchantsGrid = () => {
   );
 };
 
-export default MerchantsGrid;
+export default PayMerchant;

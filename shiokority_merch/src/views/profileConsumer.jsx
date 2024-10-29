@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import consumerController from '../controller/consumerController';
 import CardValidation from './CardValidation';
 import ShiokorityPayLogo from '../asset/image/ShiokorityPay.png';
 
 
 const ProfileConsumer = () => {
+  const { pay_uen } = useParams();
   const [profileData, setProfileData] = useState(null);
   const [paymentData, setPaymentData] = useState({ 
     cust_email: '', 
@@ -13,7 +14,7 @@ const ProfileConsumer = () => {
     cardNumber: '',
     expiryDate: '',
     cvv: '',
-    uen: ''
+    uen: pay_uen
   });
   const [cardValidation, setCardValidation] = useState({
     cardNumber: false,
@@ -58,7 +59,6 @@ const ProfileConsumer = () => {
         setMessage('Please correct the card information');
         return;
       }
-      
       const response = await consumerController.sendPayment(
         profileData.cust_email, 
         paymentData.amount,
@@ -97,15 +97,6 @@ const ProfileConsumer = () => {
 
               <h3 className="text-xl font-semibold mb-4">Send Payment</h3>
               <form onSubmit={handleSendPayment} className="space-y-4">
-                <input
-                  type="text"
-                  name="uen"
-                  placeholder="UEN"
-                  value={paymentData.uen}
-                  onChange={handlePaymentChange}
-                  required
-                  className="border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#153247]"
-                />
                 <input
                   type="number"
                   name="amount"
