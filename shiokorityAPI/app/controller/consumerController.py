@@ -1,4 +1,5 @@
 from ..models.consumer import Consumer
+from ..models.merchant import Merchant
 from ..models.apiProcess import ApiProcess
 
 class ConsumerController():
@@ -23,3 +24,6 @@ class ConsumerController():
     
     def validateUEN(self, uen):
         return ApiProcess().validateUEN(uen)
+
+    def get_merchant_data(self):
+        return Merchant().getMerchantData()

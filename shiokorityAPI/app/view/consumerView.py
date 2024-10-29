@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify, session
 from werkzeug.exceptions import BadRequest
 from ..controller.consumerController import ConsumerController
+from ..controller.auditTrailController import AuditTrailController #Added by lu
 import bcrypt
 from ..models.fraudDetection import FraudDetection
 
 
 consumerBlueprint = Blueprint('consumerBlueprint', __name__)
 consumer_instance = ConsumerController()
+audit_trail_controller = AuditTrailController()
     
 @consumerBlueprint.route('/register-consumer', methods=['POST'])
 def registerConsumer():
@@ -94,5 +96,19 @@ def sendPayment():
         return jsonify({'success': False, 'message':message}), 400
     
 
+#Added by lu
+@consumerBlueprint.route('/view-merchant', methods=['GET'])
+def fetchMerchantList():
+    try:
+        merchants = ConsumerController().get_merchant_data()
 
+        if merchants:
+            audit_trail_controller.log_action('GET', '/admin/view-merchant', "Viewed merchant list")
+            return jsonify(merchants), 200
+        else:
+            audit_trail_controller.log_action('GET', '/admin/view-merchant', "Failed to fetch merchant list")
+            return jsonify(success=False, message="No merchants found"), 404
 
+    except Exception as e:
+        audit_trail_controller.log_action('GET', '/admin/view-merchant', f"Unexpected error: {str(e)}")
+        return jsonify(success=False, message="An unexpected error occurred"), 500
