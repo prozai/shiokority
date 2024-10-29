@@ -37,6 +37,32 @@ class consumerController {
       throw new Error(error.message);
     }
   }
+
+  //Added by lu
+  static async getMerchantData() {
+    try {
+      const response = await fetch('/consumer/view-merchant');
+
+      // Check if the response is OK (status code in the range 200-299)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Parse the JSON response
+      const merchantsData = await response.json(); 
+
+      // Check if merchantsData is an array
+      if (!Array.isArray(merchantsData)) {
+        throw new Error('Expected an array of merchants');
+      }
+
+      return merchantsData; // Return the array of merchant data
+    } catch (error) {
+      console.error('Error fetching merchant data:', error);
+      throw new Error('Failed to fetch merchant data');
+    }
+  }
+
 }
 
 export default consumerController;

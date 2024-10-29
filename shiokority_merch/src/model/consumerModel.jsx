@@ -57,6 +57,21 @@ class Consumer {
       throw new Error(error.response?.data?.message || 'Failed to send payment');
     }
   }
+
+  //Added by lu
+  static async getMerchantData() {
+    try {
+      const response = await fetch('/consumer/view-merchant');
+      // const merchantsData = await response.json();
+      return response.data;
+      // Map only the merchant IDs
+      // return merchantsData.map((merchant) => merchant.merch_id);
+    } catch (error) {
+      console.error('Error fetching merchant data:', error);
+      throw new Error('Failed to fetch merchant data');
+    }
+  }
+
 }
 
 export default Consumer;
