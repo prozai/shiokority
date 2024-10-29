@@ -15,21 +15,21 @@ class Administrator():
             with connection.cursor() as cursor:
                 # Query to retrieve the hashed password and status
                 sql_query = '''
-                    SELECT admin_id, admin_email, admin_pass, admin_account_status 
+                    SELECT admin_id, admin_email, admin_pass, admin_account_status,
+                    admin_mfa_enabled 
                     FROM Admin 
                     WHERE admin_email = %s
                 '''
                 cursor.execute(sql_query, (email,))
                 user = cursor.fetchone()
                 
-                
                 if not user:
                     print(f"Login attempt failed: User not found for email {email}")
-                    return False, "User not found "
+                    return {'status': False, 'message': "User not found "}
                 
                 if user['admin_account_status'] != 1:
                     print(f"Login attempt failed: Inactive account for email {email}")
-                    return False, "Inactive account"
+                    return {'status': False, 'message': "Inactive account"}
                 
                 # Retrieve the hashed password from the database
                 hashed_password = user['admin_pass'].encode('utf-8')
@@ -39,16 +39,16 @@ class Administrator():
                     
                     # update login attempt
                     FraudDetection().adminFraudDetection(user['admin_email'], True)
-                    return True, user['admin_email']
+                    return {'status': True, 'message': "Login successful", 'admin_email': user['admin_email'], 'admin_mfa_enabled': user['admin_mfa_enabled']}
                 
                 else:
                     isFraud, message = FraudDetection().adminFraudDetection(user['admin_email'], False)
                     print(f"Login attempt failed: {message}")
 
-                    if not isFraud:
-                        return False, message
+                    if isFraud:
+                        return {'status': False, 'message': message}
 
-                    return False,"Incorrect password"
+                    return {'status': False, 'message': "Invalid password"}
 
         except Exception as e:
             print(f"Unexpected error during login validation: {str(e)}")

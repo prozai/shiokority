@@ -16,22 +16,19 @@ def adminLogin():
         if not data:
             raise BadRequest("No input data provided")
 
-        email = data.get('email', '')
-        password = data.get('password', '')
+        email = data.get('email')
+        password = data.get('password')
 
-        if not email or not password:
-            raise BadRequest("Email and password are required")
-
-        admin, adminEmail = admin_controller.validate_admin_login(email, password)
+        admin = admin_controller.validate_admin_login(email, password)
 
         if admin:
             session['loggedIn'] = True
-            session['email'] = adminEmail
-            audit_trail_controller.log_action('POST', '/admin/auth/login', f"Admin {adminEmail} logged in successfully")
-            return jsonify(success=True), 200
+            session['email'] = admin['admin_email']
+            audit_trail_controller.log_action('POST', '/admin/auth/login', f"Admin {email} logged in successfully")
+            return jsonify(success=True, isMFA=admin['admin_mfa_enabled']), 200
         else:
             audit_trail_controller.log_action('POST', '/admin/auth/login', f"Failed login attempt for {email}")
-            return jsonify(success=False, message=adminEmail), 401
+            return jsonify(success=False, message=email), 401
 
 
     except BadRequest as e:
