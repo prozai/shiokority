@@ -270,6 +270,6 @@ class FraudDetection():
 
         for is_safe, message in checks:
             if not is_safe:
-                return False, f"Fraud Alert: {message}"
+                return True, f"Fraud Alert: {message}"
 
-        return True, "Admin appears legitimate"
+        return False, "Admin appears legitimate"

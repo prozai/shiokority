@@ -28,9 +28,18 @@ const Login = () => {
       
       const response = await AdministratorController.login(formData);
       setStatus(response.message);
-      navigate('/dashboard');
+
+      if (response.isMFA === 1)
+      {
+        navigate('/verify2FA');
+      }
+      else
+      {
+        navigate('/dashboard');
+      }
+      
     } catch (error) {
-      setStatus('Login failed: ' + error.message);
+      setStatus(error.message);
     }
   };
 

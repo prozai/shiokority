@@ -16,13 +16,7 @@ class AdministratorController {
   }
 
   static async createMerchant(data) {
-    try {
-      const result = await Merchant.createMerchant(data);
-      return result;
-    } catch (error) {
-      console.error('Error in createMerchant:', error);
-      throw error;
-    }
+    return await Merchant.createMerchant(data);
   }
 
   static async getMerchantData() {
@@ -55,13 +49,7 @@ class AdministratorController {
 
   // My work of art
   static async addUser(data) {
-    try {
-      const result = await Consumer.addUser(data);  // Calls the model method to add user
-      return result;
-    } catch (error) {
-      console.error('Error in createUser:', error);
-      throw error;
-    }
+    return await Consumer.addUser(data);
   }
 
   static async getAllUsers() {
@@ -86,13 +74,7 @@ class AdministratorController {
   }
 
   static async updateUser(userId, userData) {
-    try {
-      const result = await Consumer.updateUser(userId, userData);  // Calls the model method to update the user
-      return result;
-    } catch (error) {
-      console.error('Error in updateUser:', error);
-      throw error;
-    }
+    return await Consumer.updateUser(userId, userData);
   }
 
   static async verify2FA(code) {

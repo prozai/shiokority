@@ -28,11 +28,11 @@ const AdminAddUser = () => {
     e.preventDefault();
     setStatusMessage('Adding user...');
     try {
-      await AdministratorController.addUser(formData);
-      setStatusMessage('User added successfully');
-      setFormData({ email: '', password: '', first_name: '', last_name: '', address: '', phone: '', status: true });
+      const response = await AdministratorController.addUser(formData);
+      setStatusMessage(response.message);
+      setFormData({ email: '', password: '', first_name: '', last_name: '', address: '', phone: '', status: true});
     } catch (error) {
-      setStatusMessage('Failed to add user: ' + error.message);
+      setStatusMessage(error.message);
     }
   };
 
