@@ -13,9 +13,6 @@ class MerchantController:
     def getMerchantByID(self, merch_id):
         return Merchant().getMerchantByID(merch_id)
     
-    def updateMerchant(self, merch_id, merchant):
-        return Merchant().updateMerchant(merch_id, merchant)
-    
     def validateUEN(self, uen):
         return ApiProcess().validateUEN(uen)
     

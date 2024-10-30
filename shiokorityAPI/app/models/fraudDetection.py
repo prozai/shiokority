@@ -7,7 +7,6 @@ class FraudDetection():
 
     def __init__(self):
         # Configure detection thresholds
-
         self.thresholds = {
             'amount': 1000,                    # Single transaction amount
             'daily_total': 3000,               # Daily total amount
@@ -19,20 +18,16 @@ class FraudDetection():
 
     def _check_amount(self, amount):
         """Check if single transaction amount is suspiciously high"""
-
         if amount > self.thresholds['amount']:
-            return False, f"Amount ${amount} exceeds single transaction limit"
+            return False, f"Transaction amount (${amount}) exceeds the limit of ${self.thresholds['amount']}. This transaction has been stopped for your security."
         return True, ""
     
     def _check_daily_total(self, user_id, new_amount):
         """Check if daily total spending is suspicious"""
-        
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             with connection.cursor() as cursor:
-                # Fetch the total amount spent by the user today
-
                 sqlQuery = """
                 SELECT COALESCE(SUM(transaction_amount), 0) as total_spent
                 FROM Transaction
@@ -43,28 +38,24 @@ class FraudDetection():
                 cursor.execute(sqlQuery, (user_id))
                 total_spent = cursor.fetchone()['total_spent']
 
-
                 if total_spent + new_amount > self.thresholds['daily_total']:
-                    return False, f"Daily total amount ${total_spent + new_amount} exceeds daily limit"
+                    return False, f"Daily spending limit of ${self.thresholds['daily_total']} exceeded. This transaction has been stopped for your security."
                 
                 return True, ""
             
         except pymysql.MySQLError as e:
             connection.rollback()
             print(f"Error _check_daily_total: {e}")
-            return False, "An error occurred"
+            return False, "Transaction processing error. This transaction has been stopped."
         finally:
             connection.close()
     
     def _check_transaction_frequency(self, user_id):
         """Check hourly and daily transaction counts"""
-
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             with connection.cursor() as cursor:
-                # Fetch the number of transactions by the user in the last hour
-
                 sqlQuery = """
                 SELECT COUNT(*) as transactions_last_hour
                 FROM Transaction
@@ -76,9 +67,7 @@ class FraudDetection():
                 transactions_last_hour = cursor.fetchone()['transactions_last_hour']
 
                 if transactions_last_hour > self.thresholds['hourly_transactions']:
-                    return False, f"Hourly transaction limit exceeded"
-
-                # Fetch the number of transactions by the user today
+                    return False, f"Maximum transactions per hour ({self.thresholds['hourly_transactions']}) exceeded. This transaction has been stopped for your security."
 
                 sqlQuery = """
                 SELECT COUNT(*) as transactions_today
@@ -91,26 +80,23 @@ class FraudDetection():
                 transactions_today = cursor.fetchone()['transactions_today']
 
                 if transactions_today > self.thresholds['daily_transactions']:
-                    return False, f"Daily transaction limit exceeded"
+                    return False, f"Maximum daily transactions ({self.thresholds['daily_transactions']}) exceeded. This transaction has been stopped for your security."
                 
                 return True, ""
   
         except pymysql.MySQLError as e:
             connection.rollback()
             print(f"Error _check_transaction_frequency: {e}")
-            return False, "An error occurred"
+            return False, "Transaction processing error. This transaction has been stopped."
         finally:
             connection.close()
 
     def _check_sudden_pattern_change(self, user_id, amount):
         """Check if transaction amount is significantly different from user's pattern"""
-
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             with connection.cursor() as cursor:
-                # Fetch the average transaction amount by the user
-
                 sqlQuery = """
                 SELECT AVG(transaction_amount) as avg_amount, STDDEV(transaction_amount) as stddev
                 FROM Transaction
@@ -121,31 +107,26 @@ class FraudDetection():
                 cursor.execute(sqlQuery, (user_id))
                 result = cursor.fetchone()
 
-                # If no history, skip this check
                 if result['avg_amount'] == None or result['stddev'] == None:
                     return True, ""
 
-                # Flag if amount is more than 3 standard deviations from mean
                 if abs(amount - result['avg_amount']) > (3 * result['stddev']):
-                    return False, f"Amount ${amount} significantly differs from usual pattern"
+                    return False, "Unusual transaction amount detected. This transaction has been stopped for your security."
                 return True, ""
             
         except pymysql.MySQLError as e:
             connection.rollback()
             print(f"Error _check_sudden_pattern_change: {e}")
-            return False, "An error occurred"
+            return False, "Transaction processing error. This transaction has been stopped."
         finally:
             connection.close()
 
     def _check_rapid_transactions(self, user_id, timestamp):
         """Check for suspiciously rapid consecutive transactions"""
-        
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             with connection.cursor() as cursor:
-                # Fetch the timestamp of the last transaction by the user
-
                 sqlQuery = """
                 SELECT transaction_date_created
                 FROM Transaction
@@ -157,15 +138,14 @@ class FraudDetection():
                 cursor.execute(sqlQuery, (user_id, timestamp))
                 recent_transactions = cursor.fetchall()
 
-                if len(recent_transactions) >= self.thresholds['rapid_transaction']:  # More than 3 transactions in 5 minutes
-                    return False, "Too many rapid transactions"
+                if len(recent_transactions) >= self.thresholds['rapid_transaction']:
+                    return False, "Multiple rapid transactions detected. This transaction has been stopped for your security."
                 return True, ""
-
             
         except pymysql.MySQLError as e:
             connection.rollback()
             print(f"Error _check_rapid_transactions: {e}")
-            return False, "An error occurred"
+            return False, "Transaction processing error. This transaction has been stopped."
         finally:
             connection.close()
 
@@ -174,8 +154,6 @@ class FraudDetection():
         Main fraud detection method that runs all checks
         Returns: (is_safe, message)
         """
-
-        # Round amount to 2 decimal places
         amount = Decimal(amount).quantize(Decimal('0.00'))
 
         checks = [
@@ -188,18 +166,15 @@ class FraudDetection():
 
         for is_safe, message in checks:
             if not is_safe:
-                return False, f"Fraud Alert: {message}"
+                return False, f"Security Alert: {message}"
 
-        return True, "Transaction appears legitimate"
+        return True, "Transaction authorized"
     
     def check_login_attempts(self, adminEmail):
-
         connection = getDBConnection(current_app.config['ADMIN_SCHEMA'])
 
         try:
             with connection.cursor() as cursor:
-                # Fetch the number of login attempts by the admin
-
                 sqlQuery = """
                 SELECT admin_login_flag_counter
                 FROM admin 
@@ -209,7 +184,6 @@ class FraudDetection():
                 login_attempts = cursor.fetchone()['admin_login_flag_counter']
 
                 if login_attempts >= self.thresholds['max_attempts']:
-                    # Update counter and lock account
                     sqlQuery = """
                     UPDATE Admin
                     SET admin_login_flag_counter = 0,
@@ -218,14 +192,14 @@ class FraudDetection():
                     """
                     cursor.execute(sqlQuery, (adminEmail))
                     connection.commit()
-                    return False, f"Maximum login attempts exceeded"
+                    return False, "Account locked due to multiple failed login attempts. This login has been stopped for your security."
         
                 return True, ""
             
         except pymysql.MySQLError as e:
             connection.rollback()
             print(f"Error check_login_attempts: {e}")
-            return False, "An error occurred"
+            return False, "Authentication error. This login has been stopped."
         
     def update_login_attempts(self, adminEmail, status):
         connection = getDBConnection(current_app.config['ADMIN_SCHEMA'])
@@ -253,7 +227,7 @@ class FraudDetection():
         except pymysql.MySQLError as e:
             connection.rollback()
             print(f"Error update_login_attempts: {e}")
-            return False, "An error occurred"
+            return False, "Authentication error. This login has been stopped."
         finally:
             connection.close()
 
@@ -262,7 +236,6 @@ class FraudDetection():
         Main fraud detection method that runs all checks
         Returns: (is_safe, message)
         """
-
         checks = [
             self.check_login_attempts(adminEmail),
             self.update_login_attempts(adminEmail, status)
@@ -270,6 +243,6 @@ class FraudDetection():
 
         for is_safe, message in checks:
             if not is_safe:
-                return True, f"Fraud Alert: {message}"
+                return True, f"Security Alert: {message}"
 
-        return False, "Admin appears legitimate"
+        return False, "Authentication successful"

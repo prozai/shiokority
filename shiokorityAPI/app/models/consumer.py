@@ -84,17 +84,8 @@ class Consumer():
     # My work of art
     #136
     def addUser(self, user):
-        connection = None
+        connection = getDBConnection(current_app.config['PAY_SCHEMA'])
         try:
-            # Establish a connection to the database
-            connection = pymysql.connect(
-                host=current_app.config['MYSQL_HOST'],
-                user=current_app.config['MYSQL_USER'],
-                password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['PAY_SCHEMA'],
-                cursorclass=pymysql.cursors.DictCursor
-            )
-
             # Hash the password before storing
             hashed_password = bcrypt.hashpw(user['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -122,49 +113,40 @@ class Consumer():
 
     #137
     def get_all_users(self):
+
+        connection = getDBConnection(current_app.config['PAY_SCHEMA'])
         try:
-            with pymysql.connect(
-                host=current_app.config['MYSQL_HOST'],
-                user=current_app.config['MYSQL_USER'],
-                password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['PAY_SCHEMA'],
-                cursorclass=pymysql.cursors.DictCursor
-            ) as connect:
-                with connect.cursor() as cursor:
-                    sqlQuery = "SELECT * FROM Customer"
-                    cursor.execute(sqlQuery)
-                    users = cursor.fetchall()
-                if not users:
-                    return False
-                return users
+            with connection.cursor() as cursor:
+                sqlQuery = "SELECT * FROM Customer"
+                cursor.execute(sqlQuery)
+                users = cursor.fetchall()
+                
+            if not users:
+                return False
+            return users
         except pymysql.MySQLError as e:
             print(f"Error fetching users: {e}")
             return False
 
     def getUserById(self, user_id):
+
+        connection = getDBConnection(current_app.config['PAY_SCHEMA'])
         try:
-            with pymysql.connect(
-                host=current_app.config['MYSQL_HOST'],
-                user=current_app.config['MYSQL_USER'],
-                password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['PAY_SCHEMA'],
-                cursorclass=pymysql.cursors.DictCursor
-            ) as connection:
-                with connection.cursor() as cursor:
-                    # Query to retrieve user details by user_id
-                    sql_query = '''
-                        SELECT cust_id, cust_email, cust_fname, cust_lname, cust_status, cust_address, cust_phone, date_created, date_updated_on
-                        FROM Customer
-                        WHERE cust_id = %s
-                    '''
-                    cursor.execute(sql_query, (user_id,))
-                    user = cursor.fetchone()
-                    
-                    # Return the user data if found, otherwise None
-                    if user:
-                        return user
-                    else:
-                        return False
+            with connection.cursor() as cursor:
+                # Query to retrieve user details by user_id
+                sql_query = '''
+                    SELECT cust_id, cust_email, cust_fname, cust_lname, cust_status, cust_address, cust_phone, date_created, date_updated_on
+                    FROM Customer
+                    WHERE cust_id = %s
+                '''
+                cursor.execute(sql_query, (user_id,))
+                user = cursor.fetchone()
+                
+                # Return the user data if found, otherwise None
+                if user:
+                    return user
+                else:
+                    return False
         except MySQLError as e:
             print(f"Database error during user retrieval: {str(e)}")
             return False
@@ -174,16 +156,10 @@ class Consumer():
 
     #141
     #138
-    def update_user(self, cust_id, email=None, first_name=None, last_name=None, address=None, phone=None, status=None):
+    def update_user(self, cust_id, email, first_name, last_name, address, phone, status):
+
+        connection = getDBConnection(current_app.config['PAY_SCHEMA'])
         try:
-            # Establish a connection to the database
-            connection = pymysql.connect(
-                host=current_app.config['MYSQL_HOST'],
-                user=current_app.config['MYSQL_USER'],
-                password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['PAY_SCHEMA'],
-                cursorclass=pymysql.cursors.DictCursor
-            )
 
             # Construct SQL query based on provided fields
             updates = []
