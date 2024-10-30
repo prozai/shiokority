@@ -15,20 +15,20 @@ def registerMerchant():
     try:
         data = request.get_json()
         if not data:
-            audit_trail_controller.log_action('POST', '/register-merchant', "No input data provided")
+            audit_trail_controller.log_action('POST', '/merchant/register-merchant', "No input data provided")
             return jsonify({'success': False, 'message': 'Merchant email, password, first name, last name, phone number, and address are required'}), 400
         
         success, message = merchant_instance.registerMerchant(data)
         
         if success:
-            audit_trail_controller.log_action('POST', '/register-merchant', "Merchant registered successfully")
+            audit_trail_controller.log_action('POST', '/merchant/register-merchant', "Merchant registered successfully")
             return jsonify({'success': True, 'message': message}), 201
         else:
-            audit_trail_controller.log_action('POST', '/register-merchant', f"Merchant registration failed: {message}")
+            audit_trail_controller.log_action('POST', '/merchant/register-merchant', f"Merchant registration failed: {message}")
             return jsonify({'success': False, 'message': message}), 400
 
     except Exception as e:
-        audit_trail_controller.log_action('POST', '/register-merchant', f"Unexpected error: {e}")
+        audit_trail_controller.log_action('POST', '/merchant/register-merchant', f"Unexpected error: {e}")
         print(f"Error registering merchant: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred during registration'}), 500
 
@@ -38,7 +38,7 @@ def loginMerchant():
     try:
         data = request.get_json()
         if not data or 'email' not in data or 'password' not in data:
-            audit_trail_controller.log_action('POST', '/login', "Email and password are required")
+            audit_trail_controller.log_action('POST', '/merchant/login', "Email and password are required")
             return jsonify({'success': False, 'message': 'Email and password are required'}), 400
 
         email = data['email']
@@ -48,14 +48,14 @@ def loginMerchant():
 
         if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['merch_pass'].encode('utf-8')):
             session['merch_id'] = merchant['merch_id']
-            audit_trail_controller.log_action('POST', '/login', f"Merchant {email} logged in successfully")
+            audit_trail_controller.log_action('POST', '/merchant/login', f"Merchant {email} logged in successfully")
             return jsonify({'success': True, 'message': 'Login successful', 'merchant': {'merch_id': merchant['merch_id']}}), 200
         else:
-            audit_trail_controller.log_action('POST', '/login', f"Failed login attempt for email: {email}")
+            audit_trail_controller.log_action('POST', '/merchant/login', f"Failed login attempt for email: {email}")
             return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
 
     except Exception as e:
-        audit_trail_controller.log_action('POST', '/login', f"Unexpected error: {e}")
+        audit_trail_controller.log_action('POST', '/merchant/login', f"Unexpected error: {e}")
         print(f"Error logging in merchant: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred during login'}), 500
 
@@ -64,16 +64,16 @@ def loginMerchant():
 def profile():
     try:
         if 'merch_id' not in session:
-            audit_trail_controller.log_action('GET', '/profile', "Unauthorized access attempt")
+            audit_trail_controller.log_action('GET', '/merchant/profile', "Unauthorized access attempt")
             return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
 
         merchant = merchant_instance.getMerchantByID(session['merch_id'])
 
         if merchant:
-            audit_trail_controller.log_action('GET', '/profile', f"Retrieved profile for merchant ID {session['merch_id']}")
+            audit_trail_controller.log_action('GET', '/merchant/profile', f"Retrieved profile for merchant ID {session['merch_id']}")
             return jsonify(merchant), 200
         else:
-            audit_trail_controller.log_action('GET', '/profile', f"Merchant ID {session['merch_id']} not found")
+            audit_trail_controller.log_action('GET', '/merchant/profile', f"Merchant ID {session['merch_id']} not found")
             return jsonify({'success': False, 'message': 'Merchant not found'}), 404
 
     except Exception as e:
@@ -87,10 +87,10 @@ def logout():
     try:
         merch_id = session.get('merch_id')
         session.clear()
-        audit_trail_controller.log_action('POST', '/logout', f"Merchant ID {merch_id} logged out successfully")
+        audit_trail_controller.log_action('POST', '/merchant/logout', f"Merchant ID {merch_id} logged out successfully")
         return jsonify({'success': True, 'message': 'Logged out successfully'}), 200
     except Exception as e:
-        audit_trail_controller.log_action('POST', '/logout', f"Unexpected error: {e}")
+        audit_trail_controller.log_action('POST', '/merchant/logout', f"Unexpected error: {e}")
         print(f"Error logging out merchant: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred during logout'}), 500
 
@@ -98,19 +98,19 @@ def logout():
 def viewTransactionHistory():
     try:
         if 'merch_id' not in session:
-            audit_trail_controller.log_action('GET', '/viewTransactionHistory', "Unauthorized access attempt")
+            audit_trail_controller.log_action('GET', '/merchant/viewTransactionHistory', "Unauthorized access attempt")
             return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
 
         transactionHistory = merchant_instance.viewPaymentRecordByMerchId(session['merch_id'])
 
         if not transactionHistory:
-            audit_trail_controller.log_action('GET', '/viewTransactionHistory', f"No transaction history found for merchant ID {session['merch_id']}")
+            audit_trail_controller.log_action('GET', '/merchant/viewTransactionHistory', f"No transaction history found for merchant ID {session['merch_id']}")
             return jsonify({'success': False, 'message': 'No transaction history found'}), 404
 
-        audit_trail_controller.log_action('GET', '/viewTransactionHistory', f"Transaction history retrieved for merchant ID {session['merch_id']}")
+        audit_trail_controller.log_action('GET', '/merchant/viewTransactionHistory', f"Transaction history retrieved for merchant ID {session['merch_id']}")
         return jsonify(transactionHistory), 200
 
     except Exception as e:
-        audit_trail_controller.log_action('GET', '/viewTransactionHistory', f"Unexpected error: {e}")
+        audit_trail_controller.log_action('GET', '/merchant/viewTransactionHistory', f"Unexpected error: {e}")
         print(f"Error viewing transaction history: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred while fetching transaction history'}), 500
