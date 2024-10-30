@@ -27,45 +27,24 @@ const PayMerchant = () => {
     navigate(`/profile-consumer/${uen}`);
   };
 
-  // Styles for the grid layout
-  const containerStyle = {
-    padding: '20px',
-  };
-
-  const gridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-    gap: '20px',
-  };
-
-  const cardStyle = {
-    backgroundColor: '#f9f9f9',
-    border: '1px solid #ddd',
-    padding: '20px',
-    textAlign: 'center',
-    borderRadius: '5px',
-    cursor: 'pointer', // Change cursor to pointer to indicate clickability
-  };
-
   return (
-    <div style={containerStyle}>
-      <h1>Available Merchants</h1>
-      <br />
-      <div style={gridStyle}>
+    <div className="p-5">
+      <h1 className="text-2xl font-semibold mb-4 text-center">Available Merchants</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
         {merchants.length > 0 ? (
           merchants.map((merchant) => (
             <div
               key={merchant.merch_id}
-              style={cardStyle}
+              className="bg-gray-100 border border-gray-300 p-5 rounded-md text-center cursor-pointer hover:bg-gray-200 transition"
               onClick={() => handleMerchantClick(merchant.merch_uen)} // Call the click handler on card click
             >
-              <h3>{merchant.merch_name}</h3>
-              <p>Address: {merchant.merch_address}</p>
-              <p>UEN: {merchant.merch_uen}</p>
+              <h3 className="text-lg font-medium">{merchant.merch_name}</h3>
+              <p className="text-gray-600">Address: {merchant.merch_address}</p>
+              <p className="text-gray-600">UEN: {merchant.merch_uen}</p>
             </div>
           ))
         ) : (
-          <p>No merchants available.</p>
+          <p className="text-gray-500">No merchants available.</p>
         )}
       </div>
     </div>
