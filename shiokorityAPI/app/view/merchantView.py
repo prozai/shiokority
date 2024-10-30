@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify, session
 from ..controller.merchantController import MerchantController
 from ..controller.auditTrailController import AuditTrailController  # Import the AuditTrailController
+from ..controller.auditTrailController import AuditTrailController  # Import the AuditTrailController
 import bcrypt
 
 merchant_instance = MerchantController()
+audit_trail_controller = AuditTrailController()
 audit_trail_controller = AuditTrailController()
 
 # Create the Blueprint for merchant-related routes
@@ -43,7 +45,10 @@ def loginMerchant():
 
         email = data['email']
         password = data['password']
+        email = data['email']
+        password = data['password']
 
+        merchant = merchant_instance.getMerchantByEmail(email)
         merchant = merchant_instance.getMerchantByEmail(email)
 
         if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['merch_pass'].encode('utf-8')):
@@ -68,6 +73,7 @@ def profile():
             return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
 
         merchant = merchant_instance.getMerchantByID(session['merch_id'])
+        merchant = merchant_instance.getMerchantByID(session['merch_id'])
 
         if merchant:
             audit_trail_controller.log_action('GET', '/merchant/profile', f"Retrieved profile for merchant ID {session['merch_id']}")
@@ -75,6 +81,11 @@ def profile():
         else:
             audit_trail_controller.log_action('GET', '/merchant/profile', f"Merchant ID {session['merch_id']} not found")
             return jsonify({'success': False, 'message': 'Merchant not found'}), 404
+
+    except Exception as e:
+        audit_trail_controller.log_action('GET', '/profile', f"Unexpected error: {e}")
+        print(f"Error fetching merchant profile: {e}")
+        return jsonify({'success': False, 'message': 'An unexpected error occurred while fetching the profile'}), 500
 
     except Exception as e:
         audit_trail_controller.log_action('GET', '/profile', f"Unexpected error: {e}")
