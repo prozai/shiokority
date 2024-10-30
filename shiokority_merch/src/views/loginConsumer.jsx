@@ -18,7 +18,7 @@ const LoginConsumer = () => {
     setMessage('Logging in...');
     try {
       await consumerController.loginConsumer(formData);
-      navigate('/profile-consumer'); // Redirect to profile after login
+      navigate('/pay-merchant'); // Redirect to profile after login
     } catch (error) {
       setMessage('Login failed: ' + error.message);
     }
