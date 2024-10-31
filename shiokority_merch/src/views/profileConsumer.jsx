@@ -89,7 +89,7 @@ const ProfileConsumer = () => {
       setMessage(response.message);
       setMessageType('success');
       // Reset form after successful payment
-      setPaymentData(prev => ({ ...prev, amount: '', cardNumber: '', expiryDate: '', cvv: '' }));
+      setPaymentData(prev => ({ ...prev, amount: ''}));
     } catch (error) {
       setMessage(error.message);
       setMessageType('error');
