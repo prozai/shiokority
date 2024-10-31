@@ -80,7 +80,7 @@ def sendPayment():
     # 1. Validate the card (need to tokenize the card number and pass it to the bank)
     # 2. if the card is valid, process the payment
 
-    # validate the card
+    # validate the card (need to do tokenization)
     success, message = ConsumerController().customerValidateCardProcedure(data['cardNumber'], data['cvv'], data['expiryDate'])
 
     # if the card is invalid, return the error message

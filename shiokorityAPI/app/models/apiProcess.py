@@ -5,18 +5,32 @@ import pymysql
 from .fraudDetection import FraudDetection
 from datetime import datetime, timedelta
 from ..models.consumer import Consumer
+from ..auth.CardTokenizer import CardTokenizer
 
 class ApiProcess(): 
 
+    def __init__(self):
+        self.tokenizer = CardTokenizer()
+
     def validateCardProcedure(self, card_number, cvv, expiry_date):
+        # Tokenize card here
+        token = self.tokenizer.tokenize(card_number, cvv, expiry_date)
+
+        if not token:
+            return False, "Invalid card details"
+
         # Establish a connection to the database
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             # Create a cursor to interact with the database
             with connection.cursor() as cursor:
+                
+                # Detokenize the card details include card number, cvv, and expiry date
+                card = self.tokenizer.bank_detokenize(token)
+
                 # Call the stored procedure with OUT parameters as placeholders
-                cursor.callproc('CheckCardInBank', (card_number, cvv, expiry_date, 0, ''))
+                cursor.callproc('CheckCardInBank', (card['card_number'], card['cvv'], card['expiry_date'], 0, ''))
 
                 # Retrieve the OUT parameter values using the positional names
                 cursor.execute("SELECT @_CheckCardInBank_3 AS statusCode, @_CheckCardInBank_4 AS statusMessage")
