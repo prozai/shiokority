@@ -62,7 +62,8 @@ class ApiProcess():
     
     def paymentProcessProcedure(self, data):
         #data include cust_email, amount, cardNumber, expiryDate, cvv
-        
+
+        token = self.tokenizer.tokenize(data['cardNumber'], data['cvv'], data['expiryDate'])
 
         # fraud detection check
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -74,7 +75,7 @@ class ApiProcess():
 
         
         # before process to bank, need to insert the payment record
-        isInserted, response = self.beforeProcessToBank(data['uen'], data['cust_email'], data['cardNumber'], data['cvv'], data['expiryDate'], data['amount'])
+        isInserted, response = self.beforeProcessToBank(data['uen'], data['cust_email'], token, data['cvv'], data['expiryDate'], data['amount'])
 
         if not isInserted:
             # if the payment record is not inserted, return the error message from response
@@ -102,7 +103,7 @@ class ApiProcess():
         
 
         # if the bank process payment is successful, insert the payment history and update the payment status
-        isUpdated, message = self.afterProcessToBank(paymentRecordId, 'completed', data['cardNumber'], merchId, bank_transactionRecordId, transactionId, paymentId)
+        isUpdated, message = self.afterProcessToBank(paymentRecordId, 'completed', token, merchId, bank_transactionRecordId, transactionId, paymentId)
 
         return isUpdated, message
 
