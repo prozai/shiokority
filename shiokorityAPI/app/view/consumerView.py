@@ -20,8 +20,10 @@ def registerConsumer():
     success, message = consumer_instance.registerConsumer(data)
     
     if success:
+        audit_trail_controller.log_action('POST', '/register-consumer', f"Registered consumer with email {data['email']}")
         return jsonify({'success': True, 'message': message}), 201
     else:
+        audit_trail_controller.log_action('POST', '/register-consumer', f"Failed to register consumer with email {data['email']}")
         return jsonify({'success': False, 'message': message}), 400
 
 @consumerBlueprint.route('/login-consumer', methods=['POST'])
@@ -38,8 +40,11 @@ def loginConsumer():
     if consumer and bcrypt.checkpw(password.encode('utf-8'), consumer['cust_pass'].encode('utf-8')):
         # Store the consumer ID in the session upon successful login
         session['cust_id'] = consumer['cust_id']
+
+        audit_trail_controller.log_action('POST', '/login-consumer', f"Logged in consumer with email {email}")
         return jsonify({'success': True, 'message': 'Login successful', 'customer': {'cust_id': consumer['cust_id']}}), 200
     else:
+        audit_trail_controller.log_action('POST', '/login-consumer', f"Failed to log in consumer with email {email}")
         return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
 
 @consumerBlueprint.route('/logout-consumer', methods=['POST'])
@@ -56,8 +61,10 @@ def profile():
     consumer = consumer_instance.getConsumerByID(session['cust_id'])
     
     if consumer:
+        audit_trail_controller.log_action('GET', '/profile-consumer', f"Viewed profile of consumer with ID {session['cust_id']}")
         return jsonify(consumer), 200
     else:
+        audit_trail_controller.log_action('GET', '/profile-consumer', f"Failed to fetch profile of consumer with ID {session['cust_id']}")
         return jsonify({'success': False, 'message': 'Consumer not found'}), 404
     
 
@@ -74,6 +81,7 @@ def sendPayment():
     success = ConsumerController().validateUEN(data['uen'])
 
     if not success:
+        audit_trail_controller.log_action('POST', '/send-payment', f"Invalid UEN {data['uen']}")
         return jsonify({'success': False, 'message': 'Invalid UEN'}), 400
 
     # 0. Need to tokenize the card number and pass it to the bank in the model 
@@ -85,14 +93,17 @@ def sendPayment():
 
     # if the card is invalid, return the error message
     if not success:
+        audit_trail_controller.log_action('POST', '/send-payment', f"Incorrect card details for consumer with email {data['cust_email']}")
         return jsonify({'success': False, 'message': message}), 400
     
     # if the card is valid, process the payment
     success, message = ConsumerController().processPaymentProcedure(data)
     
     if success:
+        audit_trail_controller.log_action('POST', '/send-payment', f"Payment sent by consumer with email {data['cust_email']} to merchant with UEN {data['uen']}")
         return jsonify({'success': True, 'message':message}), 200
     else:
+        audit_trail_controller.log_action('POST', '/send-payment', f"Failed to send payment by consumer with email {data['cust_email']} to merchant with UEN {data['uen']}")
         return jsonify({'success': False, 'message':message}), 400
     
 

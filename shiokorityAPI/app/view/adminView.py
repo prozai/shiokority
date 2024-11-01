@@ -251,12 +251,15 @@ def getQRcode():
     
     totp_uri = generate_totp_uri(session['email'], decrypt_secret(user['admin_secret_key']))
     qr_code = create_qr_code(totp_uri)
-    
+
+    audit_trail_controller.log_action('GET', '/admin/getQRcode', f"QR code generated for {session['email']}")
     return send_file(qr_code, mimetype='image/png')
 @adminBlueprint.route('/getSecretKey', methods=['GET'])
 def getSecretKey():
     user = admin_controller.getAdminTokenByEmail(session['email'])
     de_secret_key = decrypt_secret(user['admin_secret_key'])
+
+    audit_trail_controller.log_action('GET', '/admin/getSecretKey', f"Secret key retrieved for {session['email']}")
     return jsonify(secret_key=de_secret_key)
     
 @adminBlueprint.route('/2fa/verify', methods=['POST'])
@@ -268,11 +271,14 @@ def verify2FA():
     user = admin_controller.getAdminTokenByEmail(session['email'])
     server_token = get_totp_token(decrypt_secret(user['admin_secret_key']))
     if server_token == data['code']:
+        audit_trail_controller.log_action('POST', '/admin/2fa/verify', f"2FA verified for {session['email']}")
         update2FA = admin_controller.update2FAbyEmail(session['email'])
         return jsonify(success=update2FA), 200
     else:
+        audit_trail_controller.log_action('POST', '/admin/2fa/verify', f"2FA failed for {session['email']}")
         return jsonify({"error": "Failed to update user details"}), 400
-    
+
+# This is the endpoint to get the secret key to insert into the database
 @adminBlueprint.route('/get-key', methods=['GET'])
 def getKeyToInsert():
     secret_key = encrypt_secret(generate_secret())
