@@ -31,32 +31,19 @@ const ConsumerRoute = () => {
   return <Outlet />;
 };
 
-// Public Route - redirects to dashboard if already logged in
-const PublicRoute = () => {
-  const isMerchantLogin = localStorage.getItem('isMerchantLoggedIn') === 'true';
-  const isConsumerLogin = localStorage.getItem('isConsumerLoggedIn') === 'true';
-  
-  if (isMerchantLogin) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  if (isConsumerLogin) {
-    return <Navigate to="/pay-merchant" replace />;
-  }
-  return <Outlet />;
-};
+
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* Public Routes */}
-        <Route element={<PublicRoute />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login-consumer" element={<LoginConsumer />} />
-          <Route path="/register-consumer" element={<RegisterConsumer />} />
-          <Route path="/" element={<Login />} />
-        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login-consumer" element={<LoginConsumer />} />
+        <Route path="/register-consumer" element={<RegisterConsumer />} />
+        <Route path="/" element={<Login />} />
+        
 
         {/* Protected Merchant Routes */}
         <Route element={<MerchantRoute />}>
