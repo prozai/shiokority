@@ -16,6 +16,7 @@ class Merchant {
   static async login(data) {
     try {
       const response = await axios.post('merchant/login', data, { withCredentials: true });
+      localStorage.setItem('isMerchantLoggedIn', response.data.success); // Assuming the API returns a token
       localStorage.setItem('merch_token', response.data.token); // Assuming the API returns a token
       localStorage.setItem('merch_id', response.data.merchant.merch_id); // Store merchant ID after login
       return response.data;
@@ -30,6 +31,7 @@ class Merchant {
     try {
       await axios.post('merchant/logout', {}, { withCredentials: true });
       localStorage.removeItem('merch_token');
+      localStorage.removeItem('isMerchantLoggedIn');
       localStorage.setItem('merch_id');
     } catch (error) {
       console.error('Logout failed:', error);

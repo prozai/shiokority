@@ -23,6 +23,7 @@ class Consumer {
   static async loginConsumer(data) {
     try {
       const response = await api.post('/consumer/login-consumer', data, { withCredentials: true });
+      localStorage.setItem('isConsumerLoggedIn', response.data.success); // Save token or session management
       localStorage.setItem('cust_token', response.data.token); // Save token or session management
       localStorage.setItem('cust_id', response.data.customer.cust_id);
       return response.data;
@@ -36,15 +37,12 @@ class Consumer {
       await api.post('/consumer/logout-consumer', {}, { withCredentials: true });
       localStorage.removeItem('cust_token');
       localStorage.setItem('cust_id');
+      localStorage.removeItem('isConsumerLoggedIn');
     } catch (error) {
       console.error('Logout failed:', error);
     }
   }
 
-  // Check if consumer is logged in
-  static isLoggedIn() {
-    return !!localStorage.getItem('cust_token');
-  }
 
   // Fetch consumer profile details
   static async getProfileConsumer() {
