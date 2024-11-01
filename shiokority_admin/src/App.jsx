@@ -4,14 +4,12 @@ import Login from './views/Login';
 import EditMerchant from './views/EditMerchant';
 import ViewManagement from './views/viewManagement';
 import CreateMerchant from './views/CreateMerchant';
-import AdministratorController from './controller/administratorController';
 import Setup2FA from './views/Setup2FA';
 import Verify2FA from './views/Verify2FA';
 import CreateUser from './views/CreateUser';
 import EditUser from './views/EditUser';
 
 const ProtectedRoute = () => {
-
   const isLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;

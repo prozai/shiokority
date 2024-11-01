@@ -5,18 +5,32 @@ import pymysql
 from .fraudDetection import FraudDetection
 from datetime import datetime, timedelta
 from ..models.consumer import Consumer
+from ..auth.CardTokenizer import CardTokenizer
 
 class ApiProcess(): 
 
+    def __init__(self):
+        self.tokenizer = CardTokenizer()
+
     def validateCardProcedure(self, card_number, cvv, expiry_date):
+        # Tokenize card here
+        token = self.tokenizer.tokenize(card_number, cvv, expiry_date)
+
+        if not token:
+            return False, "Invalid card details"
+
         # Establish a connection to the database
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             # Create a cursor to interact with the database
             with connection.cursor() as cursor:
+                
+                # Detokenize the card details include card number, cvv, and expiry date
+                card = self.tokenizer.bank_detokenize(token)
+
                 # Call the stored procedure with OUT parameters as placeholders
-                cursor.callproc('CheckCardInBank', (card_number, cvv, expiry_date, 0, ''))
+                cursor.callproc('CheckCardInBank', (card['card_number'], card['cvv'], card['expiry_date'], 0, ''))
 
                 # Retrieve the OUT parameter values using the positional names
                 cursor.execute("SELECT @_CheckCardInBank_3 AS statusCode, @_CheckCardInBank_4 AS statusMessage")
@@ -48,7 +62,8 @@ class ApiProcess():
     
     def paymentProcessProcedure(self, data):
         #data include cust_email, amount, cardNumber, expiryDate, cvv
-        
+
+        token = self.tokenizer.tokenize(data['cardNumber'], data['cvv'], data['expiryDate'])
 
         # fraud detection check
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -60,7 +75,7 @@ class ApiProcess():
 
         
         # before process to bank, need to insert the payment record
-        isInserted, response = self.beforeProcessToBank(data['uen'], data['cust_email'], data['cardNumber'], data['cvv'], data['expiryDate'], data['amount'])
+        isInserted, response = self.beforeProcessToBank(data['uen'], data['cust_email'], token, data['cvv'], data['expiryDate'], data['amount'])
 
         if not isInserted:
             # if the payment record is not inserted, return the error message from response
@@ -88,7 +103,7 @@ class ApiProcess():
         
 
         # if the bank process payment is successful, insert the payment history and update the payment status
-        isUpdated, message = self.afterProcessToBank(paymentRecordId, 'completed', data['cardNumber'], merchId, bank_transactionRecordId, transactionId, paymentId)
+        isUpdated, message = self.afterProcessToBank(paymentRecordId, 'completed', token, merchId, bank_transactionRecordId, transactionId, paymentId)
 
         return isUpdated, message
 
