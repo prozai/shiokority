@@ -28,6 +28,9 @@ function Dashboard() {
     navigate('/user-management');
   };
 
+  const handleAuditTrail = () => {
+    navigate('/auditTrail');
+  };
   // Define alerts to pass to TopNotificationBar
   const initialAlerts = [
     { color: 'bg-red-500', message: 'Red Alert' },
@@ -44,7 +47,8 @@ function Dashboard() {
       <Sidebar 
         handleLogout={handleLogout} 
         handleSetup2FA={handleSetup2FA} 
-        handleUserManagement={handleUserManagement} 
+        handleUserManagement={handleUserManagement}
+        handleAuditTrail={handleAuditTrail}
       />
 
       {/* Main Content */}

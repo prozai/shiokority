@@ -277,3 +277,33 @@ def verify2FA():
 def getKeyToInsert():
     secret_key = encrypt_secret(generate_secret())
     return jsonify(secret_key=secret_key)
+
+@adminBlueprint.route('/getAllAuditTrailLogs', methods=['GET'])
+def getAllAuditTrailLogs():
+    try:
+        logs = audit_trail_controller.get_all_logs()
+        if logs:
+            audit_trail_controller.log_action('GET', '/admin/getAllAuditTrailLogs', "Retrieved all audit trail logs")
+            return jsonify(logs), 200
+        else:
+            audit_trail_controller.log_action('GET', '/admin/getAllAuditTrailLogs', "No audit trail logs found")
+            return jsonify({"message": "No audit trail logs found"}), 404
+    except Exception as e:
+        audit_trail_controller.log_action('GET', '/admin/getAllAuditTrailLogs', f"Unexpected error: {e}")
+        print(f"Error retrieving all audit trail logs: {e}")
+        return jsonify({"error": "An unexpected error occurred"}), 500
+
+@adminBlueprint.route('/getAuditTrailById/<int:audit_id>', methods=['GET'])
+def getAuditTrailById(audit_id):
+    try:
+        log = audit_trail_controller.get_log_by_id(audit_id)
+        if log:
+            audit_trail_controller.log_action('GET', f'/admin/getAuditTrailById/{audit_id}', f"Retrieved audit log with ID: {audit_id}")
+            return jsonify(log), 200
+        else:
+            audit_trail_controller.log_action('GET', f'/admin/getAuditTrailById/{audit_id}', f"No audit log found with ID: {audit_id}")
+            return jsonify({"message": "Audit trail log not found"}), 404
+    except Exception as e:
+        audit_trail_controller.log_action('GET', f'/admin/getAuditTrailById/{audit_id}', f"Unexpected error: {e}")
+        print(f"Error retrieving audit trail log by ID: {e}")
+        return jsonify({"error": "An unexpected error occurred"}), 500

@@ -8,7 +8,7 @@ import Setup2FA from './views/Setup2FA';
 import Verify2FA from './views/Verify2FA';
 import CreateUser from './views/CreateUser';
 import EditUser from './views/EditUser';
-
+import AuditTrail from './views/AuditTrail';
 const ProtectedRoute = () => {
   const isLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
   if (!isLoggedIn) {
@@ -30,6 +30,7 @@ function App() {
         <Route path="/create-user" element={<CreateUser />} />
         <Route path="/setup2FA" element={<Setup2FA />} />
         <Route path="/verify2FA" element={<Verify2FA />} />
+        <Route path="/auditTrail" element={<AuditTrail />} />
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

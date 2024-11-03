@@ -1,6 +1,7 @@
 from ..models.administrator import Administrator
 from ..models.merchant import Merchant
 from ..models.consumer import Consumer
+from ..models.auditTrail import AuditTrail
 
 class AdminController:
     def validate_admin_login(self, email, password):
@@ -27,7 +28,7 @@ class AdminController:
     def update2FAbyEmail(self, email):
         return Administrator().update2FAbyEmail(email)
 
-    def addUser(self,user):
+    def addUser(self, user):
         return Consumer().addUser(user)
 
     def get_all_users(self):
@@ -38,7 +39,9 @@ class AdminController:
 
     def submit_user_update(self, user_id, email=None, first_name=None, last_name=None, address=None, phone=None, status=None):
         return Consumer().update_user(user_id, email, first_name, last_name, address, phone, status)
-    
 
+    def get_all_audit_trail_logs(self):
+        return AuditTrail().get_all_logs()
 
-    
+    def get_log_by_id(self, audit_id):
+        return AuditTrail().get_log_by_id(audit_id)

@@ -100,3 +100,30 @@ class AuditTrail:
         except Exception as e:
             logger.error(f"Unexpected error fetching logs for module '{module}': {e}")
             return []
+
+    def get_log_by_id(self, audit_id):
+        """
+        Fetches a single entry from the Audit_Trail table based on the audit trail ID.
+
+        Parameters:
+            audit_id (int): The ID of the audit trail entry to fetch.
+
+        Returns:
+            dict: The audit trail entry matching the ID, or None if not found.
+        """
+        try:
+            with self.get_connection() as connection:
+                with connection.cursor() as cursor:
+                    query = """
+                    SELECT * FROM Audit_Trail 
+                    WHERE audit_trail_id = %s
+                    """
+                    cursor.execute(query, (audit_id,))
+                    result = cursor.fetchone()
+                    return dict(result) if result else None
+        except pymysql.MySQLError as e:
+            logger.error(f"Database error fetching log with ID {audit_id}: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error fetching log with ID {audit_id}: {e}")
+            return None

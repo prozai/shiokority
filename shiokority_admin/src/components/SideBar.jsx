@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShiokorityAdminLogo from '../asset/image/ShiokorityAdmin.png';
 
-const Sidebar = ({ handleLogout, handleSetup2FA, handleUserManagement }) => {
+const Sidebar = ({ handleLogout, handleSetup2FA, handleUserManagement, handleAuditTrail }) => {
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
@@ -24,13 +24,19 @@ const Sidebar = ({ handleLogout, handleSetup2FA, handleUserManagement }) => {
 
       {/* Navigation Menu */}
       <nav className="flex flex-col w-full space-y-4">
-        <button
+      <button
           onClick={handleUserManagement}
           className="w-full p-2 text-center hover:bg-[#0c1821] rounded-lg"
         >
           User Management
         </button>
-        {/* <SidebarLink text="Feature Management" />
+        <button 
+          onClick={handleAuditTrail}
+          className="w-full p-2 text-center hover:bg-[#0c1821] rounded-lg"
+        >
+          Audit Trail
+        </button>
+        {/*<SidebarLink text="Feature Management" />
         <SidebarLink text="Customer Support" />
         <SidebarLink text="System Management" />
         <SidebarLink text="Predictive Analytics Tools" /> */}

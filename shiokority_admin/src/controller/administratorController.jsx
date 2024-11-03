@@ -88,7 +88,7 @@ class AdministratorController {
   static async getSecretKey() {
     return await Administrator.getSecretKey();
   }
-
-}
+  
+};
 
 export default AdministratorController;
