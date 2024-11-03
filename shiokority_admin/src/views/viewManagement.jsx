@@ -28,9 +28,14 @@ const ViewManagement = () => {
     navigate('/user-management');
   };
 
+  const handleAuditTrail = () => {
+    navigate('/auditTrail');
+  };
+
   const initialAlerts = [
     { color: 'bg-red-500', message: 'Red Alert' },
   ];
+
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -39,6 +44,7 @@ const ViewManagement = () => {
         handleLogout={handleLogout} 
         handleSetup2FA={handleSetup2FA} 
         handleUserManagement={handleUserManagement} 
+        handleAuditTrail={handleAuditTrail}
       />
 
       {/* Main Content Area */}
