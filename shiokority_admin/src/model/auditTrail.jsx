@@ -1,59 +1,36 @@
-import axios from 'axios';
-
-import { ADMIN_PREFIX } from '../model/administrator';
+// src/model/auditTrail.jsx
+import api from '../services/api';
 
 class AuditTrail {
-
-  constructor(audit_id, method, module, description, timestamp) {
-    this.audit_id = audit_id;
-    this.method = method;
-    this.module = module;
-    this.description = description;
-    this.timestamp = timestamp;
-  }
-  
-static async getAllAuditTrailLogs() {
-    try {
-      const response = await axios.get(`${ADMIN_PREFIX}/getAllAuditTrailLogs`);
-      const auditTrailLog = await response.json();
-
-      return auditTrailLog.map(
-        (auditTrail) =>
-          new AuditTrail(
-            auditTrail.audit_id,
-            auditTrail.method,
-            auditTrail.module,
-            auditTrail.description,
-            auditTrail.timestamp,
-          )
-      );
-    } catch (error) {
-      console.error('Error fetching all audit trail logs:', error);
-      throw error;
+    constructor(audit_trail_id, audit_trail_method, audit_trail_module, audit_trail_description, audit_trail_timestamp) {
+        this.audit_trail_id = audit_trail_id;
+        this.audit_trail_method = audit_trail_method;
+        this.audit_trail_module = audit_trail_module;
+        this.audit_trail_description = audit_trail_description;
+        this.audit_trail_timestamp = audit_trail_timestamp;
     }
-  }
-
-  static async getAuditTrailById(auditId) {
-    try {
-      const response = await axios.get(`${ADMIN_PREFIX}/getAuditTrailById/${auditId}`);
-      const auditTrailLog = await response.json();
-
-      return auditTrailLog.map(
-        (auditTrail) =>
-          new AuditTrail(
-            auditTrail.audit_id,
-            auditTrail.method,
-            auditTrail.module,
-            auditTrail.description,
-            auditTrail.timestamp,
-          )
-      );
-    } catch (error) {
-      console.error('Error fetching audit trail log by ID:', error);
-      throw error;
+    
+    static async getAllAuditTrailLogs() {
+        try {
+            const response = await api.get('/admin/getAllAuditTrailLogs');
+            console.log('API Response:', response.data);
+            return response.data || [];
+        } catch (error) {
+            console.error('Error fetching all audit trail logs:', error);
+            return [];
+        }
     }
-  }
 
+    static async getAuditTrailById(auditId) {
+        try {
+            if (!auditId) return [];
+            const response = await api.get(`/admin/getAuditTrailById/${auditId}`);
+            return response.data ? [response.data] : [];
+        } catch (error) {
+            console.error('Error fetching audit trail log by ID:', error);
+            return [];
+        }
+    }
 }
 
 export default AuditTrail;
