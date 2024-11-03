@@ -10,7 +10,7 @@ const AuditTrail = () => {
     const [auditLogs, setAuditLogs] = useState([]);
     const [searchId, setSearchId] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [logsPerPage] = useState(10);
+    const [logsPerPage, setLogsPerPage] = useState(10);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [status, setStatus] = useState('');
@@ -38,6 +38,23 @@ const AuditTrail = () => {
         };
         fetchLogs();
     }, [searchId]);
+    
+    // Adjust logsPerPage dynamically based on screen height
+    useEffect(() => {
+        const adjustLogsPerPage = () => {
+            const rowHeight = 48; // row height in pixels
+            const availableHeight = window.innerHeight - 350; // Deducting space for navbar, search bar, etc.
+            const maxLogsPerPage = Math.floor(availableHeight / rowHeight);
+            setLogsPerPage(maxLogsPerPage);
+        };
+
+        adjustLogsPerPage();
+        window.addEventListener('resize', adjustLogsPerPage);
+
+        return () => {
+            window.removeEventListener('resize', adjustLogsPerPage);
+        };
+    }, []);
 
     // Calculate pagination
     const indexOfLastLog = currentPage * logsPerPage;
@@ -92,7 +109,7 @@ const AuditTrail = () => {
         handleUserManagement={handleUserManagement}
         handleAuditTrail={handleAuditTrail}
       />
-        <div className="flex flex-col min-h-screen bg-gray-100">
+        <div className="flex flex-col min-h-screen bg-gray-100 w-full">
             <TopNavbar title="Audit Trail" />
             
             <div className="p-6">
