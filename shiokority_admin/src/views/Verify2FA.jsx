@@ -31,8 +31,7 @@ const Verify2FA = () => {
         setError('Verification failed. Please try again.');
       }
     } catch (error) {
-      setError('An error occurred. Please try again later.');
-      console.error('2FA verification error:', error);
+      setError('Validation failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
