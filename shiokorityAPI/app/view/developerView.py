@@ -46,10 +46,12 @@ def login():
         session['dev_id'] = ifLogin.get('dev_id')
         audit_trail_controller.log_action('POST', '/developers/login', f"Developer {data.get('email')} logged in successfully")
         return jsonify(ifLogin)
+
     except Exception as e:
         audit_trail_controller.log_action('POST', '/developers/login', f"Unexpected error: {e}")
         print(f"Error logging in developer: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred during login'}), 500
+
 
 @developerBlueprint.route('/logout', methods=['POST'])
 def logout():
