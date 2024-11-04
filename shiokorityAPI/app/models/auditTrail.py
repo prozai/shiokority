@@ -54,15 +54,20 @@ class AuditTrail:
 
     def get_all_logs(self):
         """
-        Fetches all entries from the Audit_Trail table.
+        Fetches entries from the Audit_Trail table limited to the past month.
 
         Returns:
-            list: A list of all audit trail entries.
+            list: A list of audit trail entries from the last month.
         """
         try:
             with self.get_connection() as connection:
                 with connection.cursor() as cursor:
-                    query = "SELECT * FROM Audit_Trail ORDER BY audit_trail_id DESC"
+                    query = """
+                    SELECT * 
+                    FROM Audit_Trail 
+                    WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+                    ORDER BY audit_trail_id DESC
+                    """
                     cursor.execute(query)
                     result = cursor.fetchall()
                     return [dict(row) for row in result]
