@@ -47,6 +47,11 @@ def logout():
 
 @adminBlueprint.route("/create-merchant", methods=['POST'])
 def createMerchant():
+
+    if 'loggedIn' not in session:
+        audit_trail_controller.log_action('POST', '/admin/create-merchant', "Unauthorized access")
+        return jsonify(success=False, message="Unauthorized access"), 401
+
     try:
         data = request.get_json()
         if not data:
@@ -72,6 +77,11 @@ def createMerchant():
 
 @adminBlueprint.route('/view-merchant', methods=['GET'])
 def fetchMerchantList():
+
+    if 'loggedIn' not in session:
+        audit_trail_controller.log_action('GET', '/admin/view-merchant', "Unauthorized access")
+        return jsonify(success=False, message="Unauthorized access"), 401
+
     try:
         merchants = admin_controller.get_merchant_data()
 
@@ -88,6 +98,11 @@ def fetchMerchantList():
         
 @adminBlueprint.route('/merchants/<merch_id>', methods=['GET'])
 def getMerchant(merch_id):
+
+    if 'loggedIn' not in session:
+        audit_trail_controller.log_action('POST', '/admin/create-merchant', "Unauthorized access")
+        return jsonify(success=False, message="Unauthorized access"), 401
+
     try:
         merchant = admin_controller.get_one_merchant(merch_id)
         
@@ -104,6 +119,11 @@ def getMerchant(merch_id):
 
 @adminBlueprint.route('/merchants/<merch_id>', methods=['PUT'])
 def submitMerchantUpdate(merch_id):
+
+    if 'loggedIn' not in session:
+        audit_trail_controller.log_action('PUT', f'/admin/merchants/{merch_id}', "Unauthorized access")
+        return jsonify(success=False, message="Unauthorized access"), 401
+
     try:
         data = request.json
         if not data:
@@ -128,6 +148,11 @@ def submitMerchantUpdate(merch_id):
     
 @adminBlueprint.route('/suspend-merchants/<merch_id>', methods=['PUT'])
 def updateMerchantStatus(merch_id):
+
+    if 'loggedIn' not in session:
+        audit_trail_controller.log_action('PUT', f'/admin/suspend-merchants/{merch_id}', "Unauthorized access")
+        return jsonify(success=False, message="Unauthorized access"), 401
+
     try:
         data = request.json
         if not data:
@@ -156,6 +181,11 @@ def updateMerchantStatus(merch_id):
 
 @adminBlueprint.route('/add-user', methods=['POST'])
 def addUser():
+
+    if 'loggedIn' not in session:
+        audit_trail_controller.log_action('POST', '/admin/add-user', "Unauthorized access")
+        return jsonify(success=False, message="Unauthorized access"), 401
+
     try:
         data = request.get_json()
         if not data:
@@ -181,6 +211,11 @@ def addUser():
 
 @adminBlueprint.route('/get-users', methods=['GET'])
 def getAllUser():
+
+    if 'loggedIn' not in session:
+        audit_trail_controller.log_action('GET', '/admin/get-users', "Unauthorized access")
+        return jsonify(success=False, message="Unauthorized access"), 401
+
     try:
         users = admin_controller.get_all_users()
 
@@ -198,6 +233,11 @@ def getAllUser():
 
 @adminBlueprint.route('/get-user/<int:cust_id>', methods=['GET'])
 def getUserById(cust_id):
+
+    if 'loggedIn' not in session:
+        audit_trail_controller.log_action('GET', f'/admin/get-user/{cust_id}', "Unauthorized access")
+        return jsonify(success=False, message="Unauthorized access"), 401
+
     try:
         user = admin_controller.get_user_by_id(cust_id)
         
@@ -215,6 +255,11 @@ def getUserById(cust_id):
 
 @adminBlueprint.route('/users/<int:user_id>/update', methods=['PUT'])
 def submitUserUpdate(user_id):
+
+    if 'loggedIn' not in session:
+        audit_trail_controller.log_action('PUT', f'/admin/users/{user_id}/update', "Unauthorized access")
+        return jsonify(success=False, message="Unauthorized access"), 401
+
     try:
         data = request.get_json()
 
