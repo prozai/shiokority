@@ -18,6 +18,19 @@
     "react-scripts": "^5.0.1",
     "web-vitals": "^3.5.2"
   },
+  "overrides": {
+    "nth-check": "^2.1.1",
+    "postcss": "^8.4.31",
+    "follow-redirects": "^1.15.4",
+    "webpack": "^5.90.3",
+    "tough-cookie": "^4.1.3",
+    "@adobe/css-tools": "^4.3.2",
+    "semver": "^7.5.4",
+    "word-wrap": "^1.2.5",
+    "optionator": "^0.9.3",
+    "@babel/traverse": "^7.23.2",
+    "crypto-js": "^4.2.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -44,10 +57,5 @@
   },
   "devDependencies": {
     "tailwindcss": "^3.4.1"
-  },
-  "overrides": {
-    "nth-check": "^2.1.1",
-    "postcss": "^8.4.31",
-    "follow-redirects": "^1.15.4"
   }
 }
