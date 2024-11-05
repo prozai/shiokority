@@ -11,7 +11,7 @@ class Transaction():
 
         try:
             with connection.cursor() as cursor:
-                sql = "SELECT * FROM Payment_record WHERE merch_id=%s"
+                sql = "SELECT * FROM Payment_Record WHERE merch_id=%s"
                 cursor.execute(sql, (merch_id))
                 result = cursor.fetchall()
 

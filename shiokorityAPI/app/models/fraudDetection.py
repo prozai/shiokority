@@ -177,7 +177,7 @@ class FraudDetection():
             with connection.cursor() as cursor:
                 sqlQuery = """
                 SELECT admin_login_flag_counter
-                FROM admin 
+                FROM Admin 
                 WHERE admin_email = %s
                 """
                 cursor.execute(sqlQuery, (adminEmail))
