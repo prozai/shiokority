@@ -20,7 +20,7 @@ class Consumer():
             with connection.cursor() as cursor:
                 sql_query = """
                     INSERT INTO Customer (cust_fname, cust_lname, cust_email, cust_pass, cust_address, cust_phone, date_created, date_updated_on, cust_status)
-                    VALUES (%s, %s, %s, %s, %s, %s NOW(), NOW(), 1)
+                    VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW(), 1)
                 """
                 cursor.execute(sql_query, (customer['cust_fname'], customer['cust_lname'], customer['cust_email'], hash_pass, customer['cust_address'], customer['cust_phone']))
                 connection.commit()
