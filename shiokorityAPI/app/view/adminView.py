@@ -21,15 +21,14 @@ def adminLogin():
 
         admin = admin_controller.validate_admin_login(email, password)
 
-        if admin:
+        if admin['status']:
             session['loggedIn'] = True
             session['email'] = admin['admin_email']
             audit_trail_controller.log_action('POST', '/admin/auth/login', f"Admin {email} logged in successfully")
             return jsonify(success=True, isMFA=admin['admin_mfa_enabled']), 200
         else:
             audit_trail_controller.log_action('POST', '/admin/auth/login', f"Failed login attempt for {email}")
-            return jsonify(success=False, message=email), 401
-
+            return jsonify(success=admin['status'], message=admin['message']), 401
 
     except BadRequest as e:
         audit_trail_controller.log_action('POST', '/admin/auth/login', f"Error: {str(e)}")
@@ -321,7 +320,7 @@ def verify2FA():
         return jsonify(success=update2FA), 200
     else:
         audit_trail_controller.log_action('POST', '/admin/2fa/verify', f"2FA failed for {session['email']}")
-        return jsonify({"error": "Failed to update user details"}), 400
+        return jsonify({"error": "Validation Fail"}), 400
 
 # This is the endpoint to get the secret key to insert into the database
 @adminBlueprint.route('/get-key', methods=['GET'])
