@@ -1,7 +1,6 @@
 import pymysql
 from flask import current_app
 import bcrypt
-from pymysql.err import MySQLError
 from ..auth.databaseConnection import getDBConnection
 from ..models.fraudDetection import FraudDetection
 
