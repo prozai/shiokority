@@ -131,11 +131,11 @@ class AdminAPITestCase(unittest.TestCase):
         merchant_id = "1"  # Replace with valid merchant ID
         
         update_data = {
-            "name": "Updated Merchant Name",
-            "email": "updated@example.com",
-            "address": "Updated Address",
-            "phone": "9876543210"
-            # Add other fields you want to update
+            "merch_name": "Updated Merchant Name",
+            "merch_email": "updated@example.com",
+            "merch_address": "Updated Address",
+            "merch_phone": "9876543210",
+            "uen": "test-uen-123"
         }
         
         response = self.session.put(
@@ -157,7 +157,8 @@ class AdminAPITestCase(unittest.TestCase):
             "name": "Updated Merchant Name",
             "email": "merchant1@example.com", # existing email address
             "address": "Updated Address",
-            "phone": "9876543210"
+            "phone": "9876543210",
+            "uen": "test-uen-123"
         }
 
         response = self.session.put(
