@@ -47,7 +47,7 @@ const MerchantEdit = () => {
             setStatusMessage(isSuccess.success ? 'Merchant updated successfully' : 'Failed to update merchant');
         } catch (error) {
             console.error("Error updating merchant in view", error);
-            setStatusMessage('An error occurred while updating merchant');
+            setStatusMessage('Email Existed, Fail To Update Merchant');
         } finally {
             setIsLoading(false);
         }

@@ -1,12 +1,11 @@
 import axios from 'axios';
 import { ADMIN_PREFIX } from '../constants';
-// export const ADMIN_PREFIX = '/admin';
-import api from '../services/api';
+// import api from '../services/api';
 class Administrator {
     
   static async login(data) {
     try {
-      const response = await api.post(`${ADMIN_PREFIX}/auth/login`, data);   
+      const response = await axios.post(`${ADMIN_PREFIX}/auth/login`, data);   
       
       if (response.data.success) {
         localStorage.setItem('isAdminLoggedIn', 'true');

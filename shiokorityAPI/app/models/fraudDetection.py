@@ -66,7 +66,7 @@ class FraudDetection():
                 cursor.execute(sqlQuery, (user_id))
                 transactions_last_hour = cursor.fetchone()['transactions_last_hour']
 
-                if transactions_last_hour > self.thresholds['hourly_transactions']:
+                if transactions_last_hour >= self.thresholds['hourly_transactions']:
                     return False, f"Maximum transactions per hour ({self.thresholds['hourly_transactions']}) exceeded. This transaction has been stopped for your security."
 
                 sqlQuery = """
@@ -79,7 +79,7 @@ class FraudDetection():
                 cursor.execute(sqlQuery, (user_id))
                 transactions_today = cursor.fetchone()['transactions_today']
 
-                if transactions_today > self.thresholds['daily_transactions']:
+                if transactions_today >= self.thresholds['daily_transactions']:
                     return False, f"Maximum daily transactions ({self.thresholds['daily_transactions']}) exceeded. This transaction has been stopped for your security."
                 
                 return True, ""
@@ -92,13 +92,18 @@ class FraudDetection():
             connection.close()
 
     def _check_sudden_pattern_change(self, user_id, amount):
-        """Check if transaction amount is significantly different from user's pattern"""
+        """
+        Check if transaction amount is significantly different from user's pattern
+        Uses 200% of average as threshold - simpler and more intuitive
+        """
         connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
 
         try:
             with connection.cursor() as cursor:
                 sqlQuery = """
-                SELECT AVG(transaction_amount) as avg_amount, STDDEV(transaction_amount) as stddev
+                SELECT 
+                    AVG(transaction_amount) as avg_amount,
+                    MAX(transaction_amount) as max_amount  -- Added for reference
                 FROM Transaction
                 WHERE cust_id = %s
                 AND transaction_date_created >= NOW() - INTERVAL 30 DAY
@@ -107,13 +112,15 @@ class FraudDetection():
                 cursor.execute(sqlQuery, (user_id))
                 result = cursor.fetchone()
 
-                if result['avg_amount'] == None or result['stddev'] == None:
+                if result['avg_amount'] is None:
                     return True, ""
 
-                if abs(amount - result['avg_amount']) > (3 * result['stddev']):
-                    return False, "Unusual transaction amount detected. This transaction has been stopped for your security."
+                # Flag if transaction is more than 200% of average
+                if amount > (result['avg_amount'] * 2):
+                    return False, f"Unusual transaction amount detected (${amount} exceeds typical pattern). This transaction has been stopped for your security."
+                
                 return True, ""
-            
+                
         except pymysql.MySQLError as e:
             connection.rollback()
             print(f"Error _check_sudden_pattern_change: {e}")
