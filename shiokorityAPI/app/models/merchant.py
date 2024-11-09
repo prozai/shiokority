@@ -91,7 +91,6 @@ class Merchant:
         try:
             with connect.cursor() as cursor:
                 new_status = bool(int(status))  # Convert status to boolean
-                print(new_status)
                 sql = "UPDATE Merchant SET merch_status = %s, date_updated_on = NOW() WHERE merch_id = %s"
 
                 validate = cursor.execute(sql, (new_status, merch_id))
