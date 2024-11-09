@@ -116,7 +116,7 @@ class FraudDetection():
                     return True, ""
 
                 # Flag if transaction is more than 200% of average
-                if amount > (result['avg_amount'] * 2):
+                if amount > (result['max_amount'] * 2):
                     return False, f"Unusual transaction amount detected (${amount} exceeds typical pattern). This transaction has been stopped for your security."
                 
                 return True, ""
