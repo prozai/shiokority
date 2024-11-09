@@ -1,11 +1,10 @@
-import axios from 'axios';
 import { ADMIN_PREFIX } from '../constants';
-// import api from '../services/api';
+import api from '../services/api';
 class Administrator {
     
   static async login(data) {
     try {
-      const response = await axios.post(`${ADMIN_PREFIX}/auth/login`, data);   
+      const response = await api.post(`${ADMIN_PREFIX}/auth/login`, data);   
       
       if (response.data.success) {
         localStorage.setItem('isAdminLoggedIn', 'true');
@@ -22,7 +21,7 @@ class Administrator {
 
   static async logout() {
     try {
-      await axios.post(`${ADMIN_PREFIX}/auth/logout`); // Assuming your API has a logout endpoint
+      await api.post(`${ADMIN_PREFIX}/auth/logout`); // Assuming your API has a logout endpoint
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
@@ -32,7 +31,7 @@ class Administrator {
 
   static async isLoggedIn() {
     try {
-      return await axios.get(`${ADMIN_PREFIX}/auth/isLoggedIn`);
+      return await api.get(`${ADMIN_PREFIX}/auth/isLoggedIn`);
     } catch (error) {
       return false;
     }
@@ -40,7 +39,7 @@ class Administrator {
 
   static async verify2FA(code) {
     try {
-      const response = await axios.post(`${ADMIN_PREFIX}/2fa/verify`, { code });
+      const response = await api.post(`${ADMIN_PREFIX}/2fa/verify`, { code });
       return response.data;
     } catch (error) {
       throw new Error('Failed to verify 2FA');
@@ -49,7 +48,7 @@ class Administrator {
 
   static async getQRcode() {
     try {
-      const response = await axios.get(`${ADMIN_PREFIX}/getQRcode`, { responseType: 'blob' });
+      const response = await api.get(`${ADMIN_PREFIX}/getQRcode`, { responseType: 'blob' });
       return response.data;
     } catch (error) {
       throw new Error('Failed to get QR code');
@@ -58,7 +57,7 @@ class Administrator {
 
   static async getSecretKey() {
     try {
-      const response = await axios.get(`${ADMIN_PREFIX}/getSecretKey`);
+      const response = await api.get(`${ADMIN_PREFIX}/getSecretKey`);
       return response.data;
     } catch (error) {
       throw new Error('Failed to get secret key');
