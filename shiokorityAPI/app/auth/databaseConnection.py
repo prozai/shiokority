@@ -2,11 +2,19 @@ from flask import current_app
 import pymysql
 
 def getDBConnection(schema_name):
-        config = {
+    config = {
         'host': current_app.config['MYSQL_HOST'],
         'user': current_app.config['MYSQL_USER'],
         'password': current_app.config['MYSQL_PASSWORD'],
         'database': schema_name,
         'cursorclass': pymysql.cursors.DictCursor
     }
-        return pymysql.connect(**config)
+        # Create the connection
+    connection = pymysql.connect(**config)
+    
+    # Set timezone for this connection
+    with connection.cursor() as cursor:
+        cursor.execute("SET time_zone = '+08:00'")
+        connection.commit()
+    
+    return connection

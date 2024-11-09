@@ -3,7 +3,6 @@ from werkzeug.exceptions import BadRequest
 from ..controller.consumerController import ConsumerController
 from ..controller.auditTrailController import AuditTrailController  # Added by lu
 import bcrypt
-from ..models.fraudDetection import FraudDetection
 
 consumerBlueprint = Blueprint('consumerBlueprint', __name__)
 consumer_instance = ConsumerController()
