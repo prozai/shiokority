@@ -13,7 +13,6 @@ class AuditTrail {
     static async getAllAuditTrailLogs() {
         try {
             const response = await api.get('/admin/getAllAuditTrailLogs');
-            console.log('API Response:', response.data);
             return response.data || [];
         } catch (error) {
             console.error('Error fetching all audit trail logs:', error);

@@ -45,3 +45,6 @@ class AdminController:
 
     def get_log_by_id(self, audit_id):
         return AuditTrail().get_log_by_id(audit_id)
+    
+    def validateTokenEmail(self, email):
+        return Administrator().validateTokenEmail(email)
