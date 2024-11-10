@@ -89,4 +89,23 @@ class Administrator():
         except Exception as e:
             print(f"Unexpected error during login validation: {str(e)}")
             return False
-        
+    
+    def validateTokenEmail(self, email):
+
+        connection = getDBConnection(current_app.config['ADMIN_SCHEMA'])
+
+        try:
+            with connection.cursor() as cursor:
+                # Query to retrieve the hashed password and status
+                sql_query = '''
+                    SELECT admin_email
+                    FROM Admin 
+                    WHERE admin_email = %s
+                '''
+                cursor.execute(sql_query, (email,))
+                user = cursor.fetchone()
+                return user
+            
+        except Exception as e:
+            print(f"Unexpected error during login validation: {str(e)}")
+            return False

@@ -10,6 +10,8 @@ class Administrator {
       
       if (response.data.success) {
         localStorage.setItem('isAdminLoggedIn', 'true');
+        localStorage.setItem('access_token', response.data.access_token);
+        localStorage.setItem('refresh_token', response.data.refresh_token);
         return response.data;
       }
       else {
@@ -28,14 +30,8 @@ class Administrator {
       console.error('Logout failed:', error);
     } finally {
       localStorage.removeItem('isAdminLoggedIn');
-    }
-  }
-
-  static async isLoggedIn() {
-    try {
-      return await api.get(`${ADMIN_PREFIX}/auth/isLoggedIn`);
-    } catch (error) {
-      return false;
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
     }
   }
 
