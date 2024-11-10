@@ -1,5 +1,5 @@
-import { ADMIN_PREFIX } from '../constants';
-import api from '../services/api';
+import axios from 'axios';
+
 
 class Merchant {
 
@@ -16,7 +16,7 @@ class Merchant {
 
   static async createMerchant(merchantData) {
     try {
-      const response = await api.post(`${ADMIN_PREFIX}/create-merchant`, merchantData);
+      const response = await axios.post('/admin/create-merchant', merchantData);
       return response.data;
     } catch (error) {
       throw new Error(error.response.data.message);
@@ -26,8 +26,8 @@ class Merchant {
 
   static async getMerchantData() {
     try {
-      const response = await api.get(`${ADMIN_PREFIX}/view-merchant`);
-      const merchantsData = await response.data;
+      const response = await fetch('/admin/view-merchant');
+      const merchantsData = await response.json();
 
       return merchantsData.map(
         (merchant) =>
@@ -50,7 +50,7 @@ class Merchant {
 
   static async fetchMerchantById(merchId) {
     try {
-      const response = await api.get(`${ADMIN_PREFIX}/merchants/${merchId}`);
+      const response = await axios.get(`/admin/merchants/${merchId}`);
       return response.data;
     } catch (error) {
       console.error("There was an error fetching the merchant data!", error);
@@ -60,7 +60,7 @@ class Merchant {
 
   static async updateMerchant(merchId, merchantData) {
     try {
-      const response = await api.put(`${ADMIN_PREFIX}/merchants/${merchId}`, merchantData);
+      const response = await axios.put(`/admin/merchants/${merchId}`, merchantData);
       return response.data;
     } catch (error) {
       console.error("There was an error updating the merchant!", error);
@@ -70,7 +70,7 @@ class Merchant {
 
   static async updateMerchantStatus(merch_id, status) {
     try {
-      const response = await api.put(`${ADMIN_PREFIX}/suspend-merchants/${merch_id}`, { status });
+      const response = await axios.put(`/admin/suspend-merchants/${merch_id}`, { status });
       return response.data;
     } catch (error) {
       console.error('Error suspending merchant:', error);

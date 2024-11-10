@@ -2,22 +2,19 @@ from flask import Flask
 from flask_cors import CORS
 from config import config 
 import os
-from datetime import timedelta
 
 #This is Root route for this application, so if needed just create a blueprint for your controller, do not create your own app route in your controller.
 app = Flask(__name__)
 
-# Get config and initialize CORS
+CORS(app,
+     supports_credentials=True,  # Important for cookies
+     origins=['http://localhost:3000'],  # Replace with your frontend URL
+     allow_headers=['Content-Type'],
+     expose_headers=['Access-Control-Allow-Origin'],
+     methods=['GET', 'POST', 'OPTIONS', 'PUT'])
+
 config_name = os.getenv('FLASK_ENV', 'testing')
 app.config.from_object(config[config_name])
-config[config_name].init_cors(app)
-
-# app.config.update(
-#     SESSION_COOKIE_SECURE=True,  # For HTTPS
-#     SESSION_COOKIE_HTTPONLY=True,  # Prevent XSS
-#     SESSION_COOKIE_SAMESITE='Lax',  # CSRF protection
-#     PERMANENT_SESSION_LIFETIME=timedelta(hours=24),  # Session duration
-# )
 
 #Registering blueprints
 from app.view.merchantView import merchantBlueprint

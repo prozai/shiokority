@@ -3,11 +3,10 @@ import axios from 'axios';
 
 // Create axios instance
 const api = axios.create({
-  baseURL: 'https://api.shiokority.online', // Change this to your EC2 URL in production
-  withCredentials: true,
+  baseURL: '', // Change this to your EC2 URL in production
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   }
 });
 

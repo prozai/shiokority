@@ -33,7 +33,7 @@ const AuditTrail = () => {
     const [logsPerPage, setLogsPerPage] = useState(10);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [status , setStatus] = useState('');
+    const [setStatus] = useState('');
     const [viewMode, setViewMode] = useState('paginated');
     const [refreshInterval, setRefreshInterval] = useState(null);
     const [lastRefresh, setLastRefresh] = useState(new Date());
@@ -164,7 +164,7 @@ const AuditTrail = () => {
             setStatus('Logged out successfully');
             navigate('/login');
         } catch (error) {
-            setStatus('Logout failed ');
+            setStatus('Logout failed: ' + error.message);
         }
     };
 
