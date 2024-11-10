@@ -7,19 +7,10 @@ from datetime import timedelta
 #This is Root route for this application, so if needed just create a blueprint for your controller, do not create your own app route in your controller.
 app = Flask(__name__)
 
-from flask_cors import CORS
-
-CORS(app, resources={
-    r"/*": {
-        "origins": ["http://localhost:3000"],
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True
-    }
-})
-
+# Get config and initialize CORS
 config_name = os.getenv('FLASK_ENV', 'testing')
 app.config.from_object(config[config_name])
+config[config_name].init_cors(app)
 
 # app.config.update(
 #     SESSION_COOKIE_SECURE=True,  # For HTTPS
