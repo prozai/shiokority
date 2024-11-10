@@ -40,9 +40,14 @@ def adminLogin():
 
 @adminBlueprint.route("/auth/logout", methods=['POST'])
 def logout():
-    audit_trail_controller.log_action('POST', '/admin/auth/logout', f"Admin {session['email']} logged out")
-    session.clear()
-    return jsonify({'message': 'Logout successful'}), 200
+    try:
+        email = session.get('email', 'Unknown user')
+        audit_trail_controller.log_action('POST', '/admin/auth/logout', f"Admin {email} logged out")
+    except Exception as e:
+        audit_trail_controller.log_action('POST', '/admin/auth/logout', "Logout attempted with invalid session")
+    finally:
+        session.clear()
+        return jsonify({'message': 'Logout successful'}), 200
 
 @adminBlueprint.route("/create-merchant", methods=['POST'])
 def createMerchant():
