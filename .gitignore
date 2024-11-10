@@ -31,4 +31,12 @@ instance/
 config.py
 testDatabase.py
 holdingArea/
+
 shiokorityAPI/test.py
+shiokority_admin/.env
+shiokority_admin/.env.development
+shiokority_admin/.env.production
+
+shiokority_merch/.env
+shiokority_merch/.env.development
+shiokority_merch/.env.production

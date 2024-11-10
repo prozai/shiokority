@@ -2,7 +2,6 @@
   "name": "shiokority_merch",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://api.shiokority.online:5001",
   "dependencies": {
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
