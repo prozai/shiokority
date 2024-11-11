@@ -49,7 +49,7 @@ class Consumer():
         try:
             connection = getDBConnection(current_app.config['PAY_SCHEMA'])
             with connection.cursor() as cursor:
-                sql_query = "SELECT * FROM Customer WHERE cust_email = %s"
+                sql_query = "SELECT * FROM Customer WHERE cust_email = %s AND cust_status = 1"
                 cursor.execute(sql_query, (cust_email,))
                 consumer = cursor.fetchone()  
                 return consumer  # Consumer data fetched successfully
@@ -218,3 +218,21 @@ class Consumer():
         finally:
             if connection:
                 connection.close()
+
+    def validateTokenEmail(self, email):
+        # Validate the email token
+        try:
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
+            with connection.cursor() as cursor:
+                sql_query = "SELECT COUNT(*) FROM Customer WHERE cust_email = %s AND cust_status = 1"
+                cursor.execute(sql_query, (email,))
+                consumer = cursor.fetchone()
+                
+                if not consumer:
+                    return False
+                
+                return True
+
+        except pymysql.MySQLError as e:
+            print(f"Error validating email token: {e}")
+            return False
