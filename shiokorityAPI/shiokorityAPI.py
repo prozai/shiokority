@@ -9,9 +9,15 @@ app = Flask(__name__)
 
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:3000"],
+        "origins": [
+            "http://localhost:3000",
+            "http://192.168.0.130:3000",
+            "https://shiokority-admin.s3.ap-southeast-1.amazonaws.com",
+            "https://shiokority-dev.s3.ap-southeast-1.amazonaws.com",
+            "https://shiokority-merch.s3.ap-southeast-1.amazonaws.com"
+        ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
+        "allow_headers": ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With", "Cache-Control"],
         "supports_credentials": True
     }
 })
