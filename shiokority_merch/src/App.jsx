@@ -43,13 +43,12 @@ function App() {
         <Route path="/login-consumer" element={<LoginConsumer />} />
         <Route path="/register-consumer" element={<RegisterConsumer />} />
         <Route path="/" element={<Login />} />
-        
+        <Route path="/bankpage" element={<BankPage />} />
 
         {/* Protected Merchant Routes */}
         <Route element={<MerchantRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/bankpage" element={<BankPage />} />
           <Route path="/transactions" element={<TransactionHistory />} />
         </Route>
 
