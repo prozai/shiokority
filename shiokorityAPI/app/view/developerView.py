@@ -2,11 +2,11 @@ import base64
 from flask import Blueprint, request, jsonify, session, send_file
 from werkzeug.exceptions import BadRequest
 from app.controller.developersController import DevelopersController
-from ..models.developers import Developers
 from ..auth.api_key_manager import generate_encrypted_api_key
 from cryptography.hazmat.primitives import serialization
 from ..auth.TOTP import generate_totp_uri, create_qr_code, generate_secret, encrypt_secret, decrypt_secret, get_totp_token
 from ..controller.auditTrailController import AuditTrailController  # Import AuditTrailController
+from flask_jwt_extended import create_access_token, create_refresh_token,jwt_required, get_jwt_identity, get_jwt
 
 developerBlueprint = Blueprint('developerBlueprint', __name__)
 audit_trail_controller = AuditTrailController()
@@ -38,14 +38,23 @@ def login():
             raise BadRequest('No data provided')
         
         ifLogin = DevelopersController().loginDeveloper(data)
+
         if not ifLogin.get('success'):
             audit_trail_controller.log_action('POST', '/developers/login', f"Failed login attempt for email: {data.get('email')}")
             return jsonify(ifLogin)
+        
+        access_token = create_access_token(
+                identity=data.get('email'),
+                additional_claims={'dev_id':ifLogin['dev_id']})
 
-        session['email'] = data.get('email')
-        session['dev_id'] = ifLogin.get('dev_id')
         audit_trail_controller.log_action('POST', '/developers/login', f"Developer {data.get('email')} logged in successfully")
-        return jsonify(ifLogin)
+        return jsonify({
+            'success': ifLogin['success'],
+            "dev_id": ifLogin["dev_id"],
+            "two_factor_enabled" : ifLogin['two_factor_enabled'],
+            'access_token': access_token,
+            'refresh_token': create_refresh_token(identity=data.get('email'))            
+        }), 200
 
     except Exception as e:
         audit_trail_controller.log_action('POST', '/developers/login', f"Unexpected error: {e}")
@@ -54,11 +63,18 @@ def login():
 
 
 @developerBlueprint.route('/logout', methods=['POST'])
+@jwt_required()
 def logout():
     try:
-        email = session.get('email')
+        current_user = get_jwt_identity()
+        validateUser = DevelopersController().validateTokenEmail(current_user)
+
+        if not validateUser:
+            audit_trail_controller.log_action('POST', '/developers/logout', "Unauthorized access attempt")
+            return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+        
         session.clear()
-        audit_trail_controller.log_action('POST', '/developers/logout', f"Developer {email} logged out")
+        audit_trail_controller.log_action('POST', '/developers/logout', f"Developer {current_user} logged out")
         return jsonify({"message": "Logged out successfully"}), 200
     except Exception as e:
         audit_trail_controller.log_action('POST', '/developers/logout', f"Unexpected error: {e}")
@@ -66,54 +82,88 @@ def logout():
         return jsonify({'success': False, 'message': 'An unexpected error occurred during logout'}), 500
 
 @developerBlueprint.route('/getQRcode', methods=['GET'])
+@jwt_required()
 def getQRcode():
     try:
-        user = DevelopersController().getDeveloperByEmail(session['email'])
-        totp_uri = generate_totp_uri(session['email'], decrypt_secret(user['dev_secret_key']))
+        current_user = get_jwt_identity()
+        validateUser = DevelopersController().validateTokenEmail(current_user)
+
+        if not validateUser:    
+            audit_trail_controller.log_action('GET', '/developers/getQRcode', "Unauthorized access attempt")
+            return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+
+        user = DevelopersController().getDeveloperByEmail(current_user)
+        totp_uri = generate_totp_uri(current_user, decrypt_secret(user['dev_secret_key']))
         qr_code = create_qr_code(totp_uri)
-        audit_trail_controller.log_action('GET', '/developers/getQRcode', f"QR code generated for developer {session['email']}")
+        audit_trail_controller.log_action('GET', '/developers/getQRcode', f"QR code generated for developer {current_user}")
         return send_file(qr_code, mimetype='image/png')
     except Exception as e:
         audit_trail_controller.log_action('GET', '/developers/getQRcode', f"Unexpected error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred while generating QR code'}), 500
 
 @developerBlueprint.route('/getSecretKey', methods=['GET'])
+@jwt_required()
 def getSecretKey():
     try:
-        user = DevelopersController().getDeveloperByEmail(session['email'])
+
+        current_user = get_jwt_identity()
+        validateUser = DevelopersController().validateTokenEmail(current_user)
+
+        if not validateUser:
+            audit_trail_controller.log_action('GET', '/developers/getSecretKey', "Unauthorized access attempt")
+            return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+
+        user = DevelopersController().getDeveloperByEmail(current_user)
         de_secret_key = decrypt_secret(user['dev_secret_key'])
-        audit_trail_controller.log_action('GET', '/developers/getSecretKey', f"Retrieved secret key for developer {session['email']}")
+        audit_trail_controller.log_action('GET', '/developers/getSecretKey', f"Retrieved secret key for developer {current_user}")
         return jsonify(secret_key=de_secret_key)
     except Exception as e:
         audit_trail_controller.log_action('GET', '/developers/getSecretKey', f"Unexpected error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred while retrieving secret key'}), 500
 
 @developerBlueprint.route('/2fa/verify', methods=['POST'])
+@jwt_required()
 def verify2FA():
     try:
+        current_user = get_jwt_identity()
+        validateUser = DevelopersController().validateTokenEmail(current_user)
+
+        if not validateUser:
+            audit_trail_controller.log_action('POST', '/developers/2fa/verify', "Unauthorized access attempt")
+            return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+
         data = request.get_json()
         if not data:
             audit_trail_controller.log_action('POST', '/developers/2fa/verify', "No data provided")
             raise BadRequest('No data provided')
         
-        user = DevelopersController().getDeveloperByEmail(session['email'])
+        user = DevelopersController().getDeveloperByEmail(current_user)
         server_token = get_totp_token(decrypt_secret(user['dev_secret_key']))
         
         if server_token == data['code']:
-            update2FA = DevelopersController().update2FAbyEmail(session['email'])
-            audit_trail_controller.log_action('POST', '/developers/2fa/verify', f"2FA verified for developer {session['email']}")
+            update2FA = DevelopersController().update2FAbyEmail(current_user)
+            audit_trail_controller.log_action('POST', '/developers/2fa/verify', f"2FA verified for developer {current_user}")
             return jsonify(success=update2FA), 200
         else:
-            audit_trail_controller.log_action('POST', '/developers/2fa/verify', f"2FA verification failed for developer {session['email']}")
+            audit_trail_controller.log_action('POST', '/developers/2fa/verify', f"2FA verification failed for developer {current_user}")
             return jsonify(success=False), 401
     except Exception as e:
         audit_trail_controller.log_action('POST', '/developers/2fa/verify', f"Unexpected error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred during 2FA verification'}), 500
 
 @developerBlueprint.route('/generate-api-key', methods=['POST'])
+@jwt_required()
 def generate_api_key():
     try:
-        dev_id = session.get('dev_id')
+        current_user = get_jwt_identity()
+        validateUser = DevelopersController().validateTokenEmail(current_user)
+
+        if not validateUser:
+            audit_trail_controller.log_action('POST', '/developers/generate-api-key', "Unauthorized access attempt")
+            return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+        
+        dev_id = get_jwt()['dev_id']
+
         if not dev_id:
             audit_trail_controller.log_action('POST', '/developers/generate-api-key', "Developer ID is required")
             return jsonify({'success': False, 'message': 'Developer ID is required'}), 400
@@ -129,7 +179,7 @@ def generate_api_key():
         encoded_signature = base64.b64encode(api_data['signature']).decode('utf-8')
         encoded_public_key = base64.b64encode(public_key_pem).decode('utf-8')
 
-        success = Developers().save_api_key(dev_id, encoded_iv, encoded_ciphertext, encoded_signature, encoded_public_key)
+        success = DevelopersController().saveApiKey(dev_id, encoded_iv, encoded_ciphertext, encoded_signature, encoded_public_key)
         audit_trail_controller.log_action('POST', '/developers/generate-api-key', f"API key generation {'successful' if success else 'failed'} for developer ID {dev_id}")
 
         if success:
@@ -141,30 +191,49 @@ def generate_api_key():
         return jsonify({'success': False, 'message': 'An unexpected error occurred during API key generation'}), 500
 
 @developerBlueprint.route('/api-keys', methods=['GET'])
+@jwt_required()
 def get_api_keys():
     try:
-        dev_id = session.get('dev_id')
+        current_user = get_jwt_identity()
+        validateUser = DevelopersController().validateTokenEmail(current_user)
+
+        if not validateUser:
+            audit_trail_controller.log_action('GET', '/developers/api-keys', "Unauthorized access attempt")
+            return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+
+        dev_id = get_jwt()['dev_id']
+
         if not dev_id:
             audit_trail_controller.log_action('GET', '/developers/api-keys', "Developer ID is required")
             return jsonify({'success': False, 'message': 'Developer ID is required'}), 400
 
-        api_keys = Developers().get_api_keys(dev_id)
+        api_keys = DevelopersController().getApiKeys(dev_id)
         audit_trail_controller.log_action('GET', '/developers/api-keys', f"Retrieved API keys for developer ID {dev_id}")
         return jsonify({'success': True, 'api_keys': api_keys}), 200
     except Exception as e:
         audit_trail_controller.log_action('GET', '/developers/api-keys', f"Unexpected error: {e}")
+        print(f"Error fetching API keys: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred while fetching API keys'}), 500
 
 @developerBlueprint.route('/api-keys/<api_id>', methods=['DELETE'])
+@jwt_required()
 def delete_api_key(api_id):
     try:
-        success = Developers().delete_api_key(api_id)
-        audit_trail_controller.log_action('DELETE', f'/developers/api-keys/{api_id}', f"API key deletion {'successful' if success else 'failed'} for API ID {api_id}")
+        current_user = get_jwt_identity()
+        validateUser = DevelopersController().validateTokenEmail(current_user)
 
+        if not validateUser:
+            audit_trail_controller.log_action('DELETE', f'/developers/api-keys/{api_id}', "Unauthorized access attempt")
+            return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+
+        success = DevelopersController().deleteApiKey(api_id)
+        
         if success:
+            audit_trail_controller.log_action('DELETE', f'/developers/api-keys/{api_id}', f"API key deletion {'successful' if success else 'failed'} for API ID {api_id}")
             return jsonify({'success': True, 'message': 'API key deleted successfully'}), 200
         else:
-            return jsonify({'success': False, 'message': 'Failed to delete API key'}), 500
+            audit_trail_controller.log_action('DELETE', f'/developers/api-keys/{api_id}', "Failed to delete API key")
+            return jsonify({'success': False, 'message': 'Failed to delete API key'}), 400
     except Exception as e:
         audit_trail_controller.log_action('DELETE', f'/developers/api-keys/{api_id}', f"Unexpected error: {e}")
         return jsonify({'success': False, 'message': 'An unexpected error occurred while deleting API key'}), 500

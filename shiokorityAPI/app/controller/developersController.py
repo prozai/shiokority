@@ -22,6 +22,15 @@ class DevelopersController():
     def getDeveloperByEmail(self, dev_email):
         return Developers().getDeveloperByEmail(dev_email)
     
-    def getApiKeys(dev_id):
-        return Developers().getApiKeys(dev_id)
+    def getApiKeys(self, dev_id):
+        return Developers().get_api_keys(dev_id)
+    
+    def deleteApiKey(self, api_key):
+        return Developers().delete_api_key(api_key)
+    
+    def saveApiKey(self, dev_id, iv, ciphertext, signature, public_key):
+        return Developers().save_api_key(dev_id, iv, ciphertext, signature, public_key)
+    
+    def validateTokenEmail(self, email):
+        return Developers().validateTokenEmail(email)
     

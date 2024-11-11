@@ -10,6 +10,19 @@ adminBlueprint = Blueprint('adminBlueprint', __name__)
 admin_controller = AdminController()
 audit_trail_controller = AuditTrailController()
 
+@adminBlueprint.after_request
+def after_request(response):
+    # Get the origin from the request
+    origin = request.headers.get('Origin', '*')
+    
+    # Add CORS headers to every response
+    response.headers.add('Access-Control-Allow-Origin', origin)
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    
+    return response
+
 @adminBlueprint.route("/auth/login", methods=['POST'])
 def adminLogin():
     try:
@@ -460,3 +473,28 @@ def getAuditTrailById(audit_id):
         audit_trail_controller.log_action('GET', f'/admin/getAuditTrailById/{audit_id}', f"Unexpected error: {e}")
         print(f"Error retrieving audit trail log by ID: {e}")
         return jsonify({"error": "An unexpected error occurred"}), 500
+
+@adminBlueprint.route('/auth/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    try:
+        # Get current user's identity
+        current_user = get_jwt_identity()
+        
+        # Create new access token
+        access_token = create_access_token(
+            identity=current_user
+        )
+        
+        return jsonify({
+            'success': True,
+            'access_token': access_token,
+            'message': 'Token refreshed successfully'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': 'Token refresh failed',
+            'error': str(e)
+        }), 401

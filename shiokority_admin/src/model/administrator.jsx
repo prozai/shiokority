@@ -29,9 +29,7 @@ class Administrator {
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
-      localStorage.removeItem('isAdminLoggedIn');
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      localStorage.clear();
     }
   }
 
