@@ -3,9 +3,9 @@ from ..controller.merchantController import MerchantController
 from ..controller.auditTrailController import AuditTrailController  # Import the AuditTrailController
 from ..controller.auditTrailController import AuditTrailController  # Import the AuditTrailController
 import bcrypt
+from flask_jwt_extended import create_access_token, create_refresh_token,jwt_required, get_jwt_identity, get_jwt
 
 merchant_instance = MerchantController()
-audit_trail_controller = AuditTrailController()
 audit_trail_controller = AuditTrailController()
 
 # Create the Blueprint for merchant-related routes
@@ -39,22 +39,31 @@ def registerMerchant():
 def loginMerchant():
     try:
         data = request.get_json()
-        if not data or 'email' not in data or 'password' not in data:
+        if not data:
             audit_trail_controller.log_action('POST', '/merchant/login', "Email and password are required")
             return jsonify({'success': False, 'message': 'Email and password are required'}), 400
 
         email = data['email']
         password = data['password']
-        email = data['email']
-        password = data['password']
 
-        merchant = merchant_instance.getMerchantByEmail(email)
         merchant = merchant_instance.getMerchantByEmail(email)
 
         if merchant and bcrypt.checkpw(password.encode('utf-8'), merchant['merch_pass'].encode('utf-8')):
-            session['merch_id'] = merchant['merch_id']
+            
+            access_token = create_access_token(
+                identity=email,
+                additional_claims={'merch_id':merchant['merch_id']}
+            )
+
             audit_trail_controller.log_action('POST', '/merchant/login', f"Merchant {email} logged in successfully")
-            return jsonify({'success': True, 'message': 'Login successful', 'merchant': {'merch_id': merchant['merch_id']}}), 200
+            
+            return jsonify({
+                'success': True, 
+                'message': 'Login successful', 
+                'merchant': {'merch_id': merchant['merch_id']},
+                'access_token': access_token,   
+                'refresh_token': create_refresh_token(identity=email)
+                }), 200
         else:
             audit_trail_controller.log_action('POST', '/merchant/login', f"Failed login attempt for email: {email}")
             return jsonify({'success': False, 'message': 'Invalid email or password'}), 401
@@ -66,26 +75,26 @@ def loginMerchant():
 
 # Fetch Merchant Profile Endpoint
 @merchantBlueprint.route('/profile', methods=['GET'])
+@jwt_required()
 def profile():
     try:
-        if 'merch_id' not in session:
+        user_identity = get_jwt_identity()
+        validateUser = merchant_instance.validateTokenEmail(user_identity)
+
+        if not validateUser:
             audit_trail_controller.log_action('GET', '/merchant/profile', "Unauthorized access attempt")
             return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+        
+        merch_id = get_jwt()['merch_id']
 
-        merchant = merchant_instance.getMerchantByID(session['merch_id'])
-        merchant = merchant_instance.getMerchantByID(session['merch_id'])
+        merchant = merchant_instance.getMerchantByID(merch_id)
 
         if merchant:
-            audit_trail_controller.log_action('GET', '/merchant/profile', f"Retrieved profile for merchant ID {session['merch_id']}")
+            audit_trail_controller.log_action('GET', '/merchant/profile', f"Retrieved profile for merchant ID {merch_id}")
             return jsonify(merchant), 200
         else:
-            audit_trail_controller.log_action('GET', '/merchant/profile', f"Merchant ID {session['merch_id']} not found")
+            audit_trail_controller.log_action('GET', '/merchant/profile', f"Merchant {merch_id} not found")
             return jsonify({'success': False, 'message': 'Merchant not found'}), 404
-
-    except Exception as e:
-        audit_trail_controller.log_action('GET', '/profile', f"Unexpected error: {e}")
-        print(f"Error fetching merchant profile: {e}")
-        return jsonify({'success': False, 'message': 'An unexpected error occurred while fetching the profile'}), 500
 
     except Exception as e:
         audit_trail_controller.log_action('GET', '/profile', f"Unexpected error: {e}")
@@ -94,9 +103,19 @@ def profile():
 
 # Logout Merchant Endpoint
 @merchantBlueprint.route('/logout', methods=['POST'])
+@jwt_required()
 def logout():
     try:
-        merch_id = session.get('merch_id')
+
+        user_identity = get_jwt_identity()
+        validateUser = merchant_instance.validateTokenEmail(user_identity)
+
+        if not validateUser:
+            audit_trail_controller.log_action('POST', '/merchant/logout', "Unauthorized access attempt")
+            return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+        
+        merch_id = get_jwt()['merch_id']
+
         session.clear()
         audit_trail_controller.log_action('POST', '/merchant/logout', f"Merchant ID {merch_id} logged out successfully")
         return jsonify({'success': True, 'message': 'Logged out successfully'}), 200
@@ -106,19 +125,25 @@ def logout():
         return jsonify({'success': False, 'message': 'An unexpected error occurred during logout'}), 500
 
 @merchantBlueprint.route('/viewTransactionHistory', methods=['GET'])
+@jwt_required()
 def viewTransactionHistory():
     try:
-        if 'merch_id' not in session:
+        user_identity = get_jwt_identity()
+        validateUser = merchant_instance.validateTokenEmail(user_identity)
+
+        if not validateUser:
             audit_trail_controller.log_action('GET', '/merchant/viewTransactionHistory', "Unauthorized access attempt")
             return jsonify({'success': False, 'message': 'Unauthorized access'}), 401
+        
+        merch_id = get_jwt()['merch_id']
 
-        transactionHistory = merchant_instance.viewPaymentRecordByMerchId(session['merch_id'])
+        transactionHistory = merchant_instance.viewPaymentRecordByMerchId(merch_id)
 
         if not transactionHistory:
-            audit_trail_controller.log_action('GET', '/merchant/viewTransactionHistory', f"No transaction history found for merchant ID {session['merch_id']}")
+            audit_trail_controller.log_action('GET', '/merchant/viewTransactionHistory', f"No transaction history found for merchant ID {merch_id}")
             return jsonify({'success': False, 'message': 'No transaction history found'}), 404
 
-        audit_trail_controller.log_action('GET', '/merchant/viewTransactionHistory', f"Transaction history retrieved for merchant ID {session['merch_id']}")
+        audit_trail_controller.log_action('GET', '/merchant/viewTransactionHistory', f"Transaction history retrieved for merchant ID {merch_id}")
         return jsonify(transactionHistory), 200
 
     except Exception as e:

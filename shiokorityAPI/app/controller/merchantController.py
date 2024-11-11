@@ -18,3 +18,6 @@ class MerchantController:
     
     def viewPaymentRecordByMerchId(self, merch_id):
         return Transaction().viewPaymentRecordByMerchId(merch_id)
+    
+    def validateTokenEmail(self, email):
+        return Merchant().validateTokenEmail(email)
