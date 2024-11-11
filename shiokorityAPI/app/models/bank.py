@@ -11,7 +11,7 @@ class Bank():
         try:
             with connection.cursor() as cursor:
 
-                sql = """SELECT * FROM Transaction_Record;"""
+                sql = """SELECT * FROM Transaction_Record ORDER BY transaction_record_id DESC;"""
                 cursor.execute(sql)
                 result = cursor.fetchall()
                 connection.commit()
@@ -29,7 +29,7 @@ class Bank():
         try:
             with connection.cursor() as cursor:
 
-                sql = """SELECT * FROM Transaction_History;"""
+                sql = """SELECT * FROM Transaction_History ORDER BY transaction_record_id DESC;"""
                 cursor.execute(sql)
                 result = cursor.fetchall()
                 connection.commit()
@@ -47,7 +47,7 @@ class Bank():
         try:
             with connection.cursor() as cursor:
 
-                sql = """SELECT * FROM Transaction;"""
+                sql = """SELECT * FROM Transaction ORDER BY transaction_id DESC;"""
                 cursor.execute(sql)
                 result = cursor.fetchall()
                 connection.commit()
