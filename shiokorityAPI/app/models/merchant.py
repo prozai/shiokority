@@ -187,4 +187,21 @@ class Merchant:
         except pymysql.MySQLError as e:
             print(f"Error fetching merchant: {e}")
             return None
-        
+    
+    def validateTokenEmail(self, email):
+        # Validate token email
+        try:
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
+            with connection.cursor() as cursor:
+                sql_query = "SELECT * FROM Merchant WHERE merch_email = %s and merch_status = 1"
+                cursor.execute(sql_query, (email,))
+                merchant = cursor.fetchone()
+
+                if not merchant:
+                    return False  # No merchant found
+
+                return True  # Merchant found
+
+        except pymysql.MySQLError as e:
+            print(f"Error validating token email: {e}")
+            return False

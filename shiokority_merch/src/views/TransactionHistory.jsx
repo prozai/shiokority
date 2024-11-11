@@ -16,6 +16,10 @@ const TransactionHistory = () => {
     }
   };
 
+  const formatDateTime = (dateStr) => {
+    return dateStr.replace(' GMT', '')
+  }
+
   useEffect(() => {
     fetchTransactionHistory();
   }, []);
@@ -81,7 +85,7 @@ const TransactionHistory = () => {
                           <span className="text-gray-600">Date & Time</span>
                         </div>
                         <span className="text-gray-900 font-medium">
-                          {new Date(transaction.payment_record_date_created).toLocaleString()}
+                          {formatDateTime(transaction.payment_record_date_created)}
                         </span>
                       </div>
 
