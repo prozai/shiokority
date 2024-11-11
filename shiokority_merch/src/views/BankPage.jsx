@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { Loader2 } from 'lucide-react';
 
 function TransactionDashboard() {
@@ -32,7 +32,7 @@ function TransactionDashboard() {
           endpoint = 'bank/view_transaction';
       }
         
-      const response = await axios.get(endpoint);
+      const response = await api.get(endpoint);
       setData(response.data);
     } catch (error) {
       setError('Failed to fetch data');

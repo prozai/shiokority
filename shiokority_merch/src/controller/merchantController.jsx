@@ -32,30 +32,6 @@ class merchantController {
     }
   }
 
-  // Update the merchant's profile
-  static async updateProfile(data) {
-    try {
-      return await Merchant.updateProfile(data);
-    } catch (error) {
-      throw new Error('Unable to update profile');
-    }
-  }
-
-    // Check if merchant is logged in
-  static isLoggedIn() {
-      return Merchant.isLoggedIn();
-  }
-
-  // Handle sending payments
-  static async processPayment(merch_email, amount) {
-    try {
-      const response = await Merchant.processPayment(merch_email, amount);
-      return response;
-    } catch (error) {
-      throw new Error('Payment failed');
-    }
-  }
-
   // Handle fetching merchant transactions and balance
   static async getTransactionHistory() {
     return await Merchant.getTransactionHistory();
