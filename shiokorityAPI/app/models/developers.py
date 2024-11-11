@@ -5,6 +5,7 @@ from flask import current_app, g
 import bcrypt
 from pymysql.err import MySQLError
 import base64
+from ..auth.databaseConnection import getDBConnection
 
 class Developers():
     
@@ -204,8 +205,8 @@ class Developers():
 
                 with connection.cursor() as cursor:
                     sql_query = """
-                    INSERT INTO Developer_API (api_id, api_key, iv, signature, public_key, api_status, date_created, date_updated_on, dev_id)
-                    VALUES (UUID(), %s, %s, %s, %s, TRUE, NOW(), NOW(), %s)
+                    INSERT INTO Developer_API (api_key, iv, signature, public_key, api_status, date_created, date_updated_on, dev_id)
+                    VALUES (%s, %s, %s, %s, TRUE, NOW(), NOW(), %s)
                     """
                     cursor.execute(sql_query, (ciphertext, iv, signature, public_key, dev_id))
                     connection.commit()
@@ -217,25 +218,21 @@ class Developers():
             return False
 
     def get_api_keys(self, dev_id):
+
+        connection = getDBConnection(current_app.config['DEV_SCHEMA'])
         try:
-            with pymysql.connect(
-                host=current_app.config['MYSQL_HOST'],
-                user=current_app.config['MYSQL_USER'],
-                password=current_app.config['MYSQL_PASSWORD'],
-                database=current_app.config['DEV_SCHEMA'],
-                cursorclass=pymysql.cursors.DictCursor
-            ) as connection:
-                with connection.cursor() as cursor:
-                    # Fetch API keys, public key, created date, and status for the given developer
-                    sql_query = """
-                    SELECT api_id, api_key, api_status, date_created, public_key
-                    FROM Developer_API
-                    WHERE dev_id = %s
-                    """
-                    cursor.execute(sql_query, (dev_id,))
-                    api_keys = cursor.fetchall()
-                    
-                    return api_keys
+            
+            with connection.cursor() as cursor:
+                # Fetch API keys, public key, created date, and status for the given developer
+                sql_query = """
+                SELECT api_id, api_key, api_status, date_created, public_key
+                FROM Developer_API
+                WHERE dev_id = %s
+                """
+                cursor.execute(sql_query, (dev_id,))
+                api_keys = cursor.fetchall()
+                
+                return api_keys
 
         except MySQLError as e:
             print(f"Database error fetching API keys: {e}")
@@ -267,4 +264,23 @@ class Developers():
 
         except pymysql.MySQLError as e:
             print(f"Database error during API key deletion: {e}")
+            return False
+    
+    def validateTokenEmail(self, email):
+        connection = getDBConnection(current_app.config['DEV_SCHEMA'])
+        try:
+            
+            with connection.cursor() as cursor:
+                sql_query = '''
+                    SELECT dev_id
+                    FROM Developer
+                    WHERE dev_email = %s
+                '''
+                cursor.execute(sql_query, (email,))
+                user = cursor.fetchone()
+                if not user:
+                    return False
+                return True
+        except Exception as e:
+            print(f"Error validating token email: {e}")
             return False
