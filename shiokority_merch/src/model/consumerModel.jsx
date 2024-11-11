@@ -1,12 +1,4 @@
-import axios from 'axios';
-
-// Create an axios instance with default config
-const api = axios.create({
-  baseURL: '', 
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+import api from '../services/api';
 
 class Consumer {
   // Register a new consumer
@@ -22,9 +14,10 @@ class Consumer {
   // Login consumer
   static async loginConsumer(data) {
     try {
-      const response = await api.post('/consumer/login-consumer', data, { withCredentials: true });
-      localStorage.setItem('isConsumerLoggedIn', response.data.success); // Save token or session management
-      localStorage.setItem('cust_token', response.data.token); // Save token or session management
+      const response = await api.post('/consumer/login-consumer', data);
+      localStorage.setItem('isConsumerLoggedIn', response.data.success); 
+      localStorage.setItem('access_token', response.data.access_token); // Save token or session management
+      localStorage.setItem('refresh_token', response.data.refresh_token); 
       localStorage.setItem('cust_id', response.data.customer.cust_id);
       return response.data;
     } catch (error) {
@@ -34,9 +27,10 @@ class Consumer {
 
   static async logoutConsumer() {
     try {
-      await api.post('/consumer/logout-consumer', {}, { withCredentials: true });
-      localStorage.removeItem('cust_token');
-      localStorage.setItem('cust_id');
+      await api.post('/consumer/logout-consumer', {});
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('cust_id');
       localStorage.removeItem('isConsumerLoggedIn');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -67,8 +61,7 @@ class Consumer {
   //Added by lu
   static async getMerchantData() {
     try {
-      const response = await fetch('/consumer/view-merchant');
-      // const merchantsData = await response.json();
+      const response = await api.get('/consumer/view-merchant');
       return response.data;
       // Map only the merchant IDs
       // return merchantsData.map((merchant) => merchant.merch_id);

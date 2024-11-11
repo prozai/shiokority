@@ -27,3 +27,6 @@ class ConsumerController():
 
     def get_merchant_data(self):
         return Merchant().getMerchantData()
+    
+    def validateTokenEmail(self, email):
+        return Consumer().validateTokenEmail(email)
