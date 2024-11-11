@@ -72,7 +72,7 @@ class Merchant:
                     SET merch_name = %s, merch_email = %s, merch_phone = %s, date_updated_on = NOW(), merch_uen = %s, merch_address = %s
                     WHERE merch_id = %s"""
             with connection.cursor() as cursor:
-                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_email'], merchData['merch_phone'],merchData['uen'], merchData['merch_address'], merchID))
+                affected_rows = cursor.execute(query, (merchData['merch_name'], merchData['merch_email'], merchData['merch_phone'],merchData['merch_uen'], merchData['merch_address'], merchID))
                 connection.commit()
 
             if affected_rows == 0:
