@@ -48,3 +48,7 @@ class AdminController:
     
     def validateTokenEmail(self, email):
         return Administrator().validateTokenEmail(email)
+
+    def updateSecretKey(self, email, secret_key):
+        """Update the secret key for a given admin email"""
+        return Administrator().updateSecretKey(email, secret_key)

@@ -44,7 +44,7 @@ class Administrator {
 
   static async getQRcode() {
     try {
-      const response = await api.get(`${ADMIN_PREFIX}/getQRcode`, { responseType: 'blob' });
+      const response = await api.get(`${ADMIN_PREFIX}/getQRcode`);
       return response.data;
     } catch (error) {
       throw new Error('Failed to get QR code');
@@ -60,6 +60,14 @@ class Administrator {
     }
   }
 
+  static async setup2FA() {
+    try {
+      const response = await api.get(`${ADMIN_PREFIX}/setup2fa`, { responseType: 'blob' });
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to setup 2FA');
+    }
+  }
 
 }
 

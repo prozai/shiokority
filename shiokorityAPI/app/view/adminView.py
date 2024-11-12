@@ -4,6 +4,7 @@ from ..controller.administratorController import AdminController
 from ..controller.auditTrailController import AuditTrailController
 from ..auth.TOTP import generate_totp_uri, create_qr_code, generate_secret, encrypt_secret, decrypt_secret, get_totp_token
 from flask_jwt_extended import create_access_token, create_refresh_token,jwt_required, get_jwt_identity, get_jwt
+import base64
 
 adminBlueprint = Blueprint('adminBlueprint', __name__)
 
@@ -360,22 +361,68 @@ def submitUserUpdate(user_id):
 @adminBlueprint.route('/getQRcode', methods=['GET'])
 @jwt_required()
 def getQRcode():
-    # need get secret key from database
+    try:
+        # Get user identity and validate
+        user_identity = get_jwt_identity()
+        validateUser = admin_controller.validateTokenEmail(user_identity)
 
-    user_identity = get_jwt_identity()
-    validateUser = admin_controller.validateTokenEmail(user_identity)
+        if not validateUser:
+            audit_trail_controller.log_action('GET', '/admin/getQRcode', "Unauthorized access")
+            return jsonify(success=False, message="Unauthorized access"), 401
 
-    if not validateUser:
-        audit_trail_controller.log_action('GET', '/admin/getQRcode', "Unauthorized access")
-        return jsonify(success=False, message="Unauthorized access"), 401
+        # Get user's current secret key
+        user = admin_controller.getAdminTokenByEmail(user_identity)
+        
+        # If no secret key exists or can't be decrypted, generate a new one
+        secret_key = None
+        if user and user['admin_secret_key']:
+            secret_key = decrypt_secret(user['admin_secret_key'])
+        
+        if not secret_key:
+            # Generate new secret key
+            secret_key = generate_secret()
+            if not secret_key:
+                audit_trail_controller.log_action('GET', '/admin/getQRcode', "Failed to generate secret key")
+                return jsonify(success=False, message="Failed to generate secret key"), 500
+            
+            # Encrypt and save the new secret key
+            encrypted_secret = encrypt_secret(secret_key)
+            if not encrypted_secret:
+                audit_trail_controller.log_action('GET', '/admin/getQRcode', "Failed to encrypt secret key")
+                return jsonify(success=False, message="Failed to encrypt secret key"), 500
+                
+            # Update in database
+            if not admin_controller.updateSecretKey(user_identity, encrypted_secret):
+                audit_trail_controller.log_action('GET', '/admin/getQRcode', "Failed to save secret key")
+                return jsonify(success=False, message="Failed to save secret key"), 500
 
-    user = admin_controller.getAdminTokenByEmail(user_identity)
-    
-    totp_uri = generate_totp_uri(user_identity, decrypt_secret(user['admin_secret_key']))
-    qr_code = create_qr_code(totp_uri)
+        # Generate TOTP URI
+        totp_uri = generate_totp_uri(user_identity, secret_key)
+        if not totp_uri:
+            audit_trail_controller.log_action('GET', '/admin/getQRcode', "Failed to generate TOTP URI")
+            return jsonify(success=False, message="Failed to generate TOTP URI"), 500
 
-    audit_trail_controller.log_action('GET', '/admin/getQRcode', f"QR code generated for {user_identity}")
-    return send_file(qr_code, mimetype='image/png')
+        # Create QR code
+        qr_code = create_qr_code(totp_uri)
+        if not qr_code:
+            audit_trail_controller.log_action('GET', '/admin/getQRcode', "Failed to create QR code")
+            return jsonify(success=False, message="Failed to create QR code"), 500
+
+        # Convert QR code to base64 for sending with JSON
+        qr_code.seek(0)
+        qr_base64 = base64.b64encode(qr_code.read()).decode('utf-8')
+
+        audit_trail_controller.log_action('GET', '/admin/getQRcode', f"QR code and secret key generated for {user_identity}")
+        return jsonify({
+            'success': True,
+            'qr_code': qr_base64,
+            'secret_key': secret_key
+        }), 200
+
+    except Exception as e:
+        audit_trail_controller.log_action('GET', '/admin/getQRcode', f"Unexpected error: {str(e)}")
+        print(f"Error generating QR code: {str(e)}")
+        return jsonify(success=False, message="An unexpected error occurred"), 500
 
 @adminBlueprint.route('/getSecretKey', methods=['GET'])
 @jwt_required()
@@ -422,9 +469,64 @@ def verify2FA():
 
 # This is the endpoint to get the secret key to insert into the database
 @adminBlueprint.route('/get-key', methods=['GET'])
+@jwt_required()
 def getKeyToInsert():
-    secret_key = encrypt_secret(generate_secret())
-    return jsonify(secret_key=secret_key)
+    try:
+        # Validate user
+        user_identity = get_jwt_identity()
+        validateUser = admin_controller.validateTokenEmail(user_identity)
+
+        if not validateUser:
+            audit_trail_controller.log_action('GET', '/admin/get-key', "Unauthorized access")
+            return jsonify(success=False, message="Unauthorized access"), 401
+
+        # Generate and encrypt secret key
+        secret_key = encrypt_secret(generate_secret())
+        
+        if not secret_key:
+            audit_trail_controller.log_action('GET', '/admin/get-key', "Failed to generate secret key")
+            return jsonify(success=False, message="Failed to generate secret key"), 500
+
+        audit_trail_controller.log_action('GET', '/admin/get-key', f"Secret key generated successfully for {user_identity}")
+        return jsonify(success=True, secret_key=secret_key), 200
+
+    except Exception as e:
+        audit_trail_controller.log_action('GET', '/admin/get-key', f"Unexpected error: {str(e)}")
+        print(f"Error generating secret key: {str(e)}")
+        return jsonify(success=False, message="An unexpected error occurred"), 500
+
+@adminBlueprint.route('/setup2fa', methods=['GET'])
+@jwt_required()
+def setup2fa():
+    try:
+        user_identity = get_jwt_identity()
+        validateUser = admin_controller.validateTokenEmail(user_identity)
+
+        if not validateUser:
+            audit_trail_controller.log_action('GET', '/admin/setup2fa', "Unauthorized access")
+            return jsonify(success=False, message="Unauthorized access"), 401
+
+        user = admin_controller.getAdminTokenByEmail(user_identity)
+        
+        if user['admin_mfa_enabled']:
+            audit_trail_controller.log_action('GET', '/admin/setup2fa', f"2FA already enabled for {user_identity}")
+            return jsonify(success=False, message="2FA is already enabled"), 400
+
+        # Generate new secret key if not exists
+        if not user['admin_secret_key']:
+            secret_key = encrypt_secret(generate_secret())
+            admin_controller.updateSecretKey(user_identity, secret_key)
+            user['admin_secret_key'] = secret_key
+
+        totp_uri = generate_totp_uri(user_identity, decrypt_secret(user['admin_secret_key']))
+        qr_code = create_qr_code(totp_uri)
+        
+        audit_trail_controller.log_action('GET', '/admin/setup2fa', f"2FA setup initiated for {user_identity}")
+        return send_file(qr_code, mimetype='image/png')
+
+    except Exception as e:
+        audit_trail_controller.log_action('GET', '/admin/setup2fa', f"Error setting up 2FA: {str(e)}")
+        return jsonify(success=False, message="Failed to setup 2FA"), 500
 
 @adminBlueprint.route('/getAllAuditTrailLogs', methods=['GET'])
 @jwt_required()
@@ -498,3 +600,4 @@ def refresh():
             'message': 'Token refresh failed',
             'error': str(e)
         }), 401
+

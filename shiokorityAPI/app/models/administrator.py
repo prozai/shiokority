@@ -109,3 +109,19 @@ class Administrator():
         except Exception as e:
             print(f"Unexpected error during login validation: {str(e)}")
             return False
+
+    def updateSecretKey(self, email, secret_key):
+        connection = getDBConnection(current_app.config['ADMIN_SCHEMA'])
+        try:
+            with connection.cursor() as cursor:
+                sql_query = '''
+                    UPDATE Admin
+                    SET admin_secret_key = %s
+                    WHERE admin_email = %s
+                '''
+                cursor.execute(sql_query, (secret_key, email))
+                connection.commit()
+                return True
+        except Exception as e:
+            print(f"Error updating secret key: {str(e)}")
+            return False

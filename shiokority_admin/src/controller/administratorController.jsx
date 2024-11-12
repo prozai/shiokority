@@ -88,7 +88,14 @@ class AdministratorController {
   static async getSecretKey() {
     return await Administrator.getSecretKey();
   }
-  
+
+  static async setup2FA() {
+    try {
+      return await Administrator.setup2FA();
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
 };
 
 export default AdministratorController;
