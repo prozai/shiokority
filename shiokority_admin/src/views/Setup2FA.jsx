@@ -16,14 +16,16 @@ function Setup2FA() {
 
   const fetchSetupInfo = async () => {
     try {
-      const secretResponse = await AdministratorController.getSecretKey();
-      setSecretKey(secretResponse.secret_key);
-
-      const qrResponse = await AdministratorController.getQRcode();
-      const imageUrl = URL.createObjectURL(qrResponse);
-      setQrCodeUrl(imageUrl);
-
-      setStatus('');
+      const response = await AdministratorController.getQRcode();
+      if (response.success) {
+        // Create URL for QR code image from base64
+        const imageUrl = `data:image/png;base64,${response.qr_code}`;
+        setQrCodeUrl(imageUrl);
+        setSecretKey(response.secret_key);
+        setStatus('');
+      } else {
+        setStatus('Failed to fetch 2FA setup info: ' + response.message);
+      }
     } catch (error) {
       setStatus('Failed to fetch 2FA setup info: ' + error.message);
     }
