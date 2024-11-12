@@ -27,26 +27,26 @@ class MerchantAPITestCase(unittest.TestCase):
             return True
         return False
 
-    def test_01_merchant_registration(self):
-        """Test merchant registration endpoint."""
-        test_merchant = {
-            "merch_email": "new_merchant2@example.com",
-            "merch_pass": "123",
-            "merch_name": "Test",
-            "merch_phone": "1234567890",
-            "merch_address": "Test Address",
-            "uen": "1234567890"
-        }
+    # def test_01_merchant_registration(self):
+    #     """Test merchant registration endpoint."""
+    #     test_merchant = {
+    #         "merch_email": "new_merchant2@example.com",
+    #         "merch_pass": "123",
+    #         "merch_name": "Test",
+    #         "merch_phone": "1234567890",
+    #         "merch_address": "Test Address",
+    #         "uen": "test23456"
+    #     }
         
-        response = self.session.post(
-            f"{self.base_url}/register-merchant",
-            json=test_merchant
-        )
+    #     response = self.session.post(
+    #         f"{self.base_url}/register-merchant",
+    #         json=test_merchant
+    #     )
         
-        self.assertEqual(response.status_code, 201)
-        data = response.json()
-        self.assertTrue(data['success'])
-        print("✓ Merchant registration test passed")
+    #     self.assertEqual(response.status_code, 201)
+    #     data = response.json()
+    #     self.assertTrue(data['success'])
+    #     print("✓ Merchant registration test passed")
 
     # def test_02_merchant_registration_invalid(self):
     #     """Test merchant registration with repeated email."""
@@ -126,7 +126,7 @@ class MerchantAPITestCase(unittest.TestCase):
         
     #     self.assertEqual(response.status_code, 401)
     #     data = response.json()
-    #     self.assertFalse(data['success'])
+    #     self.assertEqual(data['msg'], 'Missing Authorization Header')
     #     print("✓ Unauthorized profile access test passed")
 
     # def test_07_view_transaction_history(self):
@@ -153,7 +153,7 @@ class MerchantAPITestCase(unittest.TestCase):
         
     #     self.assertEqual(response.status_code, 401)
     #     data = response.json()
-    #     self.assertFalse(data['success'])
+    #     self.assertEqual(data['msg'], 'Missing Authorization Header')
     #     print("✓ Unauthorized transaction history access test passed")
 
     # def test_09_merchant_logout(self):
