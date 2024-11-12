@@ -158,7 +158,7 @@ class AdminAPITestCase(unittest.TestCase):
             "merch_email": "updated@example.com",
             "merch_address": "Updated Address",
             "merch_phone": "9876543210",
-            "uen": "test-uen-444"
+            "merch_uen": "test-uen-444"
         }
         
         headers = {
