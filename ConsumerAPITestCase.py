@@ -9,21 +9,21 @@ class ConsumerAPITestCase(unittest.TestCase):
         self.base_url = "https://api.shiokority.online/consumer"
         self.session = requests.Session()
         self.consumer_credentials = {
-            "email": "usertest@example.com",  # Replace with test consumer credentials
+            "email": "usertest@example.com",
             "password": "123"
         }
-        # Store session token after login
-        self.session_token = None
+        # Store JWT token
+        self.access_token = None
         
     def login(self):
-        """Helper method to log in and get session token."""
+        """Helper method to log in and get JWT token."""
         response = self.session.post(
             f"{self.base_url}/login-consumer",
             json=self.consumer_credentials
         )
         if response.status_code == 200:
-            # Store session cookies for subsequent requests
-            self.session_token = self.session.cookies.get_dict()
+            data = response.json()
+            self.access_token = data['access_token']
             return True
         return False
 
@@ -79,6 +79,8 @@ class ConsumerAPITestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertTrue(data['success'])
+        self.assertIn('access_token', data)
+        self.assertIn('refresh_token', data)
         print("✓ Consumer login test passed")
 
     def test_04_consumer_login_invalid(self):
@@ -100,9 +102,16 @@ class ConsumerAPITestCase(unittest.TestCase):
 
     def test_05_view_profile(self):
         """Test viewing consumer profile endpoint."""
-        self.login()  # Ensure we're logged in
+        self.login()
         
-        response = self.session.get(f"{self.base_url}/profile-consumer")
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        
+        response = self.session.get(
+            f"{self.base_url}/profile-consumer",
+            headers=headers
+        )
         
         self.assertEqual(response.status_code, 200)
         profile = response.json()
@@ -131,8 +140,13 @@ class ConsumerAPITestCase(unittest.TestCase):
             "uen":"53339185K"
         }
         
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+
         response = self.session.post(
             f"{self.base_url}/send-payment",
+            headers=headers,
             json=payment_data
         )
         
@@ -153,8 +167,13 @@ class ConsumerAPITestCase(unittest.TestCase):
             "amount": "100.00"
         }
         
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+
         response = self.session.post(
             f"{self.base_url}/send-payment",
+            headers=headers,
             json=payment_data
         )
         
@@ -175,32 +194,51 @@ class ConsumerAPITestCase(unittest.TestCase):
             "amount": "100.00"
         }
         
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+
         response = self.session.post(
             f"{self.base_url}/send-payment",
+            headers=headers,
             json=payment_data
         )
         
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertFalse(data['success'])
-        print("✓ Invalid UEN payment test passed")
+        print("✓ Invalid card information test passed")
 
-    def test_09_view_merchants(self):
+    def test_10_view_merchants(self):
         """Test viewing merchant list endpoint."""
         self.login()
         
-        response = self.session.get(f"{self.base_url}/view-merchant")
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+
+        response = self.session.get(
+            f"{self.base_url}/view-merchant",
+            headers=headers
+        )
         
         self.assertEqual(response.status_code, 200)
         merchants = response.json()
         self.assertIsInstance(merchants, list)
         print("✓ View merchants test passed")
 
-    def test_10_consumer_logout(self):
+    def test_11_consumer_logout(self):
         """Test consumer logout endpoint."""
         self.login()
         
-        response = self.session.post(f"{self.base_url}/logout-consumer")
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+
+        response = self.session.post(
+            f"{self.base_url}/logout-consumer",
+            headers=headers
+        )
         
         self.assertEqual(response.status_code, 200)
         data = response.json()
