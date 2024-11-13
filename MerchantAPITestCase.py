@@ -30,7 +30,7 @@ class MerchantAPITestCase(unittest.TestCase):
     def test_01_merchant_registration(self):
         """Test merchant registration endpoint."""
         test_merchant = {
-            "merch_email": "new_merchant2@example.com",
+            "merch_email": "new_merchant@example.com",
             "merch_pass": "123",
             "merch_name": "Test",
             "merch_phone": "1234567890",

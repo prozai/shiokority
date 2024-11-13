@@ -61,7 +61,7 @@ class DeveloperAPITestCase(unittest.TestCase):
             json=test_developer
         )
         
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertFalse(data['success'])
         print("✓ Duplicate registration test passed")
