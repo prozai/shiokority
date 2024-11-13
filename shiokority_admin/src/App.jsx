@@ -20,7 +20,11 @@ const ProtectedRoute = () => {
 function App() {
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Login />} />
+      
+      {/* Protected Merchant Routes */}
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/user-management" element={<ViewManagement />} />
@@ -32,7 +36,6 @@ function App() {
         <Route path="/verify2FA" element={<Verify2FA />} />
         <Route path="/auditTrail" element={<AuditTrail />} />
       </Route>
-      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
