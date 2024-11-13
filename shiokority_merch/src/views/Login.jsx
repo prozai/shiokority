@@ -79,6 +79,15 @@ const Login = () => {
             Create New Account
           </button>
         </p>
+        <div className="text-center mt-4 border-t pt-4">
+          <p className="text-gray-600 mb-2">Are you a consumer?</p>
+          <button 
+            onClick={() => navigate('/login-consumer')}
+            className="bg-gray-100 text-[#153247] font-bold py-2 px-6 rounded-full hover:bg-gray-200 w-full"
+          >
+            Go to Consumer Login
+          </button>
+        </div>
       </div>
     </div>
   );
