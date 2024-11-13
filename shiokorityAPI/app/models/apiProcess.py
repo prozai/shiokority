@@ -99,7 +99,7 @@ class ApiProcess():
             # if the bank process payment is not successful, insert the payment history and update the payment status
             isUpdated, message = self.afterProcessToBank(paymentRecordId, 'failed', data['cardNumber'], merchId, bank_transactionRecordId, transactionId, paymentId)
 
-            return isUpdated, message
+            return False, message
         
 
         # if the bank process payment is successful, insert the payment history and update the payment status
