@@ -7,7 +7,7 @@ import qrcode
 import io
 from cryptography.fernet import Fernet, InvalidToken
 import hashlib
-from config import config
+from shiokorityAPI.config import config
 
 ENCRYPTION_KEY = config['default'].ENCRYPTION_KEY
 cipher_suite = Fernet(ENCRYPTION_KEY) 
