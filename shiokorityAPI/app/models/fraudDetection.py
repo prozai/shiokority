@@ -24,7 +24,7 @@ class FraudDetection():
     
     def _check_daily_total(self, user_id, new_amount):
         """Check if daily total spending is suspicious"""
-        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
+        connection = getDBConnection('shiokority_api')
 
         try:
             with connection.cursor() as cursor:
@@ -52,7 +52,7 @@ class FraudDetection():
     
     def _check_transaction_frequency(self, user_id):
         """Check hourly and daily transaction counts"""
-        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
+        connection = getDBConnection('shiokority_api')
 
         try:
             with connection.cursor() as cursor:
@@ -96,7 +96,7 @@ class FraudDetection():
         Check if transaction amount is significantly different from user's pattern
         Uses 200% of average as threshold - simpler and more intuitive
         """
-        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
+        connection = getDBConnection('shiokority_api')
 
         try:
             with connection.cursor() as cursor:
@@ -130,7 +130,7 @@ class FraudDetection():
 
     def _check_rapid_transactions(self, user_id, timestamp):
         """Check for suspiciously rapid consecutive transactions"""
-        connection = getDBConnection(current_app.config['SHIOKORITY_API_SCHEMA'])
+        connection = getDBConnection('shiokority_api')
 
         try:
             with connection.cursor() as cursor:
@@ -178,7 +178,7 @@ class FraudDetection():
         return True, "Transaction authorized"
     
     def check_login_attempts(self, adminEmail):
-        connection = getDBConnection(current_app.config['ADMIN_SCHEMA'])
+        connection = getDBConnection('shiokority_admin')
 
         try:
             with connection.cursor() as cursor:
@@ -209,7 +209,7 @@ class FraudDetection():
             return False, "Authentication error. This login has been stopped."
         
     def update_login_attempts(self, adminEmail, status):
-        connection = getDBConnection(current_app.config['ADMIN_SCHEMA'])
+        connection = getDBConnection('shiokority_admin')
 
         try:
             with connection.cursor() as cursor:
