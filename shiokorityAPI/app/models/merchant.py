@@ -32,7 +32,7 @@ class Merchant:
         try:
             connection = getDBConnection(current_app.config['PAY_SCHEMA'])
             with connection.cursor() as cursor:
-                sqlQuery = "SELECT * FROM Merchant"
+                sqlQuery = "SELECT * FROM Merchant WHERE merch_status = 1"
                 cursor.execute(sqlQuery)
                 merchant = cursor.fetchall()
 
