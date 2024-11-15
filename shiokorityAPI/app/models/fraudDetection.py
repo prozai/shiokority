@@ -73,7 +73,7 @@ class FraudDetection():
                 SELECT COUNT(*) as transactions_today
                 FROM Transaction
                 WHERE cust_id = %s
-                AND DATE(transaction_date_created) = CURDATE();
+                AND transaction_date_created >= NOW() - INTERVAL 24 HOUR;
                 """
                 
                 cursor.execute(sqlQuery, (user_id))

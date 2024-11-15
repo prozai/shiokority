@@ -32,7 +32,7 @@ class Merchant:
         try:
             connection = getDBConnection(current_app.config['PAY_SCHEMA'])
             with connection.cursor() as cursor:
-                sqlQuery = "SELECT * FROM Merchant WHERE merch_status = 1"
+                sqlQuery = "SELECT * FROM Merchant"
                 cursor.execute(sqlQuery)
                 merchant = cursor.fetchall()
 
@@ -205,3 +205,17 @@ class Merchant:
         except pymysql.MySQLError as e:
             print(f"Error validating token email: {e}")
             return False
+    
+    def getActiveMerchant(self):
+        try:
+            connection = getDBConnection(current_app.config['PAY_SCHEMA'])
+            with connection.cursor() as cursor:
+                sqlQuery = "SELECT * FROM Merchant WHERE merch_status = 1"
+                cursor.execute(sqlQuery)
+                merchant = cursor.fetchall()
+
+                return merchant  # Merchant data fetched successfully
+
+        except pymysql.MySQLError as e:
+            print(f"Error fetching merchant data: {e}")
+            return False  # Return False in case of an error

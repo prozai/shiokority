@@ -26,7 +26,7 @@ class ConsumerController():
         return ApiProcess().validateUEN(uen)
 
     def get_merchant_data(self):
-        return Merchant().getMerchantData()
+        return Merchant().getActiveMerchant()
     
     def validateTokenEmail(self, email):
         return Consumer().validateTokenEmail(email)

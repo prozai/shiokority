@@ -110,16 +110,16 @@ def dayFraudTransaction(custId):
     finally:
         connection.close()
 
-def dayHourlyFraudTransaction(custId):
+def dayHourlyFraudTransaction(custId, loop):
 
     connection = getDBConnection('shiokority_api')
     try:
         with connection.cursor() as cursor:
             # Get current date at midnight
-            today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            today = datetime.now().replace(month=11, day=15,hour=0, minute=0, second=0, microsecond=0)
 
             # Create transactions for each hour
-            for hour in range(10):
+            for hour in range(loop):
                 # Create timestamp for this hour
                 timestamp = today + timedelta(hours=hour)
 
@@ -159,9 +159,10 @@ def dayHourlyFraudTransaction(custId):
         connection.close()
 
 if __name__ == '__main__':
-    # for i in range(0,5):
-    #     insertHourlyFraudTransaction(1)
+    for i in range(0,5):
+        insertHourlyFraudTransaction(9)
 
-    dayHourlyFraudTransaction(1)
+    dayHourlyFraudTransaction(10, 10)
+    dayHourlyFraudTransaction(11, 5)
     
     

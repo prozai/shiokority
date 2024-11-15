@@ -246,7 +246,7 @@ def addUser():
             audit_trail_controller.log_action('POST', '/admin/add-user', f"Bad Request with data: {data}")
             raise BadRequest("No input data provided")
 
-        createdUser = admin_controller.addUser(data)
+        createdUser = admin_controller.addadmiUser(data)
 
         if not createdUser:
             audit_trail_controller.log_action('POST', '/admin/add-user', f"Failed to add user with data: {data}")
